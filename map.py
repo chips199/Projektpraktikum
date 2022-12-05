@@ -16,7 +16,7 @@ class Map():
 
         # load background
         try:
-            self.background = pygame.image.load(uri + r'\backgound.png')
+            self.background = pygame.image.load(uri + r'\background.png')
             self.background.convert()
         except:
             self.background = None
@@ -85,5 +85,5 @@ class Map():
         else:
             screen.fill((41, 41, 41))
 
-        for img in self.staticimages:
-            screen.blit(img, canvas_rec)
+        #for img in self.staticimages:
+        #    screen.blit(img, canvas_rec)

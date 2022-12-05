@@ -12,7 +12,7 @@ from pip._internal import configuration
 wrk_dir = os.path.abspath(os.path.dirname(__file__))
 config_file = wrk_dir + r'\configuration.json'
 test_map = wrk_dir + r"\src\testmap"
-
+basic_map = wrk_dir + r"\src\basicmap"
 
 class Game:
 
@@ -31,7 +31,7 @@ class Game:
         # self.player3 = Player(150,150, (0,255,255))
         # self.player4 = Player(200,200, (255,0,255))
         self.canvas = canvas.Canvas(self.width, self.height, str(self.net.id) + " Testing...")
-        self.map = Map(self, test_map)
+        self.map = Map(self, basic_map)
 
     def run(self):
         clock = pygame.time.Clock()
@@ -211,10 +211,10 @@ class Game:
                     return erg
                 if self.collision_with_other_players(bottem_right):
                     return erg
-                if self.map.is_coliding(top_right):
-                    return erg
-                if self.map.is_coliding(bottem_right):
-                    return erg
+                #if self.map.is_coliding(top_right):
+                #    return erg
+                #if self.map.is_coliding(bottem_right):
+                #    return erg
                 erg += 1
         elif dirn == 1:
             # left
