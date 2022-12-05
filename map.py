@@ -30,8 +30,11 @@ class Map():
                 continue
 
             # load image for displaying
-            img = pygame.image.load(simg)
-            img.convert()
+            try:
+                img = pygame.image.load(simg)
+                img.convert()
+            except:
+                continue
             print(str(simg) + ' erfolgreich in pygame geladen')
             self.staticimages.append(img)
 
@@ -51,8 +54,11 @@ class Map():
                 continue
 
             # load image for displaying
-            img = pygame.image.load(nsimg)
-            img.convert()
+            try:
+                img = pygame.image.load(nsimg)
+                img.convert()
+            except:
+                continue
             print(str(nsimg) + ' erfolgreich in pygame geladen')
             self.staticimages.append(img)
 
