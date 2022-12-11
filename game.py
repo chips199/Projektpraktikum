@@ -176,7 +176,8 @@ class Game:
                 erg.append(sample[p]["mouse"])
             return erg
 
-    def pointInRec(self, point, p):
+    @staticmethod
+    def pointInRec(point, p):
         x1, y1, w, h = p
         x2, y2 = x1 + w, y1 + h
         x, y = point
@@ -189,8 +190,8 @@ class Game:
         # checks if a point collides with any other player
         otherPlayers = self.playerList[:int(self.net.id)] + self.playerList[int(self.net.id) + 1:]
         for p in otherPlayers:
-            rec = pygame.Rect(p.x, p.y, p.width, p.height)
-            if rec.collidepoint(point):
+            # rec = pygame.Rect(p.x, p.y, p.width, p.height)
+            if self.pointInRec(point, (p.x, p.y, p.width, p.height)):
                 return True
         return False
 
@@ -199,7 +200,7 @@ class Game:
         # only check the direction in which the player wants to move
         top_left = [player.x, player.y]
         top_right = [player.x + player.width, player.y]
-        bottem_left = [player.x, player.y + player.width]
+        bottem_left = [player.x, player.y + player.height]
         bottem_right = [player.x + player.width, player.y + player.height]
         erg = 0
         if dirn == 0:
@@ -211,10 +212,10 @@ class Game:
                     return erg
                 if self.collision_with_other_players(bottem_right):
                     return erg
-                #if self.map.is_coliding(top_right):
-                #    return erg
-                #if self.map.is_coliding(bottem_right):
-                #    return erg
+                if self.map.is_coliding(top_right):
+                    return erg
+                if self.map.is_coliding(bottem_right):
+                    return erg
                 erg += 1
         elif dirn == 1:
             # left
@@ -231,7 +232,7 @@ class Game:
                     return erg
                 erg += 1
         elif dirn == 2:
-            # down
+            # up
             for i in range(distance):
                 top_left[1] -= 1
                 top_right[1] -= 1
@@ -245,7 +246,9 @@ class Game:
                     return erg
                 erg += 1
         else:
-            # up
+            # down
+            bottem_left[0] += 1
+            bottem_right[0] -= 1
             for i in range(distance):
                 bottem_left[1] += 1
                 bottem_right[1] += 1
