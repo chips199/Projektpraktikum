@@ -1,4 +1,5 @@
 ![Tests](https://github.com/mCodingLLC/SlapThatLikeButton-TestingStarterProject/actions/workflows/tests.yml/badge.svg)
+
 # Network Game Tutorial
 
 This is the code for my network game tutorial series on YouTube.
