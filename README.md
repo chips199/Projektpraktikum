@@ -1,3 +1,4 @@
+![Tests](https://github.com/mCodingLLC/SlapThatLikeButton-TestingStarterProject/actions/workflows/tests.yml/badge.svg)
 # Network Game Tutorial
 
 This is the code for my network game tutorial series on YouTube.
@@ -16,4 +17,3 @@ You can also run Network Game Tutorial in Gitpod, a free online dev environment 
 If you're intersted in a paid subscription with GitPod use the coupon code: **TECHWITHTIM19**
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/techwithtim/Network-Game-Tutorial/blob/master/run.py)
-![Tests](https://github.com/mCodingLLC/SlapThatLikeButton-TestingStarterProject/actions/workflows/tests.yml/badge.svg)
