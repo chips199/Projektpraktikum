@@ -5,4 +5,4 @@ def inc(x):
 
 
 def test_answer():
-    pytest.assert inc(3) == 4
+    assert inc(3) == 4
