@@ -2,6 +2,8 @@ import datetime
 
 import pygame
 
+import weapon
+
 
 class Player():
     width, height = 50, 100
@@ -10,12 +12,15 @@ class Player():
     status_jump = 0
     is_connected = False
     mousepos = (0, 0)
+    weapon = weapon.Weapon(100, 10, 10, 100)
+    health = 100
 
     def __init__(self, startx, starty, color=(255, 0, 0)):
         self.x = startx
         self.y = starty
         self.velocity = 5
         self.color = color
+        self.weapon = weapon
 
     def draw(self, g):
         pygame.draw.rect(g, self.color, (self.x, self.y, self.width, self.height), 0)
@@ -41,3 +46,8 @@ class Player():
         self.move(2, h)
         self.status_jump += h
 
+    def hit(self):
+        self.weapon.durability -= 1
+
+    def beaten(self, weapon_enemy):
+        self.health -= weapon_enemy.damage

@@ -46,6 +46,33 @@ class Game:
                 if event.type == pygame.K_ESCAPE:
                     run = False
 
+                # Hit
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    # Check if Player can use his weapon
+                    if self.playerList[id].weapon.can_hit():
+                        # Check if an enemy player is in range
+                        for player in self.playerList:
+                            #  Do not beat your own player
+                            if player == self.playerList[id]:
+                                continue
+                            # Check if the player was hit
+                            # First check if the opponent is in range of the weapon
+                            # Then check if the player's mouse is on the opponent
+                            if player.x < self.playerList[id].x + self.playerList[id].width + self.playerList[
+                                id].weapon.distance \
+                                    and player.x + player.width > self.playerList[id].x - self.playerList[
+                                id].weapon.distance \
+                                    and player.y < self.playerList[id].y + self.playerList[id].height + self.playerList[
+                                id].weapon.distance \
+                                    and player.y + player.height > self.playerList[id].y - self.playerList[
+                                id].weapon.distance \
+                                    and player.x < self.playerList[id].mousepos[0] < player.x + player.width \
+                                    and player.y < self.playerList[id].mousepos[1] < player.y + player.height:
+                                # Draw damage from opponent
+                                player.beaten(self.playerList[id].weapon.damage)
+                                self.playerList[id].hit()
+                                break
+
             keys = pygame.key.get_pressed()
 
             if keys[pygame.K_d]:
