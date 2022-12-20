@@ -6,10 +6,10 @@ from typing import List
 
 
 class Map():
-    solid = list() # type: List[pygame.image]
-    solid_x_splited = list() # type: List[pygame.image]
-    solid_y_splited = list() # type: List[pygame.image]
-    staticimages = list() # type: List[pygame.image]
+    solid = list() # type: List[tuple]
+    solid_x_splited = list() # type: List[int]
+    solid_y_splited = list() # type: List[int]
+    staticimages = list() # type: List[pygame.Surface]
 
     def __init__(self, game, uri):
         self.game = game
