@@ -1,7 +1,7 @@
 import json
 import os
 import socket
-from _thread import *
+from _thread import start_new_thread
 import sys
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -21,7 +21,7 @@ s.listen(4)
 print("Waiting for a connection")
 
 currentId = 0
-config_file = os.path.abspath(os.path.dirname(__file__)) + '\configuration.json'
+config_file = os.path.abspath(os.path.dirname(__file__)) + r'\configuration.json'
 with open(config_file) as file:
     game_data = json.load(file)
 
@@ -53,6 +53,7 @@ def threaded_client(conn):
     print("Connection Closed")
     conn.close()
 
+    
 while True:
     conn, addr = s.accept()
     print("Connected to: ", addr)
