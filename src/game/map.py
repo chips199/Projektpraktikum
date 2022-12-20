@@ -3,14 +3,14 @@ import os
 import matplotlib.pyplot as plt
 import pygame
 from typing import List
-from typing import tuple
+from typing import Tuple
 
 
 class Map():
-    solid = list() # type: List[tuple]
+    solid = list() # type: List[Tuple]
     solid_x_splited = list() # type: List[List[int]]
     solid_y_splited = list() # type: List[List[int]]
-    staticimages = list() # type: List[pygame.Surface]
+    staticimages = list() # type: List[pygame.surface.Surface]
 
     def __init__(self, game, uri):
         self.game = game
