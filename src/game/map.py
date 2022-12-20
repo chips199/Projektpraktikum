@@ -2,6 +2,7 @@ import imageio.v3 as iio
 import os
 import matplotlib.pyplot as plt
 import pygame
+from typing import List
 
 
 class Map():
@@ -86,7 +87,7 @@ class Map():
 
     def draw(self, screen):
         canvas_rec = pygame.Rect(0, 0, self.game.width, self.game.height)
-        if typ(self.background) == pygame.Surface:
+        if type(self.background) == pygame.Surface:
             screen.blit(self.background, canvas_rec)
         else:
             screen.fill((41, 41, 41))
