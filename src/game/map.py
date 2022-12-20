@@ -7,7 +7,7 @@ from typing import Tuple
 
 
 class Map():
-    solid = list() # type: List[Tuple]
+    solid = list() # type: List[Tuple[int, int]]
     solid_x_splited = list() # type: List[List[int]]
     solid_y_splited = list() # type: List[List[int]]
     staticimages = list() # type: List[pygame.surface.Surface]
