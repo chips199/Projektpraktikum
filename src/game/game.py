@@ -4,13 +4,13 @@ import pygame
 import datetime
 import canvas
 from map import Map
-from src.game import player
+from src.game import player as Player
 from src.game.network import Network
 
 wrk_dir = os.path.abspath(os.path.dirname(__file__))
 config_file = wrk_dir + r'\configuration.json'
-test_map = wrk_dir + r"\src\testmap"
-basic_map = wrk_dir + r"\src\basicmap"
+test_map = wrk_dir + r"\..\testmap"
+basic_map = wrk_dir + r"\..\basicmap"
 
 class Game:
 
@@ -20,10 +20,10 @@ class Game:
         self.height = h
         with open(config_file) as file:
             config = json.load(file)
-        self.playerList = [player.Player(config['0']['position'][0], config['0']['position'][1], (0, 255, 0)),
-                           player.Player(config['1']['position'][0], config['1']['position'][1], (255, 255, 0)),
-                           player.Player(config['2']['position'][0], config['2']['position'][1], (0, 255, 255)),
-                           player.Player(config['3']['position'][0], config['3']['position'][1], (255, 0, 255))]
+        self.playerList = [Player.Player(config['0']['position'][0], config['0']['position'][1], (0, 255, 0)),
+                           Player.Player(config['1']['position'][0], config['1']['position'][1], (255, 255, 0)),
+                           Player.Player(config['2']['position'][0], config['2']['position'][1], (0, 255, 255)),
+                           Player.Player(config['3']['position'][0], config['3']['position'][1], (255, 0, 255))]
         # self.player = Player(50, 50, (0,255,0))
         # self.player2 = Player(100,100, (255,255,0))
         # self.player3 = Player(150,150, (0,255,255))
@@ -220,6 +220,20 @@ class Game:
         return False
 
     def nextToSolid(self, player, dirn, distance):
+        other_players = self.playerList[:int(self.net.id)] + self.playerList[int(self.net.id) + 1:]
+        simulated_player = Player.Player(player.x, player.y)
+        for i in range(distance):
+            erg = 0
+            simulated_player.move(dirn, 1)
+            if self.map.colides(simulated_player.solid):
+                return erg
+            for p in other_players:
+                if p.colides(simulated_player.solid):
+                    return erg
+                erg += 1
+        return erg
+
+    def nextToSolid1(self, player, dirn, distance):
         # checks in a direction for each pixel of the distance for collision and returns the remaining distance
         # only check the direction in which the player wants to move
         top_left = [player.x, player.y]
