@@ -17,4 +17,4 @@ You can also run Network Game Tutorial in Gitpod, a free online dev environment 
 
 If you're intersted in a paid subscription with GitPod use the coupon code: **TECHWITHTIM19**
 
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/techwithtim/Network-Game-Tutorial/blob/master/run.py)
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/chips199/Projektpraktikum/actions/workflows/tests.yml/badge.svg)
