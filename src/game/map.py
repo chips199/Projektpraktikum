@@ -21,7 +21,7 @@ class Map():
             self.background = pygame.image.load(uri + r'\background.png')
             self.background.convert()
         except:
-            self.background = "no image found"
+            self.background = "no image found"  # type: ignore[assignment]
 
         # load solid images and add solid pixels to list
         # print(self.directory + r'\solid')
