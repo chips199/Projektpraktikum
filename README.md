@@ -1,20 +1,9 @@
 ![Tests](https://github.com/mCodingLLC/SlapThatLikeButton-TestingStarterProject/actions/workflows/tests.yml/badge.svg)
 
-# Network Game Tutorial
+# Multiplayer PvP Spiel
 
-This is the code for my network game tutorial series on YouTube.
+Ein Multiplayer PvP Spiel, das wir im Rahmen des Projektpraktikumsmodul umsetzen.
 
-You can view the video tutorial on YouTube here: https://www.youtube.com/watch?v=_fx7FQ3SP0U&list=PLzMcBGfZo4-kR7Rh-7JCVDN8lm3Utumvq
-
-# Running The Game
-To run the game you will need to run an instane of *server.py* on one machine. Then you can run instances of *run.py* on other machines to connect.
-
-You will need to change the **server** address in both *server.py* and *network.py* to be the IPV4 address of your machine or the server ips you'll be using.
-
-# Run in Gitpod
-
-You can also run Network Game Tutorial in Gitpod, a free online dev environment for GitHub:
-
-If you're intersted in a paid subscription with GitPod use the coupon code: **TECHWITHTIM19**
+Die Umsetzung erfolgt in Python unter Verwendung von Pygame.
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/chips199/Projektpraktikum/actions/workflows/tests.yml/badge.svg)
