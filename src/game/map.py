@@ -2,13 +2,15 @@ import imageio.v3 as iio
 import os
 import matplotlib.pyplot as plt
 import pygame
+from typing import List
+from typing import Tuple
 
 
 class Map():
-    solid = list()
-    solid_x_splited = list()
-    solid_y_splited = list()
-    staticimages = list()
+    solid = list() # type: List[Tuple[int, int]]
+    solid_x_splited = list() # type: List[List[int]]
+    solid_y_splited = list() # type: List[List[int]]
+    staticimages = list() # type: List[pygame.surface.Surface]
 
     def __init__(self, game, uri):
         self.game = game
@@ -19,7 +21,7 @@ class Map():
             self.background = pygame.image.load(uri + r'\background.png')
             self.background.convert()
         except:
-            self.background = None
+            self.background = "no image found"  # type: ignore[assignment]
 
         # load solid images and add solid pixels to list
         # print(self.directory + r'\solid')
@@ -86,7 +88,7 @@ class Map():
 
     def draw(self, screen):
         canvas_rec = pygame.Rect(0, 0, self.game.width, self.game.height)
-        if self.background is not None:
+        if type(self.background) == pygame.Surface:
             screen.blit(self.background, canvas_rec)
         else:
             screen.fill((41, 41, 41))
