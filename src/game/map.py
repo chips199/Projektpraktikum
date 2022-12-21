@@ -12,6 +12,7 @@ class Map():
     solid_x_splited = list() # type: List[List[int]]
     solid_y_splited = list() # type: List[List[int]]
     staticimages = list() # type: List[pygame.surface.Surface]
+    player_uris = list() # type: List[str]
 
     def __init__(self, game, uri):
         self.game = game
@@ -23,6 +24,13 @@ class Map():
             self.background.convert()
         except:
             self.background = "no image found"
+
+        for filename in os.listdir(self.directory + r'\player'):
+            playerimg = os.path.join(self.directory + r'\player', filename)
+            if not os.path.isfile(playerimg):
+                print(str(playerimg) + ' is not a file')
+                continue
+            self.player_uris.append(playerimg)
 
         # load solid images and add solid pixels to list
         # print(self.directory + r'\solid')
@@ -57,23 +65,24 @@ class Map():
             for image in solid_images:
                 combinded_solid_image.blit(image, (0, 0))
             combinded_solid_image.convert_alpha()
-            edge_surface = pygame.transform.laplacian(combinded_solid_image).convert_alpha()
-            alpha_array = pygame.surfarray.pixels_alpha(edge_surface)
-            alpha_array.swapaxes(0,1)
+            self.edge_surface = pygame.transform.laplacian(combinded_solid_image).convert_alpha()
+            alpha_array = pygame.surfarray.pixels_alpha(self.edge_surface)
+            alpha_array = alpha_array.swapaxes(0, 1)
             for yi, y in enumerate(alpha_array):
                 for xi, x in enumerate(y):
                     # print(e1)
-                    if x > 200:
+                    if x > 100:
                         self.solid.append((xi, yi))
-            # Add surface borders
-            # horizontal edges
-            for x in range(self.game.width):
-                self.solid.append((x, 0))
-                self.solid.append((x, self.game.height))
-            # vertical edges
-            for y in range(self.game.height):
-                self.solid.append((0, y))
-                self.solid.append((self.game.width, y))
+        # Add surface borders
+        # horizontal edges
+        for x in range(self.game.width):
+            self.solid.append((x, 0))
+            self.solid.append((x, self.game.height))
+        # vertical edges
+        for y in range(self.game.height):
+            self.solid.append((0, y))
+            self.solid.append((self.game.width, y))
+
 
         # load unsolid images
         for filename in os.listdir(self.directory + r'\not_solid'):
@@ -111,8 +120,10 @@ class Map():
         # checks if a list of pixels intersects with the list of solid pixels of the map
         a = self.solid
         b = edge_array
-        a = list(map(lambda x: str(x[0]) + str(x[1]), a))
-        b = list(map(lambda x: str(x[0]) + str(x[1]), b))
+        a = list(map(lambda x: str(x[0]) + ',' + str(x[1]), a))
+        b = list(map(lambda x: str(x[0]) + ',' + str(x[1]), b))
+        #print(b)
+        #print(a)
         return len(np.intersect1d(a, b)) != 0
 
     def is_coliding(self, p):
@@ -135,6 +146,8 @@ class Map():
             screen.blit(self.background, canvas_rec)
             if len(self.staticimages) != 0:
                 screen.blit(self.static_objects_img, canvas_rec)
+                #screen.blit(self.edge_surface, canvas_rec)
+
         else:
             screen.fill((41, 41, 41))
 
