@@ -24,7 +24,7 @@ class Player():
         self.velocity = 5
         self.color = color
         self.weapon = weapon
-        self.solid = []
+        self.solid = []  # type: List[Tuple[int, int]]
         self.relativ_solids = []
         print(len(self.solid))
         if image is not None and len(self.solid) == 0:
@@ -113,11 +113,11 @@ class Player():
         # checks if a list of pixels intersects with the list of solid pixels of the player
         a = self.solid
         b = edge_array
-        a = list(map(lambda x: str(x[0]) + ',' + str(x[1]), a))
-        b = list(map(lambda x: str(x[0]) + ',' + str(x[1]), b))
+        c = list(map(lambda x: str(x[0]) + ',' + str(x[1]), a))
+        d = list(map(lambda x: str(x[0]) + ',' + str(x[1]), b))
         #print(b)
         #print(a)
-        return len(np.intersect1d(a, b)) != 0
+        return len(np.intersect1d(c, d)) != 0
 
     def jump(self, h):
         self.move(2, h)

@@ -8,11 +8,11 @@ from typing import Tuple
 
 
 class Map():
-    solid = list() # type: List[Tuple[int, int]]
-    solid_x_splited = list() # type: List[List[int]]
-    solid_y_splited = list() # type: List[List[int]]
-    staticimages = list() # type: List[pygame.surface.Surface]
-    player_uris = list() # type: List[str]
+    solid = list()  # type: List[Tuple[int, int]]
+    solid_x_splited = list()  # type: List[List[int]]
+    solid_y_splited = list()  # type: List[List[int]]
+    staticimages = list()  # type: List[pygame.surface.Surface]
+    player_uris = list()  # type: List[str]
 
     def __init__(self, game, uri):
         self.game = game
@@ -50,8 +50,8 @@ class Map():
             self.staticimages.append(img)
 
             # add solid Pixels
-            #col_img = iio.imread(simg)
-            #for yi, y in enumerate(col_img):
+            # col_img = iio.imread(simg)
+            # for yi, y in enumerate(col_img):
             #    for xi, x in enumerate(y):
             #        # print(e1)
             #        if x[3] > 200:
@@ -61,7 +61,7 @@ class Map():
         # use these to generate array of edge pixels and save it in solid.
         solid_images = self.staticimages.copy()
         if len(solid_images) != 0:
-            combinded_solid_image =  solid_images.pop()
+            combinded_solid_image = solid_images.pop()
             for image in solid_images:
                 combinded_solid_image.blit(image, (0, 0))
             combinded_solid_image.convert_alpha()
@@ -82,7 +82,6 @@ class Map():
         for y in range(self.game.height):
             self.solid.append((0, y))
             self.solid.append((self.game.width, y))
-
 
         # load unsolid images
         for filename in os.listdir(self.directory + r'\not_solid'):
@@ -114,17 +113,17 @@ class Map():
         # for i, point in enumerate(self.solid):
         #     self.solid_x_splited[(point[0] // 10)].append(i)
         #     self.solid_y_splited[(point[1] // 10)].append(i)
-        #print(self.solid_x_splited[159])
+        # print(self.solid_x_splited[159])
 
     def colides(self, edge_array):
         # checks if a list of pixels intersects with the list of solid pixels of the map
         a = self.solid
         b = edge_array
-        a = list(map(lambda x: str(x[0]) + ',' + str(x[1]), a))
-        b = list(map(lambda x: str(x[0]) + ',' + str(x[1]), b))
-        #print(b)
-        #print(a)
-        return len(np.intersect1d(a, b)) != 0
+        c = list(map(lambda x: str(x[0]) + ',' + str(x[1]), a))
+        d = list(map(lambda x: str(x[0]) + ',' + str(x[1]), b))
+        # print(b)
+        # print(a)
+        return len(np.intersect1d(c, d)) != 0
 
     def is_coliding(self, p):
         # x Group
@@ -146,10 +145,10 @@ class Map():
             screen.blit(self.background, canvas_rec)
             if len(self.staticimages) != 0:
                 screen.blit(self.static_objects_img, canvas_rec)
-                #screen.blit(self.edge_surface, canvas_rec)
+                # screen.blit(self.edge_surface, canvas_rec)
 
         else:
             screen.fill((41, 41, 41))
 
-        #for img in self.staticimages:
+        # for img in self.staticimages:
         #    screen.blit(img, canvas_rec)
