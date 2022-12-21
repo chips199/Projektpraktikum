@@ -42,7 +42,7 @@ class Player():
                             self.solid.append((xi + self.x, yi + self.y))
                             self.relativ_solids.append((xi, yi))
             except:
-                self.image = "no image found"
+                self.image = "no image found"  # type: ignore[assignment]
                 # horizontal edges
                 for x in range(self.width):
                     self.solid.append((x + self.x, self.y))
@@ -56,7 +56,7 @@ class Player():
                     self.solid.append((self.x + self.width, self.y + y))
                     self.relativ_solids.append((self.x + self.width, y))
         else:
-            self.image = "no image found"
+            self.image = "no image found"  # type: ignore[assignment]
             # horizontal edges
             for x in range(self.width):
                 self.solid.append((x + self.x, self.y))

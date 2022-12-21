@@ -23,7 +23,7 @@ class Map():
             self.background = pygame.image.load(uri + r'\background.png')
             self.background.convert()
         except:
-            self.background = "no image found"
+            self.background = "no image found"  # type: ignore[assignment]
 
         for filename in os.listdir(self.directory + r'\player'):
             playerimg = os.path.join(self.directory + r'\player', filename)
