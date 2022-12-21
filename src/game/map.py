@@ -1,3 +1,5 @@
+from itertools import repeat
+
 import imageio.v3 as iio
 import os
 import matplotlib.pyplot as plt
@@ -5,6 +7,8 @@ import numpy as np
 import pygame
 from typing import List
 from typing import Tuple
+
+import src.game.game as Game
 
 
 class Map():
@@ -119,8 +123,10 @@ class Map():
         # checks if a list of pixels intersects with the list of solid pixels of the map
         a = self.solid
         b = edge_array
-        c = list(map(lambda x: str(x[0]) + ',' + str(x[1]), a))
-        d = list(map(lambda x: str(x[0]) + ',' + str(x[1]), b))
+        #c = list(map(lambda x: str(x[0]) + ',' + str(x[1]), a))
+        #d = list(map(lambda x: str(x[0]) + ',' + str(x[1]), b))
+        c = list(map(Game.Game.coordToDezimal, a, repeat(self.game.width)))
+        d = list(map(Game.Game.coordToDezimal, b, repeat(self.game.width)))
         # print(b)
         # print(a)
         return len(np.intersect1d(c, d)) != 0

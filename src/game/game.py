@@ -28,16 +28,16 @@ class Game:
             config = json.load(file)
         if len(self.map.player_uris) == 4:
             self.playerList = [
-                Player.Player(config['0']['position'][0], config['0']['position'][1], self.map.player_uris[0]),
-                Player.Player(config['1']['position'][0], config['1']['position'][1], self.map.player_uris[1]),
-                Player.Player(config['2']['position'][0], config['2']['position'][1], self.map.player_uris[2]),
-                Player.Player(config['3']['position'][0], config['3']['position'][1], self.map.player_uris[3])]
+                Player.Player(config['0']['position'][0], config['0']['position'][1], self, self.map.player_uris[0]),
+                Player.Player(config['1']['position'][0], config['1']['position'][1], self, self.map.player_uris[1]),
+                Player.Player(config['2']['position'][0], config['2']['position'][1], self, self.map.player_uris[2]),
+                Player.Player(config['3']['position'][0], config['3']['position'][1], self, self.map.player_uris[3])]
         else:
             self.playerList = [
-                Player.Player(config['0']['position'][0], config['0']['position'][1], (0, 255, 0)),
-                Player.Player(config['1']['position'][0], config['1']['position'][1], (255, 255, 0)),
-                Player.Player(config['2']['position'][0], config['2']['position'][1], (0, 255, 255)),
-                Player.Player(config['3']['position'][0], config['3']['position'][1], (255, 0, 255))]
+                Player.Player(config['0']['position'][0], config['0']['position'][1], self, None, (0, 255, 0)),
+                Player.Player(config['1']['position'][0], config['1']['position'][1], self, None, (255, 255, 0)),
+                Player.Player(config['2']['position'][0], config['2']['position'][1], self, None, (0, 255, 255)),
+                Player.Player(config['3']['position'][0], config['3']['position'][1], self, None, (255, 0, 255))]
         # self.player = Player(50, 50, (0,255,0))
         # self.player2 = Player(100,100, (255,255,0))
         # self.player3 = Player(150,150, (0,255,255))
@@ -216,6 +216,10 @@ class Game:
             for p in sample:
                 erg.append(sample[p]["mouse"])
             return erg
+
+    @staticmethod
+    def coordToDezimal(coord, width):
+        return coord[0] + coord[1] * width
 
     def pointInRec(self, point, p):
         x1, y1, w, h = p

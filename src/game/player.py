@@ -1,4 +1,5 @@
 import datetime
+from itertools import repeat
 from typing import List, Tuple
 
 import matplotlib.pyplot as plt
@@ -6,6 +7,8 @@ import numpy as np
 import pygame
 
 import weapon
+import src.game.game as Game
+
 
 class Player():
     width, height = 50, 100
@@ -17,15 +20,15 @@ class Player():
     weapon = weapon.Weapon(100, 10, 10, 100)
     health = 100
 
-    def __init__(self, startx, starty, image=None, color=(255, 0, 0)):
+    def __init__(self, startx, starty, game, image=None, color=(255, 0, 0)):
         self.x = startx
         self.y = starty
+        self.game = game
         self.velocity = 5
         self.color = color
         self.weapon = weapon
         self.solid = []  # type: List[Tuple[int, int]]
         self.relativ_solids = []
-        print(len(self.solid))
         if image is not None and len(self.solid) == 0:
             try:
                 self.image = pygame.image.load(image).convert_alpha()
@@ -112,8 +115,10 @@ class Player():
         # checks if a list of pixels intersects with the list of solid pixels of the player
         a = self.solid
         b = edge_array
-        c = list(map(lambda x: str(x[0]) + ',' + str(x[1]), a))
-        d = list(map(lambda x: str(x[0]) + ',' + str(x[1]), b))
+        #c = list(map(lambda x: str(x[0]) + ',' + str(x[1]), a))
+        #d = list(map(lambda x: str(x[0]) + ',' + str(x[1]), b))
+        c = list(map(Game.Game.coordToDezimal, a, repeat(self.game.width)))
+        d = list(map(Game.Game.coordToDezimal, b, repeat(self.game.width)))
         #print(b)
         #print(a)
         return len(np.intersect1d(c, d)) != 0
