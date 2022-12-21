@@ -2,7 +2,6 @@ import json
 import os
 import pygame
 import datetime
-
 from matplotlib import pyplot as plt
 
 import canvas
