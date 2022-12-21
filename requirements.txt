@@ -1,1 +1,4 @@
-pygame
+imageio~=2.22.4
+matplotlib~=3.6.2
+pygame~=2.1.2
+setuptools~=60.2.0

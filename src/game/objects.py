@@ -2,7 +2,7 @@ import os
 
 import pygame
 
-from game import Game
+from src.game import game
 import imageio.v3 as iio
 
 
