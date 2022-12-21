@@ -2,15 +2,19 @@ import json
 import os
 import pygame
 import datetime
+from matplotlib import pyplot as plt
+
 import canvas
 from map import Map
-from src.game import player
+from src.game import player as Player
 from src.game.network import Network
+from src.game.weapon import Weapon
 
 wrk_dir = os.path.abspath(os.path.dirname(__file__))
 config_file = wrk_dir + r'\configuration.json'
-test_map = wrk_dir + r"\src\testmap"
-basic_map = wrk_dir + r"\src\basicmap"
+test_map = wrk_dir + r"\..\testmap"
+basic_map = wrk_dir + r"\..\basicmap"
+
 
 class Game:
 
@@ -18,18 +22,26 @@ class Game:
         self.net = Network()
         self.width = w
         self.height = h
+        self.canvas = canvas.Canvas(self.width, self.height, str(self.net.id) + " Testing...")
+        self.map = Map(self, basic_map)
         with open(config_file) as file:
             config = json.load(file)
-        self.playerList = [player.Player(config['0']['position'][0], config['0']['position'][1], (0, 255, 0)),
-                           player.Player(config['1']['position'][0], config['1']['position'][1], (255, 255, 0)),
-                           player.Player(config['2']['position'][0], config['2']['position'][1], (0, 255, 255)),
-                           player.Player(config['3']['position'][0], config['3']['position'][1], (255, 0, 255))]
+        if len(self.map.player_uris) == 4:
+            self.playerList = [
+                Player.Player(config['0']['position'][0], config['0']['position'][1], self.map.player_uris[0]),
+                Player.Player(config['1']['position'][0], config['1']['position'][1], self.map.player_uris[1]),
+                Player.Player(config['2']['position'][0], config['2']['position'][1], self.map.player_uris[2]),
+                Player.Player(config['3']['position'][0], config['3']['position'][1], self.map.player_uris[3])]
+        else:
+            self.playerList = [
+                Player.Player(config['0']['position'][0], config['0']['position'][1], (0, 255, 0)),
+                Player.Player(config['1']['position'][0], config['1']['position'][1], (255, 255, 0)),
+                Player.Player(config['2']['position'][0], config['2']['position'][1], (0, 255, 255)),
+                Player.Player(config['3']['position'][0], config['3']['position'][1], (255, 0, 255))]
         # self.player = Player(50, 50, (0,255,0))
         # self.player2 = Player(100,100, (255,255,0))
         # self.player3 = Player(150,150, (0,255,255))
         # self.player4 = Player(200,200, (255,0,255))
-        self.canvas = canvas.Canvas(self.width, self.height, str(self.net.id) + " Testing...")
-        self.map = Map(self, basic_map)
 
     def run(self):
         clock = pygame.time.Clock()
@@ -46,6 +58,33 @@ class Game:
                 if event.type == pygame.K_ESCAPE:
                     run = False
 
+                # Hit
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    # Check if Player can use his weapon
+                    if self.playerList[id].weapon.can_hit():
+                        # Check if an enemy player is in range
+                        for player in self.playerList:
+                            #  Do not beat your own player
+                            if player == self.playerList[id]:
+                                continue
+                            # Check if the player was hit
+                            # First check if the opponent is in range of the weapon
+                            # Then check if the player's mouse is on the opponent
+                            if player.x < self.playerList[id].x + self.playerList[id].width + self.playerList[
+                                id].weapon.distance \
+                                    and player.x + player.width > self.playerList[id].x - self.playerList[
+                                id].weapon.distance \
+                                    and player.y < self.playerList[id].y + self.playerList[id].height + self.playerList[
+                                id].weapon.distance \
+                                    and player.y + player.height > self.playerList[id].y - self.playerList[
+                                id].weapon.distance \
+                                    and player.x < self.playerList[id].mousepos[0] < player.x + player.width \
+                                    and player.y < self.playerList[id].mousepos[1] < player.y + player.height:
+                                # Draw damage from opponent
+                                player.beaten(self.playerList[id].weapon.damage)
+                                self.playerList[id].hit()
+                                break
+
             keys = pygame.key.get_pressed()
 
             if keys[pygame.K_d]:
@@ -58,7 +97,7 @@ class Game:
             if keys[pygame.K_SPACE] and self.playerList[id].last_jump + datetime.timedelta(
                     seconds=1) <= datetime.datetime.now() and self.playerList[id].status_jump == 0:
                 if self.playerList[id].y >= self.playerList[id].height_jump and self.nextToSolid(self.playerList[id], 3,
-                                                                                                 1) == 0:
+                                                                                                 1) < 2:
                     self.playerList[id].jump(10)
                     self.playerList[id].last_jump = datetime.datetime.now()
             if self.playerList[id].status_jump > 0:
@@ -81,6 +120,10 @@ class Game:
             pos = self.parse_pos(reply)
             for i, position in enumerate(pos):
                 self.playerList[i].x, self.playerList[i].y = position
+            for p in self.playerList:
+                if p == self.playerList[id]:
+                    continue
+                p.refresh_solids()
             # synchronise Online stati
             online = self.parse_online(reply)
             for i, on in enumerate(online):
@@ -193,6 +236,33 @@ class Game:
         return False
 
     def nextToSolid(self, player, dirn, distance):
+        other_players = self.playerList[:int(self.net.id)] + self.playerList[int(self.net.id) + 1:]
+        simulated_solid = player.solid.copy()
+        erg = 0
+        for i in range(distance):
+            v = 1
+            delta_x = 0
+            delta_y = 0
+            if dirn == 0:
+                delta_x += v
+            elif dirn == 1:
+                delta_x -= v
+            elif dirn == 2:
+                delta_y -= v
+            else:
+                delta_y += v
+            simulated_solid = list(map(lambda p: (p[0] + delta_x, p[1] + delta_y), simulated_solid))
+            if self.map.colides(simulated_solid):
+                #print('map colision')
+                return erg
+            for p in other_players:
+                if p.colides(simulated_solid):
+                    #print('player colision')
+                    return erg
+            erg += 1
+        return erg
+
+    def nextToSolid1(self, player, dirn, distance):
         # checks in a direction for each pixel of the distance for collision and returns the remaining distance
         # only check the direction in which the player wants to move
         top_left = [player.x, player.y]
@@ -209,9 +279,9 @@ class Game:
                     return erg
                 if self.collision_with_other_players(bottem_right):
                     return erg
-                #if self.map.is_coliding(top_right):
+                # if self.map.is_coliding(top_right):
                 #    return erg
-                #if self.map.is_coliding(bottem_right):
+                # if self.map.is_coliding(bottem_right):
                 #    return erg
                 erg += 1
         elif dirn == 1:
@@ -268,6 +338,3 @@ class Game:
                 dist.append(p.y - player.y - player.height)
         dist = list(filter(lambda x: x >= 0, dist))
         return min(dist)
-
-
-
