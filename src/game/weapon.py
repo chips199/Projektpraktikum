@@ -1,5 +1,4 @@
-
-import datetime
+from datetime import datetime
 
 
 class Weapon:
@@ -9,7 +8,7 @@ class Weapon:
         self.damage = damage
         self.durability = durability
         self.cooldown = cooldown
-        self.last_hit = datetime.datetime.now()
+        self.last_hit = int(round(datetime.now().timestamp()))
 
     def can_hit(self):
         """
@@ -18,4 +17,8 @@ class Weapon:
          - Shelf life not yet used up
          - Cooldown must have expired
         """
-        return self.durability > 0 and self.last_hit + self.cooldown < datetime.datetime.now()
+        return self.durability > 0 and self.last_hit + self.cooldown <= int(round(datetime.now().timestamp()))
+
+    def hit(self):
+        self.durability -= 1
+        self.last_hit = int(round(datetime.now().timestamp()))
