@@ -123,10 +123,23 @@ class Player():
         self.status_jump += h
 
     def hit(self):
+        """
+        :return None
+        When the player hits, the weapon's durability is reduced
+        """
         self.weapon.durability -= 1
 
     def beaten(self, weapon_enemy):
+        """
+        player was beaten
+        player is subtracted the damage of the weapon and it is checked if the player died during the attack
+        :param weapon_enemy The weapon with which the player was hit
+        :return None
+        """
         self.health -= weapon_enemy.damage
+        if self.health <= 0:
+            print("Player died")
+            self.health = 0
 
     def refresh_solids(self):
         self.solid = list(map(lambda p: (p[0] + self.x, p[1] + self.y), self.relativ_solids))
