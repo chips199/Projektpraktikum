@@ -14,7 +14,7 @@ class Player():
     status_jump = 0
     is_connected = False
     mousepos = (0, 0)
-    weapon = weapon.Weapon(100, 10, 10, 100)
+    user_weapon = weapon.Weapon(100, 15, 15, 1)
     health = 100
 
     def __init__(self, startx, starty, image=None, color=(255, 0, 0)):
@@ -22,7 +22,7 @@ class Player():
         self.y = starty
         self.velocity = 5
         self.color = color
-        self.weapon = weapon
+        # self.user_weapon =
         self.solid = []  # type: List[Tuple[int, int]]
         self.relativ_solids = []
         print(len(self.solid))
@@ -122,11 +122,25 @@ class Player():
         self.move(2, h)
         self.status_jump += h
 
-    def hit(self):
-        self.weapon.durability -= 1
-
     def beaten(self, weapon_enemy):
+        """
+        player was beaten
+        player is subtracted the damage of the weapon and it is checked if the player died during the attack
+        :param weapon_enemy The weapon with which the player was hit
+        :return None
+        """
         self.health -= weapon_enemy.damage
+        if self.health <= 0:
+            print("Player died")
+            # TODO: Anzeige auf Screen und Spieler ausblenden?
+            self.health = 0
+
+    def is_alive(self):
+        """
+        Returns whether the player is still alive
+        :return: boolean: True: Is alive;  False: Isn't alive
+        """
+        return self.health > 0
 
     def refresh_solids(self):
         self.solid = list(map(lambda p: (p[0] + self.x, p[1] + self.y), self.relativ_solids))
