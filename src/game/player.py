@@ -122,7 +122,6 @@ class Player():
         self.move(2, h)
         self.status_jump += h
 
-
     def beaten(self, weapon_enemy):
         """
         player was beaten
