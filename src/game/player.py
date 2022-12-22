@@ -124,8 +124,8 @@ class Player():
 
     def hit(self):
         """
-        :return None
         When the player hits, the weapon's durability is reduced
+        :return None
         """
         self.weapon.durability -= 1
 
@@ -139,6 +139,7 @@ class Player():
         self.health -= weapon_enemy.damage
         if self.health <= 0:
             print("Player died")
+            # TODO: Anzeige auf Screen und Spieler ausblenden?
             self.health = 0
 
     def refresh_solids(self):
