@@ -18,7 +18,7 @@ class Object:
             except:
                 self.img = iio.imread(os.path.abspath(os.path.dirname(__file__)) + r'\ImgNotFound.png')
         else:
-            self.img = pygame.Rect(self.pos, self.size)
+            self.img = pygame.Rect(self.pos, self.size) # type: ignore[assignment]
         self.color = color
 
     def is_coliding(self, point):
