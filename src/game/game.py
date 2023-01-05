@@ -214,14 +214,6 @@ class Game:
                 erg.append(sample[p]["mouse"])
             return erg
 
-    def pointInRec(self, point, p):
-        x1, y1, w, h = p
-        x2, y2 = x1 + w, y1 + h
-        x, y = point
-        if x in range(x1, x2):
-            if y in range(y1, y2):
-                return True
-        return False
 
     def collision_with_other_players(self, point):
         # checks if a point collides with any other player

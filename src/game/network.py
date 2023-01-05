@@ -11,11 +11,13 @@ class Network:
         # ipv4 address. This feild will be the same for all your clients.
         self.port = 5555
         self.addr = (self.host, self.port)
-        self.id = self.connect()
+        self.gid, self.id = self.connect()
 
     def connect(self):
         self.client.connect(self.addr)
-        return self.client.recv(2048).decode()
+        msg = self.client.recv(2048).decode()
+        gid, pid = msg.split(',')
+        return gid, pid
 
     def send(self, data):
         """
