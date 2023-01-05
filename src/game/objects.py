@@ -12,12 +12,9 @@ class Object:
         self.canvas = c
         self.pos = pos
         self.size = size
-        if (img is not None):
-            try:
-                self.img = iio.imread(img)
-            except:
-                self.img = iio.imread(os.path.abspath(os.path.dirname(__file__)) + r'\ImgNotFound.png')
-        else:
+        try:
+            self.ima = pygame.image.load(img).convert_alpha()
+        except:
             self.img = pygame.Rect(self.pos, self.size) # type: ignore[assignment]
         self.color = color
 
@@ -25,7 +22,7 @@ class Object:
         pass
 
     def draw(self):
-        if type(self.img) == pygame.Rect:
-            pygame.draw.rect(self.canvas, self.color, self.img)
+        if type(self.img) == pygame.Surface:
+            self.canvas.get_canvas().blit(self.image, player_rec)
         else:
-            print('Noch keine Ahnung wie das geht')
+            pygame.draw.rect(self.canvas, self.color, self.img)
