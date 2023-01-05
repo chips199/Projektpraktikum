@@ -249,7 +249,7 @@ class Game:
             else:
                 delta_y += v
             simulated_solid = list(map(lambda p: (p[0] + delta_x, p[1] + delta_y), simulated_solid))
-            if self.map.colides(simulated_solid):
+            if self.map.collides(simulated_solid):
                 #print('map colision')
                 return erg
             for p in other_players:

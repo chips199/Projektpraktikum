@@ -20,13 +20,13 @@ class Map():
 
         # load background
         try:
-            self.background = pygame.image.load(uri + r'\background.png')
+            self.background = pygame.image.load(uri + r'/background.png')
             self.background.convert()
         except:
             self.background = "no image found"  # type: ignore[assignment]
 
-        for filename in os.listdir(self.directory + r'\player'):
-            playerimg = os.path.join(self.directory + r'\player', filename)
+        for filename in os.listdir(self.directory + r'/player'):
+            playerimg = os.path.join(self.directory + r'/player', filename)
             if not os.path.isfile(playerimg):
                 print(str(playerimg) + ' is not a file')
                 continue
@@ -34,8 +34,8 @@ class Map():
 
         # load solid images and add solid pixels to list
         # print(self.directory + r'\solid')
-        for filename in os.listdir(self.directory + r'\solid'):
-            simg = os.path.join(self.directory + r'\solid', filename)
+        for filename in os.listdir(self.directory + r'/solid'):
+            simg = os.path.join(self.directory + r'/solid', filename)
             if not os.path.isfile(simg):
                 print(str(simg) + ' is not a file')
                 continue
@@ -84,8 +84,8 @@ class Map():
             self.solid.append((self.game.width, y))
 
         # load unsolid images
-        for filename in os.listdir(self.directory + r'\not_solid'):
-            nsimg = os.path.join(self.directory + r'\not_solid', filename)
+        for filename in os.listdir(self.directory + r'/not_solid'):
+            nsimg = os.path.join(self.directory + r'/not_solid', filename)
             if not os.path.isfile(nsimg):
                 print(str(nsimg) + ' is not a file')
                 continue
@@ -115,7 +115,7 @@ class Map():
         #     self.solid_y_splited[(point[1] // 10)].append(i)
         # print(self.solid_x_splited[159])
 
-    def colides(self, edge_array):
+    def collides(self, edge_array):
         # checks if a list of pixels intersects with the list of solid pixels of the map
         a = self.solid
         b = edge_array
@@ -125,23 +125,9 @@ class Map():
         # print(a)
         return len(np.intersect1d(c, d)) != 0
 
-    def is_coliding(self, p):
-        # x Group
-        x_ps = self.solid_x_splited[p[0] // 10]
-        # y Group
-        y_ps = self.solid_x_splited[p[1] // 10]
-        # Intersektion of the two groups provides max 100 points to check
-        candidates = set(x_ps).intersection(set(y_ps))
-        for i in candidates:
-            if self.solid[i] == p:
-                # returns True when Point inside solid Object
-                return True
-        # returns True when point outside Gamearea
-        return not pygame.Rect(0, 0, self.game.width, self.game.height).collidepoint(p)
-
     def draw(self, screen):
         canvas_rec = pygame.Rect(0, 0, self.game.width, self.game.height)
-        if type(self.background) == pygame.Surface:
+        if isinstance(self.background, pygame.Surface):
             screen.blit(self.background, canvas_rec)
             if len(self.staticimages) != 0:
                 screen.blit(self.static_objects_img, canvas_rec)
