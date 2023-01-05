@@ -3,7 +3,6 @@ import os
 import pygame
 
 from src.game import game
-import imageio.v3 as iio
 
 
 class Object:
@@ -15,14 +14,16 @@ class Object:
         try:
             self.ima = pygame.image.load(img).convert_alpha()
         except:
-            self.img = pygame.Rect(self.pos, self.size) # type: ignore[assignment]
+            self.ima = "no image found"  # type: ignore[assignment]
         self.color = color
 
     def is_coliding(self, point):
         pass
 
     def draw(self):
-        if type(self.img) == pygame.Surface:
-            self.canvas.get_canvas().blit(self.image, player_rec)
+        # draw Object
+        obj_rec = pygame.Rect(self.pos, self.size)
+        if type(self.ima) == pygame.Surface:
+            self.canvas.get_canvas().blit(self.ima, obj_rec)
         else:
-            pygame.draw.rect(self.canvas, self.color, self.img)
+            pygame.draw.rect(self.canvas.get_canvas(), self.color, obj_rec, 0)
