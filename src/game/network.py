@@ -14,11 +14,16 @@ class Network:
         self.id = self.connect()
 
     def connect(self):
+        """
+        establishes a connection with the server
+        :return: the first message from the server
+        """
         self.client.connect(self.addr)
         return self.client.recv(2048).decode()
 
     def send(self, data):
         """
+        sends data to the server
         :param data: str
         :return: str
         """

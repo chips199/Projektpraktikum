@@ -22,7 +22,6 @@ class Player():
         self.y = starty
         self.velocity = 5
         self.color = color
-        # self.user_weapon =
         self.solid = []  # type: List[Tuple[int, int]]
         self.relativ_solids = []
         print(len(self.solid))
@@ -35,9 +34,7 @@ class Player():
                 alpha_array = alpha_array.swapaxes(0, 1)
                 for yi, y in enumerate(alpha_array):
                     for xi, x in enumerate(y):
-                        # print(e1)
                         if x > 200:
-                            # print((xi + self.x, yi + self.y))
                             self.solid.append((xi + self.x, yi + self.y))
                             self.relativ_solids.append((xi, yi))
             except:
@@ -70,16 +67,19 @@ class Player():
                 self.relativ_solids.append((self.x + self.width, y))
 
     def draw(self, g):
+        """
+        displays a player to the canvas
+        :param g: pygame canvas
+        """
         # draw Player
         player_rec = pygame.Rect(self.x, self.y, self.width, self.height)
         if type(self.image) == pygame.Surface:
             g.blit(self.image, player_rec)
-            # g.blit(self.edge_surface, player_rec)
         else:
             pygame.draw.rect(g, self.color, player_rec, 0)
 
         # draw weapon
-        # ...
+        # ...wip...
 
     def move(self, dirn, v=-99):
         """
@@ -109,16 +109,22 @@ class Player():
         self.solid = list(map(lambda p: (p[0] + delta_x, p[1] + delta_y), self.solid))
 
     def colides(self, edge_array):
-        # checks if a list of pixels intersects with the list of solid pixels of the player
+        """
+        checks if a list of pixels intersects with the list of solid pixels of the player
+        :param edge_array:  list of tupels
+        :return: boolean if collides then true
+        """
         a = self.solid
         b = edge_array
         c = list(map(lambda x: str(x[0]) + ',' + str(x[1]), a))
         d = list(map(lambda x: str(x[0]) + ',' + str(x[1]), b))
-        #print(b)
-        #print(a)
         return len(np.intersect1d(c, d)) != 0
 
     def jump(self, h):
+        """
+        moves player upwards
+        :param h: hight of the jump
+        """
         self.move(2, h)
         self.status_jump += h
 
@@ -143,4 +149,7 @@ class Player():
         return self.health > 0
 
     def refresh_solids(self):
+        """
+        refreshes the solid list used when receiving player positions from server
+        """
         self.solid = list(map(lambda p: (p[0] + self.x, p[1] + self.y), self.relativ_solids))
