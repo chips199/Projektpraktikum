@@ -27,6 +27,7 @@ config_file = os.path.abspath(os.path.dirname(__file__)) + r'\configuration.json
 with open(config_file) as file:
     game_data = json.load(file)
 
+
 def threaded_client(conn):
     global currentId, game_data
     conn.send(str.encode(str(currentId)))

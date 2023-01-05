@@ -7,6 +7,7 @@ import pygame
 
 import weapon
 
+
 class Player():
     width, height = 50, 100
     last_jump = datetime.datetime.now()

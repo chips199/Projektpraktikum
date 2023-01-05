@@ -96,7 +96,6 @@ class Map():
                 self.static_objects_img.blit(image, (0, 0))
             self.static_objects_img.convert_alpha()
 
-
     def collides(self, edge_array):
         """
         calculates if a list of pixels colides with a map object
@@ -123,4 +122,3 @@ class Map():
 
         else:
             screen.fill((41, 41, 41))
-

@@ -83,10 +83,14 @@ class Game:
                                 # First check if the opponent is in range of the weapon
                                 # Then check if the player's mouse is on the opponent
                                 if player.x < self.playerList[id].x + self.playerList[id].width + self.playerList[
-                                    id].user_weapon.distance and player.x + player.width > self.playerList[id].x - self.playerList[
-                                    id].user_weapon.distance and player.y < self.playerList[id].y + self.playerList[id].height + self.playerList[
-                                    id].user_weapon.distance and player.y + player.height > self.playerList[id].y - self.playerList[
-                                    id].user_weapon.distance and player.x < self.playerList[id].mousepos[0] < player.x + player.width \
+                                    id].user_weapon.distance and player.x + player.width > self.playerList[id].x - \
+                                        self.playerList[
+                                            id].user_weapon.distance and player.y < self.playerList[id].y + \
+                                        self.playerList[id].height + self.playerList[
+                                    id].user_weapon.distance and player.y + player.height > self.playerList[id].y - \
+                                        self.playerList[
+                                            id].user_weapon.distance and player.x < self.playerList[id].mousepos[
+                                    0] < player.x + player.width \
                                         and player.y < self.playerList[id].mousepos[1] < player.y + player.height:
                                     # Draw damage from opponent
                                     player.beaten(self.playerList[id].user_weapon)
@@ -104,8 +108,9 @@ class Game:
                 # Jump
                 if keys[pygame.K_SPACE] and self.playerList[id].last_jump + datetime.timedelta(
                         seconds=1) <= datetime.datetime.now() and self.playerList[id].status_jump == 0:
-                    if self.playerList[id].y >= self.playerList[id].height_jump and self.nextToSolid(self.playerList[id], 3,
-                                                                                                     1) < 2:
+                    if self.playerList[id].y >= self.playerList[id].height_jump and self.nextToSolid(
+                            self.playerList[id], 3,
+                            1) < 2:
                         self.playerList[id].jump(10)
                         self.playerList[id].last_jump = datetime.datetime.now()
                 if self.playerList[id].status_jump > 0:
@@ -229,7 +234,6 @@ class Game:
                 erg.append(sample[p]["mouse"])
             return erg
 
-
     def nextToSolid(self, player, dirn, distance):
         """
         calculates the distance to the nearest object in one direction in a range
@@ -255,11 +259,11 @@ class Game:
                 delta_y += v
             simulated_solid = list(map(lambda p: (p[0] + delta_x, p[1] + delta_y), simulated_solid))
             if self.map.collides(simulated_solid):
-                #print('map colision')
+                # print('map colision')
                 return erg
             for p in other_players:
                 if p.colides(simulated_solid):
-                    #print('player colision')
+                    # print('player colision')
                     return erg
             erg += 1
         return erg
