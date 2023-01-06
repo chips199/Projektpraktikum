@@ -45,3 +45,12 @@ def test_draw(test_map):
     test_map.background = "no Surface"
     test_map.draw(screen)
     screen.fill.assert_called_with((41, 41, 41))
+
+
+def test_create_empty_map():
+    wrk_dir = os.path.os.path.dirname(__file__)
+    test_game = Mock()
+    test_game.height = 50
+    test_game.width = 50
+    empty_folder = wrk_dir + "/empty_mapinfo"
+    assert isinstance(game.map.Map(test_game, empty_folder), game.map.Map)
