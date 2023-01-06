@@ -52,5 +52,5 @@ def test_create_empty_map():
     test_game = Mock()
     test_game.height = 50
     test_game.width = 50
-    empty_folder = wrk_dir + "/empty_mapinfo"
+    empty_folder = wrk_dir + "/mock_filestructure"
     assert isinstance(game.map.Map(test_game, empty_folder), game.map.Map)
