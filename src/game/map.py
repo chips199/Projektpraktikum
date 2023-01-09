@@ -26,8 +26,8 @@ class Map():
         # load player images
         for filename in os.listdir(self.directory + r'/player'):
             playerimg = os.path.join(self.directory + r'/player', filename)
-            if not os.path.isfile(playerimg):
-                print(str(playerimg) + ' is not a file')
+            if not os.path.isfile(playerimg) or filename[-3:] != 'png':
+                print(str(playerimg) + ' is not a  png file')
                 continue
             self.player_uris.append(playerimg)
 
