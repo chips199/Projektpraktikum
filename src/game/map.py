@@ -5,7 +5,6 @@ from typing import List
 from pandas import DataFrame
 
 
-
 class Map():
     solid_df: DataFrame
     staticimages = list()  # type: List[pygame.surface.Surface]
