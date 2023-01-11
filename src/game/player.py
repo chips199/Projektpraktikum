@@ -4,6 +4,7 @@ from typing import List, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import pygame
 
 import weapon
@@ -71,6 +72,7 @@ class Player():
                 self.relativ_solids.append((self.x, y))
                 self.solid.append((self.x + self.width, self.y + y))
                 self.relativ_solids.append((self.x + self.width, y))
+        self.solid_df = pd.DataFrame(self.solid, columns=['x', 'y'])
 
     def draw(self, g):
         # draw Player
@@ -83,6 +85,18 @@ class Player():
 
         # draw weapon
         # ...
+
+    @staticmethod
+    def shift_df(df, dirn, n):
+        if dirn == 0:
+            df['x'] = df['x'].map(lambda x: x + n)
+        elif dirn == 1:
+            df['x'] = df['x'].map(lambda x: x - n)
+        elif dirn == 2:
+            df['y'] = df['y'].map(lambda y: y - n)
+        else:
+            df['y'] = df['y'].map(lambda y: y + n)
+        return df
 
     def move(self, dirn, v=-99):
         """
@@ -107,20 +121,29 @@ class Player():
         else:
             self.y += v
             delta_y += v
+        self.solid_df = Player.shift_df(self.solid_df, dirn, v)
+        return
 
         # move solid pixels
         self.solid = list(map(lambda p: (p[0] + delta_x, p[1] + delta_y), self.solid))
+        self.solid_df['x'] = self.solid_df['x'].map(lambda x: x + delta_x)
+        self.solid_df['y'] = self.solid_df['y'].map(lambda y: y + delta_y)
 
     def colides(self, edge_array):
+        """
+        intersects the given dataframe with the dataframe of this instance
+        :param edge_array: dataframne
+        :return: boolean
+        """
+        return not pd.merge(self.solid_df, edge_array, how='inner', on=['x', 'y']).empty
+
         # checks if a list of pixels intersects with the list of solid pixels of the player
         a = self.solid
         b = edge_array
-        #c = list(map(lambda x: str(x[0]) + ',' + str(x[1]), a))
-        #d = list(map(lambda x: str(x[0]) + ',' + str(x[1]), b))
+        # c = list(map(lambda x: str(x[0]) + ',' + str(x[1]), a))
+        # d = list(map(lambda x: str(x[0]) + ',' + str(x[1]), b))
         c = list(map(Game.Game.coordToDezimal, a, repeat(self.game.width)))
         d = list(map(Game.Game.coordToDezimal, b, repeat(self.game.width)))
-        #print(b)
-        #print(a)
         return len(np.intersect1d(c, d)) != 0
 
     def jump(self, h):
@@ -134,4 +157,5 @@ class Player():
         self.health -= weapon_enemy.damage
 
     def refresh_solids(self):
-        self.solid = list(map(lambda p: (p[0] + self.x, p[1] + self.y), self.relativ_solids))
+        # self.solid = list(map(lambda p: (p[0] + self.x, p[1] + self.y), self.relativ_solids))
+        self.solid_df = pd.DataFrame(list(map(lambda p: (p[0] + self.x, p[1] + self.y), self.relativ_solids)), columns=['x', 'y'])

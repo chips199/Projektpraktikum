@@ -4,17 +4,19 @@ import imageio.v3 as iio
 import os
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import pygame
 from typing import List
 from typing import Tuple
+
+from pandas import DataFrame
 
 import src.game.game as Game
 
 
 class Map():
+    solid_df: DataFrame
     solid = list()  # type: List[Tuple[int, int]]
-    solid_x_splited = list()  # type: List[List[int]]
-    solid_y_splited = list()  # type: List[List[int]]
     staticimages = list()  # type: List[pygame.surface.Surface]
     player_uris = list()  # type: List[str]
 
@@ -87,6 +89,8 @@ class Map():
             self.solid.append((0, y))
             self.solid.append((self.game.width, y))
 
+        self.solid_df = pd.DataFrame(self.solid, columns=['x', 'y'])
+
         # load unsolid images
         for filename in os.listdir(self.directory + r'\not_solid'):
             nsimg = os.path.join(self.directory + r'\not_solid', filename)
@@ -120,15 +124,20 @@ class Map():
         # print(self.solid_x_splited[159])
 
     def colides(self, edge_array):
-        # checks if a list of pixels intersects with the list of solid pixels of the map
+        """
+        intersects the given dataframe with the dataframe of this instance
+        :param edge_array: dataframne
+        :return: boolean
+        """
+        return not pd.merge(self.solid_df, edge_array, how='inner', on=['x', 'y']).empty
+
+        # checks if a list of pixels intersects with the list of solid pixels of the player
         a = self.solid
         b = edge_array
-        #c = list(map(lambda x: str(x[0]) + ',' + str(x[1]), a))
-        #d = list(map(lambda x: str(x[0]) + ',' + str(x[1]), b))
+        # c = list(map(lambda x: str(x[0]) + ',' + str(x[1]), a))
+        # d = list(map(lambda x: str(x[0]) + ',' + str(x[1]), b))
         c = list(map(Game.Game.coordToDezimal, a, repeat(self.game.width)))
         d = list(map(Game.Game.coordToDezimal, b, repeat(self.game.width)))
-        # print(b)
-        # print(a)
         return len(np.intersect1d(c, d)) != 0
 
     def is_coliding(self, p):

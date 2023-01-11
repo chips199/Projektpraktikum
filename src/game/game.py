@@ -1,5 +1,8 @@
 import json
 import os
+from copy import copy
+
+import pandas as pd
 import pygame
 import datetime
 from matplotlib import pyplot as plt
@@ -12,7 +15,6 @@ from src.game.weapon import Weapon
 
 wrk_dir = os.path.abspath(os.path.dirname(__file__))
 config_file = wrk_dir + r'\configuration.json'
-test_map = wrk_dir + r"\..\testmap"
 basic_map = wrk_dir + r"\..\basicmap"
 
 
@@ -241,6 +243,20 @@ class Game:
 
     def nextToSolid(self, player, dirn, distance):
         other_players = self.playerList[:int(self.net.id)] + self.playerList[int(self.net.id) + 1:]
+        solid_pixels_df = copy(self.map.solid_df)
+        for op in other_players:
+            solid_pixels_df = pd.concat([solid_pixels_df, op.solid_df])
+        simulated_player = copy(player.solid_df)
+        erg = 0
+        for _ in range(distance):
+            Player.Player.shift_df(simulated_player, dirn, 1)
+            if not pd.merge(simulated_player, solid_pixels_df, how='inner', on=['x', 'y']).empty:
+                return erg
+            erg += 1
+        return erg
+
+    def nextToSolid1(self, player, dirn, distance):
+        other_players = self.playerList[:int(self.net.id)] + self.playerList[int(self.net.id) + 1:]
         simulated_solid = player.solid.copy()
         erg = 0
         for i in range(distance):
@@ -257,11 +273,11 @@ class Game:
                 delta_y += v
             simulated_solid = list(map(lambda p: (p[0] + delta_x, p[1] + delta_y), simulated_solid))
             if self.map.colides(simulated_solid):
-                #print('map colision')
+                # print('map colision')
                 return erg
             for p in other_players:
                 if p.colides(simulated_solid):
-                    #print('player colision')
+                    # print('player colision')
                     return erg
             erg += 1
         return erg
