@@ -1,4 +1,4 @@
-from typing import Optional, Callable
+from typing import Optional, Callable, Union
 import customtkinter as tk
 
 
@@ -30,7 +30,7 @@ class MyLabel(tk.CTkLabel):
                 y: int = 0,
                 stepsize: int = 5,
                 delay: int = 25,
-                ending_function: Optional[Callable] = None) -> None:
+                ending_function: Optional[Union[Callable, None]] = None) -> None:
 
         """
         Move self (Label) to the given x and y coordinate
@@ -83,8 +83,8 @@ class MyLabel(tk.CTkLabel):
                 ending_function()
 
     def idle_animation(self,
-                       pos_one: list[int] = (0, 0),
-                       pos_two: list[int] = (0, 0),
+                       pos_one: tuple[int, int] = (0, 0),
+                       pos_two: tuple[int, int] = (0, 0),
                        next_pos: str = "two",
                        delay: int = 30,
                        stepsize: int = 1) -> None:
@@ -93,8 +93,8 @@ class MyLabel(tk.CTkLabel):
         Move the label between two positions in a loop with a certain delay and stepsize
 
         Parameters:
-        - pos_one (list[int]): x and y coordinate of position one
-        - pos_two (list[int]): x and y coordinate of position two
+        - pos_one (tuple[int, int]): x and y coordinate of position one
+        - pos_two (tuple[int, int]): x and y coordinate of position two
         - next_pos (str): position in which the label should be moved, should be either 'one' or 'two'
         - delay (int): Delay time in milliseconds before the next move, default is 30
         - stepsize (int): Number of pixels the label should be moved each time, default is 1

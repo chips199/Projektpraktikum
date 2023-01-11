@@ -85,7 +85,7 @@ window_height = 900
 s_id = "1"
 run = True
 
-###########################################  Window  #########################################################
+# -------------------------------------------  Window  -------------------------------------------
 root = MyWindow(window_width=1600,
                 window_height=900)
 root.title('TestName')
@@ -100,7 +100,7 @@ y = int((hs / 2) - (window_height / 2) - 20)
 root.geometry("{}x{}+{}+{}".format(window_width, window_height, x, y))
 root.resizable(False, False)
 
-###########################################  MainFrame  ######################################################
+# -------------------------------------------  MainFrame  -------------------------------------------
 main_frame = MyFrame(master=root, width=window_width, height=window_height)
 main_frame.place(anchor='center', relx=0.5, rely=0.5)
 
@@ -112,7 +112,7 @@ label_image = tk.CTkLabel(master=main_frame,
                           image=background_image)
 label_image.place(x=0, y=0)
 
-###########################################  InteractionFrame  ################################################
+# -------------------------------------------  InteractionFrame  -------------------------------------------
 interaction_frame = MyFrame(master=root, width=600, height=300, fg_color="#212121")
 interaction_frame.place(anchor='center', x=window_width / 2, y=window_height * 0.3)
 
