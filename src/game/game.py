@@ -219,142 +219,26 @@ class Game:
                 erg.append(sample[p]["mouse"])
             return erg
 
-    @staticmethod
-    def coordToDezimal(coord, width):
-        return coord[0] + coord[1] * width
-
-    def pointInRec(self, point, p):
-        x1, y1, w, h = p
-        x2, y2 = x1 + w, y1 + h
-        x, y = point
-        if x in range(x1, x2):
-            if y in range(y1, y2):
-                return True
-        return False
-
-    def collision_with_other_players(self, point):
-        # checks if a point collides with any other player
-        otherPlayers = self.playerList[:int(self.net.id)] + self.playerList[int(self.net.id) + 1:]
-        for p in otherPlayers:
-            rec = pygame.Rect(p.x, p.y, p.width, p.height)
-            if rec.collidepoint(point):
-                return True
-        return False
-
     def nextToSolid(self, player, dirn, distance):
+        """
+        calculates the distance to the nearest object in one direction in a range
+        :param player: the current player
+        :param dirn: the direction
+        :param distance: the range in which to check
+        :return: integer representing the distance to the next object within the range
+        """
+        # first combining all solid pixels in one dataframe
         other_players = self.playerList[:int(self.net.id)] + self.playerList[int(self.net.id) + 1:]
         solid_pixels_df = copy(self.map.solid_df)
         for op in other_players:
             solid_pixels_df = pd.concat([solid_pixels_df, op.solid_df])
+        # getting copy of the players solid dataframe
         simulated_player = copy(player.solid_df)
         erg = 0
+        # checking for each pixel if a move ment would cause a collision
         for _ in range(distance):
             Player.Player.shift_df(simulated_player, dirn, 1)
             if not pd.merge(simulated_player, solid_pixels_df, how='inner', on=['x', 'y']).empty:
                 return erg
             erg += 1
         return erg
-
-    def nextToSolid1(self, player, dirn, distance):
-        other_players = self.playerList[:int(self.net.id)] + self.playerList[int(self.net.id) + 1:]
-        simulated_solid = player.solid.copy()
-        erg = 0
-        for i in range(distance):
-            v = 1
-            delta_x = 0
-            delta_y = 0
-            if dirn == 0:
-                delta_x += v
-            elif dirn == 1:
-                delta_x -= v
-            elif dirn == 2:
-                delta_y -= v
-            else:
-                delta_y += v
-            simulated_solid = list(map(lambda p: (p[0] + delta_x, p[1] + delta_y), simulated_solid))
-            if self.map.colides(simulated_solid):
-                # print('map colision')
-                return erg
-            for p in other_players:
-                if p.colides(simulated_solid):
-                    # print('player colision')
-                    return erg
-            erg += 1
-        return erg
-
-    def nextToSolid1(self, player, dirn, distance):
-        # checks in a direction for each pixel of the distance for collision and returns the remaining distance
-        # only check the direction in which the player wants to move
-        top_left = [player.x, player.y]
-        top_right = [player.x + player.width, player.y]
-        bottem_left = [player.x, player.y + player.width]
-        bottem_right = [player.x + player.width, player.y + player.height]
-        erg = 0
-        if dirn == 0:
-            # right
-            for i in range(distance):
-                top_right[0] += 1
-                bottem_right[0] += 1
-                if self.collision_with_other_players(top_right):
-                    return erg
-                if self.collision_with_other_players(bottem_right):
-                    return erg
-                # if self.map.is_coliding(top_right):
-                #    return erg
-                # if self.map.is_coliding(bottem_right):
-                #    return erg
-                erg += 1
-        elif dirn == 1:
-            # left
-            for i in range(distance):
-                top_left[0] -= 1
-                bottem_left[0] -= 1
-                if self.collision_with_other_players(top_left):
-                    return erg
-                if self.collision_with_other_players(bottem_left):
-                    return erg
-                if self.map.is_coliding(top_left):
-                    return erg
-                if self.map.is_coliding(bottem_left):
-                    return erg
-                erg += 1
-        elif dirn == 2:
-            # down
-            for i in range(distance):
-                top_left[1] -= 1
-                top_right[1] -= 1
-                if self.collision_with_other_players(top_left):
-                    return erg
-                if self.collision_with_other_players(top_right):
-                    return erg
-                if self.map.is_coliding(top_left):
-                    return erg
-                if self.map.is_coliding(top_right):
-                    return erg
-                erg += 1
-        else:
-            # up
-            for i in range(distance):
-                bottem_left[1] += 1
-                bottem_right[1] += 1
-                if self.collision_with_other_players(bottem_left):
-                    return erg
-                if self.collision_with_other_players(bottem_right):
-                    return erg
-                if self.map.is_coliding(bottem_left):
-                    return erg
-                if self.map.is_coliding(bottem_right):
-                    return erg
-                erg += 1
-        return erg
-
-    def onsolid(self, player):
-        dist = []
-        # steht auf boden?
-        dist.append(self.height - player.height - player.y)
-        # Steht auf anderem Spieler?
-        for p in self.playerList:
-            if player.x in range(p.x, p.x + p.width) or player.x + player.width in range(p.x, p.x + p.width):
-                dist.append(p.y - player.y - player.height)
-        dist = list(filter(lambda x: x >= 0, dist))
-        return min(dist)

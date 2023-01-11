@@ -1,22 +1,13 @@
-from itertools import repeat
-
-import imageio.v3 as iio
 import os
-import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 import pygame
 from typing import List
-from typing import Tuple
-
 from pandas import DataFrame
 
-import src.game.game as Game
 
 
 class Map():
     solid_df: DataFrame
-    solid = list()  # type: List[Tuple[int, int]]
     staticimages = list()  # type: List[pygame.surface.Surface]
     player_uris = list()  # type: List[str]
 
@@ -65,6 +56,7 @@ class Map():
 
         # combine all static images into one, then use laplace to detect edges.
         # use these to generate array of edge pixels and save it in solid.
+        solid = list()
         solid_images = self.staticimages.copy()
         if len(solid_images) != 0:
             combinded_solid_image = solid_images.pop()
@@ -78,18 +70,18 @@ class Map():
                 for xi, x in enumerate(y):
                     # print(e1)
                     if x > 100:
-                        self.solid.append((xi, yi))
+                        solid.append((xi, yi))
         # Add surface borders
         # horizontal edges
         for x in range(self.game.width):
-            self.solid.append((x, 0))
-            self.solid.append((x, self.game.height))
+            solid.append((x, 0))
+            solid.append((x, self.game.height))
         # vertical edges
         for y in range(self.game.height):
-            self.solid.append((0, y))
-            self.solid.append((self.game.width, y))
+            solid.append((0, y))
+            solid.append((self.game.width, y))
 
-        self.solid_df = pd.DataFrame(self.solid, columns=['x', 'y'])
+        self.solid_df = pd.DataFrame(solid, columns=['x', 'y'])
 
         # load unsolid images
         for filename in os.listdir(self.directory + r'\not_solid'):
@@ -122,37 +114,6 @@ class Map():
         #     self.solid_x_splited[(point[0] // 10)].append(i)
         #     self.solid_y_splited[(point[1] // 10)].append(i)
         # print(self.solid_x_splited[159])
-
-    def colides(self, edge_array):
-        """
-        intersects the given dataframe with the dataframe of this instance
-        :param edge_array: dataframne
-        :return: boolean
-        """
-        return not pd.merge(self.solid_df, edge_array, how='inner', on=['x', 'y']).empty
-
-        # checks if a list of pixels intersects with the list of solid pixels of the player
-        a = self.solid
-        b = edge_array
-        # c = list(map(lambda x: str(x[0]) + ',' + str(x[1]), a))
-        # d = list(map(lambda x: str(x[0]) + ',' + str(x[1]), b))
-        c = list(map(Game.Game.coordToDezimal, a, repeat(self.game.width)))
-        d = list(map(Game.Game.coordToDezimal, b, repeat(self.game.width)))
-        return len(np.intersect1d(c, d)) != 0
-
-    def is_coliding(self, p):
-        # x Group
-        x_ps = self.solid_x_splited[p[0] // 10]
-        # y Group
-        y_ps = self.solid_x_splited[p[1] // 10]
-        # Intersektion of the two groups provides max 100 points to check
-        candidates = set(x_ps).intersection(set(y_ps))
-        for i in candidates:
-            if self.solid[i] == p:
-                # returns True when Point inside solid Object
-                return True
-        # returns True when point outside Gamearea
-        return not pygame.Rect(0, 0, self.game.width, self.game.height).collidepoint(p)
 
     def draw(self, screen):
         canvas_rec = pygame.Rect(0, 0, self.game.width, self.game.height)
