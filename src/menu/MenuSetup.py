@@ -1,3 +1,4 @@
+import os
 import customtkinter as tk
 
 from src.menu.MyEntry import MyEntry
@@ -5,6 +6,9 @@ from src.menu.MyFrame import MyFrame
 from src.menu.MyLabel import MyLabel
 from src.menu.MyWindow import MyWindow
 from PIL import Image
+
+
+wrk_dir = os.path.abspath(os.path.dirname(__file__))
 
 
 def load_lobby_frame(root):
@@ -22,8 +26,7 @@ def load_lobby_frame(root):
                                font=("None", 30))
     session_id_label.place(x=50, y=30)
 
-    player_image = tk.CTkImage(light_image=Image.open(r"C:\Users\range\Desktop\basic_player_orange.png"),
-                               dark_image=Image.open(r"C:\Users\range\Desktop\basic_player_orange.png"),
+    player_image = tk.CTkImage(dark_image=Image.open(wrk_dir + r"\..\basicmap\player\basic_player_orange.png"),
                                size=(49, 142))
     label_image = MyLabel(master=main_frame,
                           text=None,
@@ -31,20 +34,17 @@ def load_lobby_frame(root):
     label_image.place(x=175, y=250)
     root.update()
 
-    player_image2 = tk.CTkImage(light_image=Image.open(r"C:\Users\range\Desktop\basic_player_purple.png"),
-                                dark_image=Image.open(r"C:\Users\range\Desktop\basic_player_purple.png"),
+    player_image2 = tk.CTkImage(dark_image=Image.open(wrk_dir + r"\..\basicmap\player\basic_player_purple.png"),
                                 size=(49, 142))
     label_image2 = MyLabel(master=main_frame, text=None, image=player_image2)
     label_image2.place(x=575, y=250)
 
-    player_image3 = tk.CTkImage(light_image=Image.open(r"C:\Users\range\Desktop\basic_player_turquoise.png"),
-                                dark_image=Image.open(r"C:\Users\range\Desktop\basic_player_turquoise.png"),
+    player_image3 = tk.CTkImage(dark_image=Image.open(wrk_dir + r"\..\basicmap\player\basic_player_turquoise.png"),
                                 size=(49, 142))
     label_image3 = MyLabel(master=main_frame, text=None, image=player_image3)
     label_image3.place(x=975, y=250)
 
-    player_image4 = tk.CTkImage(light_image=Image.open(r"C:\Users\range\Desktop\basic_player_magenta.png"),
-                                dark_image=Image.open(r"C:\Users\range\Desktop\basic_player_magenta.png"),
+    player_image4 = tk.CTkImage(dark_image=Image.open(wrk_dir + r"\..\basicmap\player\basic_player_magenta.png"),
                                 size=(49, 142))
     label_image4 = MyLabel(master=main_frame, text=None, image=player_image4)
     label_image4.place(x=1375, y=250)
@@ -105,8 +105,7 @@ main_frame = MyFrame(master=root, width=window_width, height=window_height)
 main_frame.place(anchor='center', relx=0.5, rely=0.5)
 
 # Hintergrundbild
-background_image = tk.CTkImage(light_image=Image.open(r"C:\Users\range\Desktop\basic_map_structures.png"),
-                               dark_image=Image.open(r"C:\Users\range\Desktop\basic_map_structures.png"),
+background_image = tk.CTkImage(dark_image=Image.open(wrk_dir + r"\..\basicmap\solid\basic_map_structures.png"),
                                size=(1600, 900))
 label_image = tk.CTkLabel(master=main_frame,
                           text=None,
