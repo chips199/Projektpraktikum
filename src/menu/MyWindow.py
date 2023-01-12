@@ -21,7 +21,7 @@ class MyWindow(tk.CTk):
         tk.set_default_color_theme("dark-blue")
 
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
-        
+
     def on_closing(self):
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
             self.destroy()
@@ -93,4 +93,4 @@ class MyWindow(tk.CTk):
                                                                         delay,
                                                                         stepsize,
                                                                         anchor))
-        self.update()   
+        self.update()

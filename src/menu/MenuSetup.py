@@ -11,7 +11,7 @@ from PIL import Image
 wrk_dir = os.path.abspath(os.path.dirname(__file__))
 
 
-def load_lobby_frame(root):
+def load_lobby_frame(root_window):
     print("frame change")
     interaction_frame.configure(width=window_width, height=150)
     interaction_frame.place(x=0, y=250)
@@ -32,7 +32,7 @@ def load_lobby_frame(root):
                           text=None,
                           image=player_image)
     label_image.place(x=175, y=250)
-    root.update()
+    root_window.update()
 
     player_image2 = tk.CTkImage(dark_image=Image.open(wrk_dir + r"\..\basicmap\player\basic_player_purple.png"),
                                 size=(49, 142))
@@ -48,33 +48,33 @@ def load_lobby_frame(root):
                                 size=(49, 142))
     label_image4 = MyLabel(master=main_frame, text=None, image=player_image4)
     label_image4.place(x=1375, y=250)
-    root.update()
+    root_window.update()
 
     label_image.move_to(175,
                         500,
-                        ending_function=lambda: label_image.idle_animation(pos_one=[175, 500],
-                                                                           pos_two=[175, 485],
+                        ending_function=lambda: label_image.idle_animation(pos_one=(175, 500),
+                                                                           pos_two=(175, 485),
                                                                            next_pos="two"))
 
     label_image2.after(920, lambda: label_image2.move_to(575,
                                                          500,
                                                          ending_function=lambda: label_image2.idle_animation(
-                                                             pos_one=[575, 500],
-                                                             pos_two=[575, 485],
+                                                             pos_one=(575, 500),
+                                                             pos_two=(575, 485),
                                                              next_pos="two")))
 
     label_image3.after(1840, lambda: label_image3.move_to(975,
                                                           500,
                                                           ending_function=lambda: label_image3.idle_animation(
-                                                              pos_one=[975, 500],
-                                                              pos_two=[975, 485],
+                                                              pos_one=(975, 500),
+                                                              pos_two=(975, 485),
                                                               next_pos="two")))
 
     label_image4.after(2760, lambda: label_image4.move_to(1375,
                                                           500,
                                                           ending_function=lambda: label_image4.idle_animation(
-                                                              pos_one=[1375, 500],
-                                                              pos_two=[1375, 485],
+                                                              pos_one=(1375, 500),
+                                                              pos_two=(1375, 485),
                                                               next_pos="two")))
 
 
@@ -107,10 +107,11 @@ main_frame.place(anchor='center', relx=0.5, rely=0.5)
 # Hintergrundbild
 background_image = tk.CTkImage(dark_image=Image.open(wrk_dir + r"\..\basicmap\solid\basic_map_structures.png"),
                                size=(1600, 900))
-label_image = tk.CTkLabel(master=main_frame,
-                          text=None,
-                          image=background_image)
-label_image.place(x=0, y=0)
+# noinspection PyTypeChecker
+label_background = tk.CTkLabel(master=main_frame,
+                               text=None,
+                               image=background_image)
+label_background.place(x=0, y=0)
 
 # -------------------------------------------  InteractionFrame  -------------------------------------------
 interaction_frame = MyFrame(master=root, width=600, height=300, fg_color="#212121")
@@ -143,7 +144,6 @@ label_error.place_forget()
 root.update()
 
 # Create 'Play/Start Button'
-
 success_function = lambda: root.move_out_of_window(widget_list=[interaction_frame,
                                                                 main_frame.winfo_children()[0]],
                                                    direction_list=["up",

@@ -95,7 +95,7 @@ class MyLabel(tk.CTkLabel):
         Parameters:
         - pos_one (tuple[int, int]): x and y coordinate of position one
         - pos_two (tuple[int, int]): x and y coordinate of position two
-        - next_pos (str): position in which the label should be moved, should be either 'one' or 'two'
+        - next_pos (str): position to which the label should be moved, should be either 'one' or 'two'
         - delay (int): Delay time in milliseconds before the next move, default is 30
         - stepsize (int): Number of pixels the label should be moved each time, default is 1
         """
