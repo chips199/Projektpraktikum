@@ -30,7 +30,7 @@ class MyLabel(tk.CTkLabel):
                 y: int = 0,
                 stepsize: int = 5,
                 delay: int = 25,
-                ending_function: Optional[Union[Callable, None]] = None) -> None:       # type:ignore[assignment]
+                ending_function: Optional[Union[Callable, None]] = None) -> None:       # type:ignore[type-arg]
 
         """
         Move self (Label) to the given x and y coordinate
