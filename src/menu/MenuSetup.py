@@ -100,8 +100,9 @@ if ws < window_width_planned or hs < window_height_planned:
     window_width = int(ws * sizing)
     window_height = int(hs * sizing)
 
-    sizing_width = round(window_width / window_width_planned, 2)
-    sizing_height = round(window_height / window_height_planned, 2)
+    sizing_width = round(window_width / window_width_planned, 2)        # type: ignore[assignment]
+    sizing_height = round(window_height / window_height_planned, 2)     # type: ignore[assignment]
+    print(window_width / window_width_planned)
 
     w = int(300 * window_width / window_width_planned)
     h = int(60 * window_height / window_height_planned)
@@ -131,7 +132,7 @@ label_background.place(x=0, y=0)
 # -------------------------------------------  InteractionFrame  -------------------------------------------
 # "#212121"
 interaction_frame = MyFrame(master=root, width=int(600 * sizing_width), height=int(300 * sizing_height),
-                            fg_color="#212100")
+                            fg_color="#212121")
 interaction_frame.place(anchor='center', x=window_width / 2, y=window_height * 0.3)
 
 # Session ID Eingabefeld
@@ -154,12 +155,6 @@ label_error = MyLabel(master=interaction_frame,
                       font=("None", 12 * sizing_height),
                       anchor="w",
                       justify='left')
-# label_error.place(x=(entry_session_id.winfo_x() + entry_session_id.winfo_width() / 2) * sizing_width,
-#                   y=entry_session_id.winfo_y() - 20 * sizing_height * sizing_height,
-#                   anchor=tk.CENTER)
-# label_error.place_forget()
-# root.update()
-
 
 # Create 'Play/Start Button'
 success_function = lambda: root.move_out_of_window(widget_list=[interaction_frame,
