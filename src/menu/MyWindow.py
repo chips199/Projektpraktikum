@@ -12,6 +12,8 @@ class MyWindow(tk.CTk):
                  *args: object,
                  **kwargs: object) -> None:
         super(MyWindow, self).__init__(*args, **kwargs)
+        self.sizing_height = 1
+        self.sizing_width = 1
         self.window_height = window_height
         self.window_width = window_width
         self.run = True
@@ -21,6 +23,14 @@ class MyWindow(tk.CTk):
         tk.set_default_color_theme("dark-blue")
 
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
+
+    def set_size(self, width, height):
+        self.window_width = width
+        self.window_height = height
+
+    def set_sizing(self, sizing_width, sizing_height):
+        self.sizing_width = sizing_width
+        self.sizing_height = sizing_height
 
     def on_closing(self):
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
@@ -47,8 +57,8 @@ class MyWindow(tk.CTk):
         """
 
         for widget, direction in zip(widget_list, direction_list):
-            widget_x = widget.winfo_x()
-            widget_y = widget.winfo_y()
+            widget_x = round(widget.winfo_x() * self.sizing_width)
+            widget_y = round(widget.winfo_y() * self.sizing_height)
 
             # move the widget down if direction is 'down' and the y-coordinate of the widget is less than the window
             # height

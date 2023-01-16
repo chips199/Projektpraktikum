@@ -7,7 +7,13 @@ class MyLabel(tk.CTkLabel):
         super(MyLabel, self).__init__(*args, **kwargs)
 
         # create instance variable to store the scheduled event id
+        self.sizing_height = 1
+        self.sizing_width = 1
         self.after_id = None
+
+    def set_sizing(self, sizing_width, sizing_height):
+        self.sizing_width = sizing_width
+        self.sizing_height = sizing_height
 
     def label_hide_show(self,
                         x: int,
@@ -30,7 +36,7 @@ class MyLabel(tk.CTkLabel):
                 y: int = 0,
                 stepsize: int = 5,
                 delay: int = 25,
-                ending_function: Optional[Union[Callable, None]] = None) -> None:       # type:ignore[type-arg]
+                ending_function: Optional[Union[Callable, None]] = None) -> None:  # type:ignore[type-arg]
 
         """
         Move self (Label) to the given x and y coordinate
@@ -43,38 +49,41 @@ class MyLabel(tk.CTkLabel):
             - ending_function ('function'): A function that will be called once the x and y coordinates are reached,
                                             Default is None
         """
+        x_sized = round(x * self.sizing_width)
+        y_sized = round(y * self.sizing_height)
+        stepsize_sized = round(stepsize * self.sizing_height)
 
         # get the current x and y position of the widget
-        widget_x = self.winfo_x()
-        widget_y = self.winfo_y()
+        widget_x = round(self.winfo_x() * self.sizing_width)
+        widget_y = round(self.winfo_y() * self.sizing_height)
 
         # calculate the difference from current and desired position
-        x_diff = abs(widget_x - x)
-        y_diff = abs(widget_y - y)
+        x_diff = abs(widget_x - x_sized)
+        y_diff = abs(widget_y - y_sized)
 
         # set new x-coordinate
-        if x_diff > stepsize:
-            if widget_x < x:
-                new_x = widget_x + stepsize
+        if x_diff > stepsize_sized:
+            if widget_x < x_sized:
+                new_x = widget_x + stepsize_sized
             else:
-                new_x = widget_x - stepsize
+                new_x = widget_x - stepsize_sized
         else:
-            new_x = x
+            new_x = x_sized
 
         # set new y-coordinate
-        if y_diff > stepsize:
-            if widget_y < y:
-                new_y = widget_y + stepsize
+        if y_diff > stepsize_sized:
+            if widget_y < y_sized:
+                new_y = widget_y + stepsize_sized
             else:
-                new_y = widget_y - stepsize
+                new_y = widget_y - stepsize_sized
         else:
-            new_y = y
+            new_y = y_sized
 
         # move the widget to new position
         self.place(x=new_x, y=new_y)
 
         # if there is a difference in either x or y coordinate, enter a recursion after the given delay time
-        if x_diff != 0 or y_diff != 0:
+        if x_diff > stepsize_sized or y_diff > stepsize_sized:
             self.after(delay, lambda: self.move_to(x, y, stepsize, delay, ending_function))
 
         # otherwise the position is reached, so call the ending_function if it is handed over
@@ -86,7 +95,7 @@ class MyLabel(tk.CTkLabel):
                        pos_one: tuple[int, int] = (0, 0),
                        pos_two: tuple[int, int] = (0, 0),
                        next_pos: str = "two",
-                       delay: int = 30,
+                       delay: int = 35,
                        stepsize: int = 1) -> None:
 
         """
@@ -108,7 +117,8 @@ class MyLabel(tk.CTkLabel):
                          delay=delay,
                          ending_function=lambda: self.idle_animation(pos_one,
                                                                      pos_two,
-                                                                     next_pos="two"))
+                                                                     next_pos="two")
+                         )
         # move the label to position two
         elif next_pos == "two":
             self.move_to(x=pos_two[0],

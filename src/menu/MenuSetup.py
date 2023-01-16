@@ -12,36 +12,40 @@ wrk_dir = os.path.abspath(os.path.dirname(__file__))
 
 def load_lobby_frame(root_window):
     print("frame change")
-    interaction_frame.configure(width=window_width, height=150)
-    interaction_frame.place(x=0, y=250)
+    interaction_frame.configure(width=window_width, height=150 * sizing_height)
+    interaction_frame.place(x=0, y=250 * sizing_height)
 
     session_id_label = MyLabel(master=main_frame,
                                text="Session ID: {}".format(s_id),
                                font=("None", 30))
-    session_id_label.place(x=50, y=30)
+    session_id_label.place(x=50 * sizing_width, y=30 * sizing_height)
 
     player_image = tk.CTkImage(dark_image=Image.open(wrk_dir + r"\..\basicmap\player\basic_player_orange.png"),
-                               size=(49, 142))
+                               size=(int(49 * sizing_width), int(142 * sizing_height)))
     label_image = MyLabel(master=main_frame,
                           text=None,
                           image=player_image)
-    label_image.place(x=175, y=250)
-    root_window.update()
+    label_image.place(x=int(175 * sizing_width), y=int(250 * sizing_height))
+    label_image.set_sizing(sizing_width, sizing_height)
 
     player_image2 = tk.CTkImage(dark_image=Image.open(wrk_dir + r"\..\basicmap\player\basic_player_purple.png"),
-                                size=(49, 142))
+                                size=(int(49 * sizing_width), int(142 * sizing_height)))
     label_image2 = MyLabel(master=main_frame, text=None, image=player_image2)
-    label_image2.place(x=575, y=250)
+    label_image2.place(x=int(575 * sizing_width), y=int(250 * sizing_height))
+    label_image2.set_sizing(sizing_width, sizing_height)
 
     player_image3 = tk.CTkImage(dark_image=Image.open(wrk_dir + r"\..\basicmap\player\basic_player_turquoise.png"),
-                                size=(49, 142))
+                                size=(int(49 * sizing_width), int(142 * sizing_height)))
     label_image3 = MyLabel(master=main_frame, text=None, image=player_image3)
-    label_image3.place(x=975, y=250)
+    label_image3.place(x=int(975 * sizing_width), y=int(250 * sizing_height))
+    label_image3.set_sizing(sizing_width, sizing_height)
 
     player_image4 = tk.CTkImage(dark_image=Image.open(wrk_dir + r"\..\basicmap\player\basic_player_magenta.png"),
-                                size=(49, 142))
+                                size=(int(49 * sizing_width), int(142 * sizing_height)))
     label_image4 = MyLabel(master=main_frame, text=None, image=player_image4)
-    label_image4.place(x=1375, y=250)
+    label_image4.place(x=int(1375 * sizing_width), y=int(250 * sizing_height))
+    label_image4.set_sizing(sizing_width, sizing_height)
+
     root_window.update()
 
     label_image.move_to(175,
@@ -75,19 +79,35 @@ def load_lobby_frame(root_window):
 # -------------------------------------------  Parameters  -------------------------------------------
 w = 300
 h = 60
-window_width = 1600
-window_height = 900
+sizing = 0.83333
+window_width_planned = window_width = 1600
+window_height_planned = window_height = 900
+sizing_width = 1
+sizing_height = 1
 s_id = "1"
 
 # -------------------------------------------  Window  -------------------------------------------
 # configure root window
-root = MyWindow(window_width=1600,
-                window_height=900)
+root = MyWindow()
 root.title('TestName')
 
 # get screen width and height
 ws = root.winfo_screenwidth()  # width of the screen
 hs = root.winfo_screenheight()  # height of the screen
+
+# change size of window and other widgets, if the actual screen size is smaller than the planned screen size
+if ws < window_width_planned or hs < window_height_planned:
+    window_width = int(ws * sizing)
+    window_height = int(hs * sizing)
+
+    sizing_width = round(window_width / window_width_planned, 2)
+    sizing_height = round(window_height / window_height_planned, 2)
+
+    w = int(300 * window_width / window_width_planned)
+    h = int(60 * window_height / window_height_planned)
+
+root.set_size(window_width, window_height)
+root.set_sizing(sizing_width, sizing_height)
 
 # calculate x and y coordinates for the Tk root window
 x = int((ws / 2) - (window_width / 2))
@@ -101,7 +121,7 @@ main_frame.place(anchor='center', relx=0.5, rely=0.5)
 
 # Hintergrundbild
 background_image = tk.CTkImage(dark_image=Image.open(wrk_dir + r"\..\basicmap\solid\basic_map_structures.png"),
-                               size=(1600, 900))
+                               size=(window_width, window_height))
 # noinspection PyTypeChecker
 label_background = tk.CTkLabel(master=main_frame,
                                text=None,
@@ -109,7 +129,9 @@ label_background = tk.CTkLabel(master=main_frame,
 label_background.place(x=0, y=0)
 
 # -------------------------------------------  InteractionFrame  -------------------------------------------
-interaction_frame = MyFrame(master=root, width=600, height=300, fg_color="#212121")
+# "#212121"
+interaction_frame = MyFrame(master=root, width=int(600 * sizing_width), height=int(300 * sizing_height),
+                            fg_color="#212100")
 interaction_frame.place(anchor='center', x=window_width / 2, y=window_height * 0.3)
 
 # Session ID Eingabefeld
@@ -128,15 +150,16 @@ label_error = MyLabel(master=interaction_frame,
                       text_color="red",
                       bg_color="transparent",
                       width=0,
-                      height=10,
-                      font=("None", 12),
+                      height=10 * sizing_height,
+                      font=("None", 12 * sizing_height),
                       anchor="w",
                       justify='left')
-label_error.place(x=entry_session_id.winfo_x() + entry_session_id.winfo_width() / 2,
-                  y=entry_session_id.winfo_y() - 20,
-                  anchor=tk.CENTER)
-label_error.place_forget()
-root.update()
+# label_error.place(x=(entry_session_id.winfo_x() + entry_session_id.winfo_width() / 2) * sizing_width,
+#                   y=entry_session_id.winfo_y() - 20 * sizing_height * sizing_height,
+#                   anchor=tk.CENTER)
+# label_error.place_forget()
+# root.update()
+
 
 # Create 'Play/Start Button'
 success_function = lambda: root.move_out_of_window(widget_list=[interaction_frame,
@@ -147,10 +170,11 @@ success_function = lambda: root.move_out_of_window(widget_list=[interaction_fram
 
 success_function2 = lambda: main_frame.after(1800, lambda: load_lobby_frame(root))
 
-failure_function = lambda: label_error.label_hide_show(x=int(entry_session_id.winfo_x() + entry_session_id.winfo_width()
-                                                             / 2),
-                                                       y=entry_session_id.winfo_y() - 20,
-                                                       time=3000)
+failure_function = lambda: label_error.label_hide_show(
+    x=int((entry_session_id.winfo_x() + entry_session_id.winfo_width() / 2) * sizing_width),
+    y=int((entry_session_id.winfo_y() - 20) * sizing_height),
+    time=3000)
+
 button_play = tk.CTkButton(master=interaction_frame,
                            text="Play",
                            command=lambda: entry_session_id.check_text(target_text=s_id,
@@ -161,20 +185,21 @@ button_play = tk.CTkButton(master=interaction_frame,
                            height=h,
                            font=("None", h * 0.4),
                            corner_radius=int(h / 3), )
-button_play.place(x=entry_session_id.winfo_x() + entry_session_id.winfo_width() + 10,
-                  y=entry_session_id.winfo_y())
+button_play.place(x=int((entry_session_id.winfo_x() + entry_session_id.winfo_width() + 10) * sizing_width),
+                  y=int(entry_session_id.winfo_y() * sizing_height))
 root.update()
 
 # Create 'New Session Button'
 button_new_session = tk.CTkButton(master=interaction_frame,
                                   text="Create New Session",
-                                  width=button_play.winfo_x() - entry_session_id.winfo_x() + button_play.winfo_width(),
-                                  height=int(h / 2),
+                                  width=int((button_play.winfo_x() - entry_session_id.winfo_x() +
+                                             button_play.winfo_width()) * sizing_width),
+                                  height=int(h / 2 * sizing_height),
                                   #                                 command=lambda: printing(),
                                   font=("None", h * 0.4),
                                   corner_radius=int(h / 3))
-button_new_session.place(x=entry_session_id.winfo_x(),
-                         y=entry_session_id.winfo_y() + entry_session_id.winfo_height() + 15)
+button_new_session.place(x=int(entry_session_id.winfo_x() * sizing_width),
+                         y=int((entry_session_id.winfo_y() + entry_session_id.winfo_height() + 15) * sizing_height))
 
 root.update()
 
