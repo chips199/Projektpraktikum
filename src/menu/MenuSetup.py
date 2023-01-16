@@ -7,7 +7,6 @@ from src.menu.MyLabel import MyLabel
 from src.menu.MyWindow import MyWindow
 from PIL import Image
 
-
 wrk_dir = os.path.abspath(os.path.dirname(__file__))
 
 
@@ -15,11 +14,6 @@ def load_lobby_frame(root_window):
     print("frame change")
     interaction_frame.configure(width=window_width, height=150)
     interaction_frame.place(x=0, y=250)
-
-    #     session_id_label = tk.CTkLabel(master = frame,
-    #                                   text= "Session ID: {}".format(s_id),
-    #                                   font= ("None", 30))
-    #     session_id_label.place(x=50, y=30)
 
     session_id_label = MyLabel(master=main_frame,
                                text="Session ID: {}".format(s_id),
@@ -78,14 +72,15 @@ def load_lobby_frame(root_window):
                                                               next_pos="two")))
 
 
+# -------------------------------------------  Parameters  -------------------------------------------
 w = 300
 h = 60
 window_width = 1600
 window_height = 900
 s_id = "1"
-run = True
 
 # -------------------------------------------  Window  -------------------------------------------
+# configure root window
 root = MyWindow(window_width=1600,
                 window_height=900)
 root.title('TestName')
@@ -182,7 +177,6 @@ button_new_session.place(x=entry_session_id.winfo_x(),
                          y=entry_session_id.winfo_y() + entry_session_id.winfo_height() + 15)
 
 root.update()
-
 
 while root.run:
     root.update()
