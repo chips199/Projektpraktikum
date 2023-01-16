@@ -12,9 +12,9 @@ class MyEntry(tk.CTkEntry):
 
     def check_text(self,
                    target_text: str = "-200",
-                   success_function: Optional[Union[Callable, None]] = None,    # type:ignore[Callable]
-                   failure_function: Optional[Union[Callable, None]] = None,    # type:ignore[Callable]
-                   **kwargs: Optional[Union[Callable, None]]) -> None:          # type:ignore[Callable]
+                   success_function: Optional[Union[Callable, None]] = None,    # type:ignore[assignment]
+                   failure_function: Optional[Union[Callable, None]] = None,    # type:ignore[assignment]
+                   **kwargs: Optional[Union[Callable, None]]) -> None:          # type:ignore[assignment]
 
         # Check if entered text is equal to target text
         if self.get() == target_text:
