@@ -7,6 +7,8 @@ import sys
 import random
 import string
 
+from src.game import game
+
 
 def get_random_ids(number_of_ids, length):
     # returns a string of integers dealing as an id for the games
@@ -38,7 +40,7 @@ except socket.error as e:
 s.listen(number_of_games_at_a_time * number_of_players_per_game)
 print("Waiting for a connection")
 currentGId, currentPId = 0, 0
-config_file = os.path.abspath(os.path.dirname(__file__)) + r'\configuration.json'
+config_file = os.path.abspath(os.path.dirname()) + r'\configuration.json'
 with open(config_file) as file:
     game_data = json.load(file)
 
