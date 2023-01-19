@@ -1,16 +1,18 @@
 import os
+from tkinter import Canvas
+
 import customtkinter as tk
 
 from src.menu.MyEntry import MyEntry
 from src.menu.MyFrame import MyFrame
 from src.menu.MyLabel import MyLabel
 from src.menu.MyWindow import MyWindow
-from PIL import Image
+from PIL import Image, ImageTk
 
 wrk_dir = os.path.abspath(os.path.dirname(__file__))
 
 
-class MenuSetup():
+class MenuSetup:
     def __init__(self, *args, **kwargs):
         # -------------------------------------------  Parameters  -------------------------------------------
         self.interaction_frame = None
