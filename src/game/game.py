@@ -1,5 +1,8 @@
 import json
 import os
+from copy import copy
+
+import pandas as pd
 import pygame
 import datetime
 from matplotlib import pyplot as plt
@@ -12,7 +15,6 @@ from src.game.weapon import Weapon
 
 wrk_dir = os.path.abspath(os.path.dirname(__file__))
 config_file = wrk_dir + r'\configuration.json'
-test_map = wrk_dir + r"\..\testmap"
 basic_map = wrk_dir + r"\..\basicmap"
 
 
@@ -33,10 +35,10 @@ class Game:
         # if a map has player images generate use them if not don't
         if len(self.map.player_uris) == 4:
             self.playerList = [
-                Player.Player(config['0']['position'][0], config['0']['position'][1], self.map.player_uris[0]),
-                Player.Player(config['1']['position'][0], config['1']['position'][1], self.map.player_uris[1]),
-                Player.Player(config['2']['position'][0], config['2']['position'][1], self.map.player_uris[2]),
-                Player.Player(config['3']['position'][0], config['3']['position'][1], self.map.player_uris[3])]
+                Player.Player(config['0']['position'][0], config['0']['position'][1], self, self.map.player_uris[0]),
+                Player.Player(config['1']['position'][0], config['1']['position'][1], self, self.map.player_uris[1]),
+                Player.Player(config['2']['position'][0], config['2']['position'][1], self, self.map.player_uris[2]),
+                Player.Player(config['3']['position'][0], config['3']['position'][1], self, self.map.player_uris[3])]
         else:
             self.playerList = [
                 Player.Player(config['0']['position'][0], config['0']['position'][1], (0, 255, 0)),
@@ -242,28 +244,18 @@ class Game:
         :param distance: the range in which to check
         :return: integer representing the distance to the next object within the range
         """
+        # first combining all solid pixels in one dataframe
         other_players = self.playerList[:int(self.net.id)] + self.playerList[int(self.net.id) + 1:]
-        simulated_solid = player.solid.copy()
+        solid_pixels_df = copy(self.map.solid_df)
+        for op in other_players:
+            solid_pixels_df = pd.concat([solid_pixels_df, op.solid_df])
+        # getting copy of the players solid dataframe
+        simulated_player = copy(player.solid_df)
         erg = 0
-        for i in range(distance):
-            v = 1
-            delta_x = 0
-            delta_y = 0
-            if dirn == 0:
-                delta_x += v
-            elif dirn == 1:
-                delta_x -= v
-            elif dirn == 2:
-                delta_y -= v
-            else:
-                delta_y += v
-            simulated_solid = list(map(lambda p: (p[0] + delta_x, p[1] + delta_y), simulated_solid))
-            if self.map.collides(simulated_solid):
-                # print('map colision')
+        # checking for each pixel if a move ment would cause a collision
+        for _ in range(distance):
+            Player.Player.shift_df(simulated_player, dirn, 1)
+            if not pd.merge(simulated_player, solid_pixels_df, how='inner', on=['x', 'y']).empty:
                 return erg
-            for p in other_players:
-                if p.colides(simulated_solid):
-                    # print('player colision')
-                    return erg
             erg += 1
         return erg

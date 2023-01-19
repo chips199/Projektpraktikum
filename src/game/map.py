@@ -1,14 +1,12 @@
-import imageio.v3 as iio
 import os
-import matplotlib.pyplot as plt
-import numpy as np
+import pandas as pd
 import pygame
 from typing import List
-from typing import Tuple
+from pandas import DataFrame
 
 
 class Map():
-    solid = list()  # type: List[Tuple[int, int]]
+    solid_df: DataFrame
     staticimages = list()  # type: List[pygame.surface.Surface]
     player_uris = list()  # type: List[str]
 
@@ -49,6 +47,7 @@ class Map():
 
         # combine all static images into one, then use laplace to detect edges.
         # use these to generate array of edge pixels and save it in solid.
+        solid = list()
         solid_images = self.staticimages.copy()
         if len(solid_images) != 0:
             combinded_solid_image = solid_images.pop()
@@ -61,16 +60,18 @@ class Map():
             for yi, y in enumerate(alpha_array):
                 for xi, x in enumerate(y):
                     if x > 100:
-                        self.solid.append((xi, yi))
+                        solid.append((xi, yi))
         # Add surface borders
         # horizontal edges
         for x in range(self.game.width):
-            self.solid.append((x, 0))
-            self.solid.append((x, self.game.height))
+            solid.append((x, 0))
+            solid.append((x, self.game.height))
         # vertical edges
         for y in range(self.game.height):
-            self.solid.append((0, y))
-            self.solid.append((self.game.width, y))
+            solid.append((0, y))
+            solid.append((self.game.width, y))
+
+        self.solid_df = pd.DataFrame(solid, columns=['x', 'y'])
 
         # load unsolid images
         for filename in os.listdir(self.directory + r'/not_solid'):
@@ -95,19 +96,6 @@ class Map():
             for image in comb_images:
                 self.static_objects_img.blit(image, (0, 0))
             self.static_objects_img.convert_alpha()
-
-    def collides(self, edge_array):
-        """
-        calculates if a list of pixels colides with a map object
-        :param edge_array: list of tupels representing the edge of another solid object
-        :return: true if a collision happens and false if not
-        """
-        # checks if a list of pixels intersects with the list of solid pixels of the map
-        a = self.solid
-        b = edge_array
-        c = list(map(lambda x: str(x[0]) + ',' + str(x[1]), a))
-        d = list(map(lambda x: str(x[0]) + ',' + str(x[1]), b))
-        return len(np.intersect1d(c, d)) != 0
 
     def draw(self, screen):
         """
