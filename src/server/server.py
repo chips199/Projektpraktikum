@@ -36,11 +36,10 @@ try:
 except socket.error as e:
     print(str(e))
 
-
 s.listen(number_of_games_at_a_time * number_of_players_per_game)
 print("Waiting for a connection")
 currentGId, currentPId = 0, 0
-config_file = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', r'game\\configuration.json'))
+config_file = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', r'game\\configuration.json'))
 with open(config_file) as file:
     game_data = json.load(file)
 
@@ -51,6 +50,7 @@ for _ in range(number_of_games_at_a_time):
 players_connected = [[0] * number_of_players_per_game] * number_of_games_at_a_time
 # to convert list of game data and ids to dict
 game_data_dict = dict(zip(get_random_ids(number_of_games_at_a_time, 4), game_datas))
+
 
 def threaded_client(conn):
     global currentGId, currentPId, game_data_dict, players_connected, game_data
@@ -93,19 +93,18 @@ def threaded_client(conn):
             break
 
     print("Connection Closed")
-    #set lost player to connected false and disconected
+    # set lost player to connected false and disconected
     game_data_dict[game_id][str(this_pid)]["connected"] = True
     players_connected[this_gid][this_pid] = 2
     conn.close()
     # check if there is a game where every player connected once but disconnected again, if true reset the game
     if players_connected[this_gid].count(2) == number_of_players_per_game:
         players_connected[this_gid] = [0] * number_of_players_per_game
-        #print(game_data)
+        # print(game_data)
         game_data_dict[game_id] = copy(game_data)
         for n in range(number_of_players_per_game):
             game_data_dict[game_id][str(n)]["connected"] = False
         print("game zurückgesetzt da alle spieler diconnected sind")
-
 
 
 while True:
