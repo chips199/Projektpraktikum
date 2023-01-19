@@ -16,8 +16,7 @@ class Map():
 
         # load background
         try:
-            self.background = pygame.image.load(uri + r'/background.png')
-            self.background.convert()
+            self.background = pygame.image.load(uri + r'/background.png').convert()
         except:
             self.background = "no image found"  # type: ignore[assignment]
 
