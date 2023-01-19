@@ -22,9 +22,10 @@ class Player():
         self.x = startx
         self.y = starty
         self.game = game
-        self.velocity = 5
+        self.velocity = 4
         self.velocity_gravity = 1
-        self.velocity_jumping = self.max_jumping_speed = 11
+        self.velocity_jumping = self.max_jumping_speed = 10
+        self.velocity_time = 30
         self.is_jumping = False
         self.is_falling = True
         self.color = color
@@ -135,7 +136,7 @@ class Player():
                     self.jumping_time = datetime.datetime.now()
 
                 # after certain time, decrease jumping speed
-                elif datetime.datetime.now() - self.jumping_time > datetime.timedelta(milliseconds=50):
+                elif datetime.datetime.now() - self.jumping_time > datetime.timedelta(milliseconds=self.velocity_time):
                     self.velocity_jumping -= 1
                     # reset timer to current time
                     self.jumping_time = datetime.datetime.now()
@@ -193,7 +194,7 @@ class Player():
                     self.falling_time = datetime.datetime.now()
 
                 # after certain time increase the falling speed until it's maximum
-                elif datetime.datetime.now() - self.falling_time > datetime.timedelta(milliseconds=50):
+                elif datetime.datetime.now() - self.falling_time > datetime.timedelta(milliseconds=self.velocity_time):
                     self.velocity_gravity += 1
                     # reset timer to current time
                     self.falling_time = datetime.datetime.now()
@@ -206,6 +207,6 @@ class Player():
                 self.move(dirn=3, v=int(vel))
 
             # otherwise reset gravity settings after falling
-            elif self.is_falling and vel <= 0:
+            elif vel <= 0:
                 self.is_falling = False
                 self.velocity_gravity = 1

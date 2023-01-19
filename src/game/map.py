@@ -16,7 +16,7 @@ class Map():
 
         # load background
         try:
-            self.background = pygame.image.load(uri + r'/background.png').convert()
+            self.background = pygame.image.load(uri + r'/background.png').convert_alpha()
         except:
             self.background = "no image found"  # type: ignore[assignment]
 
@@ -38,7 +38,7 @@ class Map():
             # load image for displaying
             try:
                 img = pygame.image.load(simg)
-                img.convert_alpha()
+                img = img.convert_alpha()
             except:
                 continue
             print(str(simg) + ' erfolgreich in pygame geladen')
@@ -52,7 +52,7 @@ class Map():
             combinded_solid_image = solid_images.pop()
             for image in solid_images:
                 combinded_solid_image.blit(image, (0, 0))
-            combinded_solid_image.convert_alpha()
+            combinded_solid_image = combinded_solid_image.convert_alpha()
             self.edge_surface = pygame.transform.laplacian(combinded_solid_image).convert_alpha()
             alpha_array = pygame.surfarray.pixels_alpha(self.edge_surface)
             alpha_array = alpha_array.swapaxes(0, 1)
@@ -82,7 +82,7 @@ class Map():
             # load image for displaying
             try:
                 img = pygame.image.load(nsimg)
-                img.convert_alpha()
+                img = img.convert_alpha()
             except:
                 continue
             print(str(nsimg) + ' erfolgreich in pygame geladen')
@@ -94,7 +94,7 @@ class Map():
             self.static_objects_img = comb_images.pop()
             for image in comb_images:
                 self.static_objects_img.blit(image, (0, 0))
-            self.static_objects_img.convert_alpha()
+            self.static_objects_img = self.static_objects_img.convert_alpha()
 
     def draw(self, screen):
         """
