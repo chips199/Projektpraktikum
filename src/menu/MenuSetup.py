@@ -109,11 +109,13 @@ class MenuSetup:
         # Create 'Play/Start Button'
         success_function = lambda: self.root.move_out_of_window(widget_list=[self.interaction_frame,
                                                                              self.main_frame.winfo_children()[0]],
+                                                                # type:ignore[union-attr]
                                                                 direction_list=["up",
                                                                                 "down"],
                                                                 stepsize=5)
 
         success_function2 = lambda: self.main_frame.after(1800, lambda: self.load_lobby_frame())
+        # type:ignore[union-attr]
 
         failure_function = lambda: label_error.label_hide_show(
             x=int((entry_session_id.winfo_x() + entry_session_id.winfo_width() / 2) * self.sizing_width),
@@ -150,7 +152,8 @@ class MenuSetup:
     def load_lobby_frame(self):
         print("frame change")
         self.interaction_frame.configure(width=self.window_width, height=150 * self.sizing_height)
-        self.interaction_frame.place(x=0, y=250 * self.sizing_height)
+        # type:ignore[union-attr]
+        self.interaction_frame.place(x=0, y=250 * self.sizing_height)  # type:ignore[union-attr]
 
         session_id_label = MyLabel(master=self.main_frame,
                                    text="Session ID: {}".format(self.s_id),

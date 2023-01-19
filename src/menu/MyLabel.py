@@ -91,7 +91,6 @@ class MyLabel(tk.CTkLabel):
             if ending_function is not None:
                 ending_function()
 
-
     def idle_animation(self,
                        pos_one: tuple[int, int] = (0, 0),
                        pos_two: tuple[int, int] = (0, 0),
