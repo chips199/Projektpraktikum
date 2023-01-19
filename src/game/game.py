@@ -21,13 +21,18 @@ basic_map = wrk_dir + r"\..\basicmap"
 class Game:
 
     def __init__(self, w, h):
+        # setting basic varibals
         self.net = Network()
         self.width = w
         self.height = h
         self.canvas = canvas.Canvas(self.width, self.height, str(self.net.id) + " Testing...")
         self.map = Map(self, basic_map)
+        # load the config for default values
+        # this will later be done in the map to configure spawnpoints
         with open(config_file) as file:
             config = json.load(file)
+
+        # if a map has player images generate use them if not don't
         if len(self.map.player_uris) == 4:
             self.playerList = [
                 Player.Player(config['0']['position'][0], config['0']['position'][1], self, self.map.player_uris[0]),
@@ -36,84 +41,89 @@ class Game:
                 Player.Player(config['3']['position'][0], config['3']['position'][1], self, self.map.player_uris[3])]
         else:
             self.playerList = [
-                Player.Player(config['0']['position'][0], config['0']['position'][1], self, None, (0, 255, 0)),
-                Player.Player(config['1']['position'][0], config['1']['position'][1], self, None, (255, 255, 0)),
-                Player.Player(config['2']['position'][0], config['2']['position'][1], self, None, (0, 255, 255)),
-                Player.Player(config['3']['position'][0], config['3']['position'][1], self, None, (255, 0, 255))]
-        # self.player = Player(50, 50, (0,255,0))
-        # self.player2 = Player(100,100, (255,255,0))
-        # self.player3 = Player(150,150, (0,255,255))
-        # self.player4 = Player(200,200, (255,0,255))
+                Player.Player(config['0']['position'][0], config['0']['position'][1], (0, 255, 0)),
+                Player.Player(config['1']['position'][0], config['1']['position'][1], (255, 255, 0)),
+                Player.Player(config['2']['position'][0], config['2']['position'][1], (0, 255, 255)),
+                Player.Player(config['3']['position'][0], config['3']['position'][1], (255, 0, 255))]
 
     def run(self):
+        """
+        the core method of the game containing the game loop
+        """
+        # pygame stuff
         clock = pygame.time.Clock()
         run = True
 
+        # just for comfort
         id = int(self.net.id)
+
+        # game loop
         while run:
+            # pygame stuff for the max fps
             clock.tick(60)
 
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    run = False
+            if self.playerList[id].is_alive():
+                # handling pygame events
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        run = False
 
-                if event.type == pygame.K_ESCAPE:
-                    run = False
+                    if event.type == pygame.K_ESCAPE:
+                        run = False
 
-                # Hit
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    # Check if Player can use his weapon
-                    if self.playerList[id].weapon.can_hit():
-                        # Check if an enemy player is in range
-                        for player in self.playerList:
-                            #  Do not beat your own player
-                            if player == self.playerList[id]:
-                                continue
-                            # Check if the player was hit
-                            # First check if the opponent is in range of the weapon
-                            # Then check if the player's mouse is on the opponent
-                            if player.x < self.playerList[id].x + self.playerList[id].width + self.playerList[
-                                id].weapon.distance \
-                                    and player.x + player.width > self.playerList[id].x - self.playerList[
-                                id].weapon.distance \
-                                    and player.y < self.playerList[id].y + self.playerList[id].height + self.playerList[
-                                id].weapon.distance \
-                                    and player.y + player.height > self.playerList[id].y - self.playerList[
-                                id].weapon.distance \
-                                    and player.x < self.playerList[id].mousepos[0] < player.x + player.width \
-                                    and player.y < self.playerList[id].mousepos[1] < player.y + player.height:
-                                # Draw damage from opponent
-                                player.beaten(self.playerList[id].weapon.damage)
-                                self.playerList[id].hit()
-                                break
+                    # Hit
+                    elif event.type == pygame.MOUSEBUTTONDOWN:
+                        # Check if Player can use his weapon
+                        if self.playerList[id].user_weapon.can_hit():
+                            # Check if an enemy player is in range
+                            self.playerList[id].user_weapon.hit()
+                            for player in self.playerList:
+                                #  Do not beat your own player
+                                if player == self.playerList[id]:
+                                    continue
+                                # Check if the player was hit
+                                # First check if the opponent is in range of the weapon
+                                # Then check if the player's mouse is on the opponent
+                                if player.x < self.playerList[id].x + self.playerList[id].width + self.playerList[
+                                    id].user_weapon.distance and player.x + player.width > self.playerList[id].x - \
+                                        self.playerList[
+                                            id].user_weapon.distance and player.y < self.playerList[id].y + \
+                                        self.playerList[id].height + self.playerList[
+                                    id].user_weapon.distance and player.y + player.height > self.playerList[id].y - \
+                                        self.playerList[
+                                            id].user_weapon.distance and player.x < self.playerList[id].mousepos[
+                                    0] < player.x + player.width \
+                                        and player.y < self.playerList[id].mousepos[1] < player.y + player.height:
+                                    # Draw damage from opponent
+                                    player.beaten(self.playerList[id].user_weapon)
+                                    break
 
-            keys = pygame.key.get_pressed()
+                # get the key presses
+                keys = pygame.key.get_pressed()
 
-            if keys[pygame.K_d]:
-                self.playerList[id].move(0, self.nextToSolid(self.playerList[id], 0, self.playerList[id].velocity))
+                if keys[pygame.K_d]:
+                    self.playerList[id].move(0, self.nextToSolid(self.playerList[id], 0, self.playerList[id].velocity))
 
-            if keys[pygame.K_a]:
-                self.playerList[id].move(1, self.nextToSolid(self.playerList[id], 1, self.playerList[id].velocity))
+                if keys[pygame.K_a]:
+                    self.playerList[id].move(1, self.nextToSolid(self.playerList[id], 1, self.playerList[id].velocity))
 
-            # Jump
-            if keys[pygame.K_SPACE] and self.playerList[id].last_jump + datetime.timedelta(
-                    seconds=1) <= datetime.datetime.now() and self.playerList[id].status_jump == 0:
-                if self.playerList[id].y >= self.playerList[id].height_jump and self.nextToSolid(self.playerList[id], 3,
-                                                                                                 1) < 2:
-                    self.playerList[id].jump(10)
-                    self.playerList[id].last_jump = datetime.datetime.now()
-            if self.playerList[id].status_jump > 0:
-                if self.playerList[id].status_jump >= self.playerList[id].height_jump:
-                    self.playerList[id].status_jump = 0
-                else:
-                    self.playerList[id].jump(10)
-            # if keys[pygame.K_SPACE]:
-            #    if self.playerList[id].y <= self.height - self.playerList[id].velocity - self.playerList[id].height:
-            #        self.playerList[id].move(3)
-            # grafity
-            self.playerList[id].move(3, self.nextToSolid(self.playerList[id], 3, 5))
+                # Jump
+                if keys[pygame.K_SPACE] and self.playerList[id].last_jump + datetime.timedelta(
+                        seconds=1) <= datetime.datetime.now() and self.playerList[id].status_jump == 0:
+                    if self.playerList[id].y >= self.playerList[id].height_jump and self.nextToSolid(
+                            self.playerList[id], 3,
+                            1) < 2:
+                        self.playerList[id].jump(10)
+                        self.playerList[id].last_jump = datetime.datetime.now()
+                if self.playerList[id].status_jump > 0:
+                    if self.playerList[id].status_jump >= self.playerList[id].height_jump:
+                        self.playerList[id].status_jump = 0
+                    else:
+                        self.playerList[id].jump(10)
+                # gravity
+                self.playerList[id].move(3, self.nextToSolid(self.playerList[id], 3, 5))
 
-            # Mouse Postion
+            # Mouse Position
             self.playerList[id].mousepos = pygame.mouse.get_pos()
 
             # Send Data about this player and get some over the others als reply
@@ -135,19 +145,14 @@ class Game:
             for i, on in enumerate(mouse):
                 self.playerList[i].mousepos = on
 
-            # Update Canvas
-            # self.canvas.draw_background()
             # Draw Map
-
-            # Draw Player
-            # self.canvas.draw_background((41, 41, 41))
             self.map.draw(self.canvas.get_canvas())
-
+            # Draw Players
             for p in self.playerList:
                 if p.is_connected:
                     p.draw(self.canvas.get_canvas())
                     pygame.draw.circle(self.canvas.get_canvas(), (255, 0, 0), p.mousepos, 20)
-
+            # Update Canvas
             self.canvas.update()
 
         pygame.quit()
@@ -155,7 +160,7 @@ class Game:
     def send_data(self):
         """
         Send position to server
-        :return: None
+        :return: String with data of all players
         """
         with open(config_file) as file:
             sample = json.load(file)
@@ -165,14 +170,16 @@ class Game:
         data['position'] = [int(self.playerList[int(self.net.id)].x), int(self.playerList[int(self.net.id)].y)]
         data['connected'] = True
         data['mouse'] = self.playerList[int(self.net.id)].mousepos
-        # data = str(self.net.id) + ":" + str(self.playerList[int(self.net.id)].x) + "," + str(
-        #    self.playerList[int(self.net.id)].y)
-        # print(json.dumps(data))
         reply = self.net.send(json.dumps(data))
         return reply
 
     @staticmethod
     def parse_pos(data):
+        """
+        extracts positions from server data
+        :param data: string from server
+        :return: list of player positions
+        """
         erg = []
         try:
             jdata = json.loads(data)
@@ -189,6 +196,11 @@ class Game:
 
     @staticmethod
     def parse_online(data):
+        """
+        extracts online information from server data
+        :param data: string from server
+        :return: list of online stati
+        """
         erg = []
         try:
             jdata = json.loads(data)
@@ -205,6 +217,11 @@ class Game:
 
     @staticmethod
     def parse_mouse(data):
+        """
+        extracts mouse information from server data
+        :param data: string from server
+        :return: list of mouse positions
+        """
         erg = []
         try:
             jdata = json.loads(data)

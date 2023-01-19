@@ -13,7 +13,7 @@ class Player():
     status_jump = 0
     is_connected = False
     mousepos = (0, 0)
-    weapon = weapon.Weapon(100, 10, 10, 100)
+    user_weapon = weapon.Weapon(100, 15, 15, 1)
     health = 100
 
     def __init__(self, startx, starty, game, image=None, color=(255, 0, 0)):
@@ -54,16 +54,19 @@ class Player():
         self.solid_df = pd.DataFrame(solid, columns=['x', 'y'])
 
     def draw(self, g):
+        """
+        displays a player to the canvas
+        :param g: pygame canvas
+        """
         # draw Player
         player_rec = pygame.Rect(self.x, self.y, self.width, self.height)
         if type(self.image) == pygame.Surface:
             g.blit(self.image, player_rec)
-            # g.blit(self.edge_surface, player_rec)
         else:
             pygame.draw.rect(g, self.color, player_rec, 0)
 
         # draw weapon
-        # ...
+        # ...wip...
 
     @staticmethod
     def shift_df(df, dirn, n):
@@ -103,14 +106,32 @@ class Player():
         self.solid_df = Player.shift_df(self.solid_df, dirn, v)
 
     def jump(self, h):
+        """
+        moves player upwards
+        :param h: hight of the jump
+        """
         self.move(2, h)
         self.status_jump += h
 
-    def hit(self):
-        self.weapon.durability -= 1
-
     def beaten(self, weapon_enemy):
+        """
+        player was beaten
+        player is subtracted the damage of the weapon and it is checked if the player died during the attack
+        :param weapon_enemy The weapon with which the player was hit
+        :return None
+        """
         self.health -= weapon_enemy.damage
+        if self.health <= 0:
+            print("Player died")
+            # TODO: Anzeige auf Screen und Spieler ausblenden?
+            self.health = 0
+
+    def is_alive(self):
+        """
+        Returns whether the player is still alive
+        :return: boolean: True: Is alive;  False: Isn't alive
+        """
+        return self.health > 0
 
     def refresh_solids(self):
         new_pos = copy(self.relativ_solids_df)
