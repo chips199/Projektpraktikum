@@ -97,7 +97,6 @@ class Map():
                 self.static_objects_img.blit(image, (0, 0))
             self.static_objects_img.convert_alpha()
 
-
     def draw(self, screen):
         """
         displays all map objects to the canvas
