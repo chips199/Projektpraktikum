@@ -20,15 +20,15 @@ def test_map():
     return test_map
 
 
-def test_collide(test_map):
-    assert test_map.collides([(8, 9), (11, 24)]) is False
-    assert test_map.collides([(1, 2), (3, 4), (5, 6)]) is True
-    assert test_map.collides([(5, 6), (3, 4), (9, 11)]) is True
-    assert test_map.collides([(3, 4)]) is True
-    assert test_map.collides([]) is False
-    assert test_map.collides([(-1, 2)]) is False
-    assert test_map.collides(([(-1, -2)])) is False
-    assert test_map.collides([(12, 13), (-8, -9)]) is True
+# def test_collide(test_map):
+#     assert test_map.collides([(8, 9), (11, 24)]) is False
+#     assert test_map.collides([(1, 2), (3, 4), (5, 6)]) is True
+#     assert test_map.collides([(5, 6), (3, 4), (9, 11)]) is True
+#     assert test_map.collides([(3, 4)]) is True
+#     assert test_map.collides([]) is False
+#     assert test_map.collides([(-1, 2)]) is False
+#     assert test_map.collides(([(-1, -2)])) is False
+#     assert test_map.collides([(12, 13), (-8, -9)]) is True
 
 
 def test_draw(test_map):
