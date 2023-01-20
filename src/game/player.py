@@ -176,7 +176,10 @@ class Player():
         self.solid_df = new_pos
 
     def gravity(self, func):
-
+        """
+        moves player downwards when possible
+        :param func: function to check if there is no collision while falling
+        """
         # when player is not jumping
         if not self.is_jumping:
 
