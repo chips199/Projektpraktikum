@@ -175,8 +175,7 @@ class Player():
         new_pos['y'] = new_pos['y'].map(lambda y: y + self.y)
         self.solid_df = new_pos
 
-    def gravity(self,
-                func):
+    def gravity(self, func):
 
         # when player is not jumping
         if not self.is_jumping:
