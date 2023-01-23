@@ -66,7 +66,7 @@ class Game:
             # print()
             # print("FPS:", self.update_fps())
             if self.playerList[id].is_alive():
-                time = datetime.datetime.now()
+                # time = datetime.datetime.now()
                 # handling pygame events
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:

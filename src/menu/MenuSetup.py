@@ -20,6 +20,7 @@ wrk_dir = os.path.abspath(os.path.dirname(__file__))
 class MenuSetup:
     def __init__(self):
         # -------------------------------------------  Parameters  -------------------------------------------
+        self.label_error = None
         self.net = None
         self.w = 300
         self.h = 60
@@ -329,7 +330,7 @@ class MenuSetup:
         self.root.run = False
         sleep(0.5)
         # self.root.destroy()
-        self.net.start_game()
+        self.net.start_game()   # type:ignore[union-attr]
         g = game.Game(w=1600, h=900, net=self.net)
         g.run()
 
