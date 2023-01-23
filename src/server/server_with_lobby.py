@@ -62,9 +62,10 @@ maps_dict = dict(zip(game_data_dict.keys(), repeat("none")))
 
 def reset_games():
     for i, g in enumerate(players_connected):
+        print(g)
         if g.count(2) + g.count(0) == number_of_players_per_game:
             players_connected[i] = [0] * number_of_players_per_game
-            game_id = game_data_dict.keys()[n]
+            game_id = list(game_data_dict.keys())[i]
             game_data_dict[game_id] = copy(game_data)
             maps_dict[game_id] = "none"
             for n in range(number_of_players_per_game):
@@ -75,6 +76,7 @@ def reset_games():
 def threaded_client(conn):
     global game_data_dict, players_connected, maps_dict
     start_msg = conn.recv(2048).decode()
+    print(start_msg)
     # splitting create game and join
     if len(start_msg) == 4:
         # join lobby
@@ -106,7 +108,7 @@ def threaded_client(conn):
             conn.close()
             exit(1)
         game_id = start_msg
-        this_spawn_points = copy(spawn_points[maps_dict[start_msg]])
+        this_spawn_points = copy(spawn_points[maps_dict[game_id]])
         conn.send(str.encode(f"{this_pid},{game_id}"))
         # finished connecting player
 
@@ -114,7 +116,8 @@ def threaded_client(conn):
     else:
         # Create new game
         try:
-            this_spawn_points = copy(spawn_points[start_msg])
+            map_name = start_msg
+            this_spawn_points = copy(spawn_points[map_name])
         except KeyError:
             # send error Message if map is not known
             conn.send(str.encode("5, Map does not exist"))
@@ -149,8 +152,9 @@ def threaded_client(conn):
     start_waiting = datetime.datetime.now()
     last_msg = datetime.datetime.now()
     while True:
-        msg = conn.recv(2048).decode
-        if players_connected[this_gid][this_pid] != 0:
+        msg = conn.recv(2048).decode()
+        print(msg)
+        if players_connected[this_gid][this_pid] != 1:
             print("Lobby was reseted")
             conn.send(str.encode("Lobby was deleted"))
             reset_games()
@@ -163,7 +167,7 @@ def threaded_client(conn):
             conn.sendall(str.encode(json.dumps(this_spawn_points)))
             last_msg = datetime.datetime.now()
         elif msg == "ready":
-            conn.send(str.encode("ready"))
+            conn.send(str.encode(maps_dict[game_id]))
             # set all not connected players to disconnected, to make sure that reset_game() sees this lobby as done after all players disconnected
             for n, p in enumerate(players_connected[this_gid]):
                 if p == 0:
@@ -174,11 +178,11 @@ def threaded_client(conn):
             last_msg = datetime.datetime.now()
         elif (datetime.datetime.now() - start_waiting).seconds > 600:
             print("Lobby expired")
-            players_connected[this_gid][this_pid] = 2
+            players_connected[this_gid] = [2] * number_of_players_per_game
             reset_games()
             conn.close()
             exit(0)
-        elif (datetime.datetime.now() - last_msg).seconds > 60:
+        elif (datetime.datetime.now() - last_msg).seconds > 10:
             print("connection lost")
             players_connected[this_gid][this_pid] = 2
             reset_games()
@@ -187,6 +191,7 @@ def threaded_client(conn):
         print(f"Waiting for players in {game_id}")
         sleep(1)
 
+    print("Game starts")
     # set player status in game_data to online
     game_data_dict[game_id][str(this_pid)]["connected"] = True
     reply = ''

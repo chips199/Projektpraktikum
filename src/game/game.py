@@ -13,16 +13,17 @@ from src.game.weapon import Weapon
 wrk_dir = os.path.abspath(os.path.dirname(__file__))
 config_file = wrk_dir + r'\configuration.json'
 basic_map = wrk_dir + r"\..\basicmap"
+map_names_dict = {"basicmap" : basic_map}
 
 
 class Game:
 
-    def __init__(self, w, h, net = Network("basicmap")):
+    def __init__(self, w, h, net, mapname):
         self.net = net
         self.width = w
         self.height = h
         self.canvas = canvas.Canvas(self.width, self.height, str(self.net.id) + " Testing...")
-        self.map = Map(self, basic_map)
+        self.map = Map(self, map_names_dict[mapname])
         with open(config_file) as file:
             config = json.load(file)
         if len(self.map.player_uris) == 4:

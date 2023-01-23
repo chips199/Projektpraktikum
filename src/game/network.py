@@ -54,14 +54,8 @@ class Network:
         return self.send("lobby_check")
 
     def start_game(self):
-        """{
-            "0" : [50,50],
-            "1" : [100,100],
-            "2" : [150,150],
-            "3" : [200,200]
-          }"""
         self.spawnpoints = json.loads(self.send("get_spawnpoints"))
-        return self.send("ready") == "ready"
+        return self.send("ready")
 
     def getSpawnpoint(self, id):
         return self.spawnpoints[str(id)]
@@ -79,7 +73,7 @@ if __name__ == '__main__':
     if net.id == 5 or net.id is None:
         print(net.session_id)
         exit(1)
-    pressed_button = False
+    pressed_button = True
     while True:
         try:
             number_of_players_connected = int(net.check_lobby())
@@ -94,10 +88,8 @@ if __name__ == '__main__':
             print(net.check_lobby())
             exit(1)
         sleep(1)
-    if net.start_game():
-        # start game
-        g = game.Game(1600, 900, net)
-        g.run()
-    else:
-        print("something went wrong with starting the game")
+    # start game
+    map = net.start_game()
+    g = game.Game(1600, 900, net, map)
+    g.run()
 
