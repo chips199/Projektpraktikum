@@ -17,6 +17,7 @@ config_file = wrk_dir + r'\configuration.json'
 basic_map = wrk_dir + r"\..\basicmap"
 map_names_dict = {"basicmap": basic_map}
 
+clock = pygame.time.Clock()
 
 class Game:
 
