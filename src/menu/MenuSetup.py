@@ -1,4 +1,7 @@
 import os
+from _thread import start_new_thread
+from time import sleep
+
 import customtkinter as tk
 
 from src.menu.MyEntry import MyEntry
@@ -26,6 +29,14 @@ class MenuSetup:
         self.sizing_width = 1
         self.sizing_height = 1
         self.s_id = "1"
+        self.amount_player = 0
+
+        self.player_dict = {
+            "0": [wrk_dir + r"\..\basicmap\player\basic_player_magenta.png", 175],
+            "1": [wrk_dir + r"\..\basicmap\player\basic_player_orange.png", 575],
+            "2": [wrk_dir + r"\..\basicmap\player\basic_player_purple.png", 975],
+            "3": [wrk_dir + r"\..\basicmap\player\basic_player_turquoise.png", 1375]
+        }
 
         # -------------------------------------------  Window  -------------------------------------------
         # configure root window
@@ -65,12 +76,20 @@ class MenuSetup:
         self.lobby_frame = None
         self.choose_map_frame = None
 
+    def get_amount_player(self):
+        while self.root.run and self.net is not None:
+            self.amount_player = int(self.net.check_lobby())
+            print(self.amount_player)
+
     def run(self):
         self.load_main_frame()
         self.load_interaction_frame()
 
         while self.root.run:
             self.root.update()
+
+            # if self.net is not None:
+            #     self.amount_player = int(self.net.check_lobby())
 
     def load_main_frame(self):
         # -------------------------------------------  MainFrame  -------------------------------------------
@@ -190,60 +209,26 @@ class MenuSetup:
                            y=int(200 * self.sizing_height),
                            anchor='center')
 
-        player_image = tk.CTkImage(dark_image=Image.open(wrk_dir + r"\..\basicmap\player\basic_player_orange.png"),
+        for i in range(self.amount_player):
+            print("yes")
+            self.load_player(path=self.player_dict[str(i)][0], x_pos=self.player_dict[str(i)][1])
+
+    def load_player(self, x_pos, path):
+        player_image = tk.CTkImage(dark_image=Image.open(path),
                                    size=(int(49 * self.sizing_width), int(142 * self.sizing_height)))
         label_image = MyLabel(master=self.main_frame,
                               text=None,
                               image=player_image)
-        label_image.place(x=int(175 * self.sizing_width), y=int(250 * self.sizing_height))
+        label_image.place(x=int(x_pos * self.sizing_width), y=int(250 * self.sizing_height))
         label_image.set_sizing(self.sizing_width, self.sizing_height)
-
-        player_image2 = tk.CTkImage(dark_image=Image.open(wrk_dir + r"\..\basicmap\player\basic_player_purple.png"),
-                                    size=(int(49 * self.sizing_width), int(142 * self.sizing_height)))
-        label_image2 = MyLabel(master=self.main_frame, text=None, image=player_image2)
-        label_image2.place(x=int(575 * self.sizing_width), y=int(250 * self.sizing_height))
-        label_image2.set_sizing(self.sizing_width, self.sizing_height)
-
-        player_image3 = tk.CTkImage(dark_image=Image.open(wrk_dir + r"\..\basicmap\player\basic_player_turquoise.png"),
-                                    size=(int(49 * self.sizing_width), int(142 * self.sizing_height)))
-        label_image3 = MyLabel(master=self.main_frame, text=None, image=player_image3)
-        label_image3.place(x=int(975 * self.sizing_width), y=int(250 * self.sizing_height))
-        label_image3.set_sizing(self.sizing_width, self.sizing_height)
-
-        player_image4 = tk.CTkImage(dark_image=Image.open(wrk_dir + r"\..\basicmap\player\basic_player_magenta.png"),
-                                    size=(int(49 * self.sizing_width), int(142 * self.sizing_height)))
-        label_image4 = MyLabel(master=self.main_frame, text=None, image=player_image4)
-        label_image4.place(x=int(1375 * self.sizing_width), y=int(250 * self.sizing_height))
-        label_image4.set_sizing(self.sizing_width, self.sizing_height)
 
         self.root.update()
 
-        label_image.move_to(175,
+        label_image.move_to(x_pos,
                             500,
-                            ending_function=lambda: label_image.idle_animation(pos_one=(175, 500),
-                                                                               pos_two=(175, 485),
+                            ending_function=lambda: label_image.idle_animation(pos_one=(x_pos, 500),
+                                                                               pos_two=(x_pos, 485),
                                                                                next_pos="two"))
-
-        label_image2.after(920, lambda: label_image2.move_to(575,
-                                                             500,
-                                                             ending_function=lambda: label_image2.idle_animation(
-                                                                 pos_one=(575, 500),
-                                                                 pos_two=(575, 485),
-                                                                 next_pos="two")))
-
-        label_image3.after(1840, lambda: label_image3.move_to(975,
-                                                              500,
-                                                              ending_function=lambda: label_image3.idle_animation(
-                                                                  pos_one=(975, 500),
-                                                                  pos_two=(975, 485),
-                                                                  next_pos="two")))
-
-        label_image4.after(2760, lambda: label_image4.move_to(1375,
-                                                              500,
-                                                              ending_function=lambda: label_image4.idle_animation(
-                                                                  pos_one=(1375, 500),
-                                                                  pos_two=(1375, 485),
-                                                                  next_pos="two")))
 
     def load_choose_map_frame(self):
         for widget in self.main_frame.winfo_children():
@@ -341,7 +326,8 @@ class MenuSetup:
     def start_game(self):
 
         self.root.run = False
-        self.root.destroy()
+        sleep(0.5)
+        # self.root.destroy()
         self.net.start_game()
         g = game.Game(w=1600, h=900, net=self.net)
         g.run()
@@ -358,6 +344,7 @@ class MenuSetup:
                     message=self.net.session_id)
             else:
                 self.s_id = self.net.session_id
+                start_new_thread(self.get_amount_player, tuple())
                 func(target_text=self.net.id)
 
         except ConnectionRefusedError:
@@ -379,6 +366,9 @@ class MenuSetup:
                     message=self.net.session_id)
             else:
                 self.s_id = self.net.session_id
+                # self.amount_player = int(self.net.check_lobby())
+                # self.amount_player = 3
+                start_new_thread(self.get_amount_player, tuple())
                 func()
 
         except ConnectionRefusedError:
