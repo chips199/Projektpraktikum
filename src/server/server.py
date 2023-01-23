@@ -2,6 +2,7 @@ import datetime
 import json
 import os
 import socket
+import struct
 from _thread import start_new_thread
 import sys
 import random
@@ -63,7 +64,7 @@ maps_dict = dict(zip(game_data_dict.keys(), repeat("none")))
 def reset_games():
     for i, g in enumerate(players_connected):
         print(g)
-        if g.count(2) + g.count(0) == number_of_players_per_game:
+        if g.count(2) + g.count(0) + g.count(3) == number_of_players_per_game:
             players_connected[i] = [0] * number_of_players_per_game
             game_id = list(game_data_dict.keys())[i]
             game_data_dict[game_id] = copy(game_data)
@@ -168,6 +169,8 @@ def threaded_client(conn):
         if msg == "lobby_check":
             conn.send(str.encode(f"{players_connected[this_gid].count(1)}"))
             last_msg = datetime.datetime.now()
+        elif msg == "game started":
+            conn.sendall(str.encode(str(players_connected[this_gid][this_pid] == 3)))
         elif msg == "get_spawnpoints":
             conn.sendall(str.encode(json.dumps(this_spawn_points)))
             last_msg = datetime.datetime.now()
@@ -176,9 +179,11 @@ def threaded_client(conn):
         elif msg == "ready":
             conn.send(str.encode(maps_dict[game_id]))
             # set all not connected players to disconnected, to make sure that reset_game() sees this lobby as done after all players disconnected
-            for n, p in enumerate(players_connected[this_gid]):
-                if p == 0:
-                    players_connected[this_gid][n] = 2
+            # for n, p in enumerate(players_connected[this_gid]):
+            #     if p == 0:
+            #         players_connected[this_gid][n] = 2
+            # 3 in running game
+            players_connected[this_gid] = [3] * number_of_players_per_game
             break
         elif msg == "get max players":
             conn.send(str.encode(f"{number_of_players_per_game}"))
