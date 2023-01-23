@@ -77,6 +77,7 @@ class MenuSetup:
         self.choose_map_frame = None
 
     def get_amount_player(self):
+        # task to get amount of player from server, needs to be performed in asynchronus thread
         while self.root.run and self.net is not None:
             self.amount_player = int(self.net.check_lobby())
             print(self.amount_player)
