@@ -6,6 +6,7 @@ from src.menu.MyFrame import MyFrame
 from src.menu.MyLabel import MyLabel
 from src.menu.MyWindow import MyWindow
 from src.game import game
+from typing import Optional, Callable, Union
 
 from PIL import Image
 
@@ -316,11 +317,11 @@ class MenuSetup:
                                                      func=lambda: self.load_lobby_frame()))
 
     def clear_frame_sliding(self,
-                            widget_list,
-                            direction_list,
-                            stepsize=5,
-                            time=2000,
-                            func=None):
+                            widget_list: list['MyLabel|tk.CTkButton'],
+                            direction_list: list[str],
+                            stepsize: int = 5,
+                            time: int = 2000,
+                            func: Optional[Union[Callable, None]] = None) -> None:  # type:ignore[type-arg]
         self.root.move_out_of_window(widget_list=widget_list,
                                      direction_list=direction_list,
                                      stepsize=stepsize)
