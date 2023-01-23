@@ -17,8 +17,8 @@ basic_map = wrk_dir + r"\..\basicmap"
 
 class Game:
 
-    def __init__(self, w, h):
-        self.net = Network()
+    def __init__(self, w, h, net = Network("basicmap")):
+        self.net = net
         self.width = w
         self.height = h
         self.canvas = canvas.Canvas(self.width, self.height, str(self.net.id) + " Testing...")

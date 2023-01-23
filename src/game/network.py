@@ -1,6 +1,8 @@
+import json
 import socket
 import struct
 from time import sleep
+from src.game import game
 
 
 class Network:
@@ -11,7 +13,7 @@ class Network:
         # For this to work on your machine this must be equal to the ipv4 address of the machine running the server
         # You can find this address by typing ipconfig in CMD and copying the ipv4 address. Again this must be the servers
         # ipv4 address. This feild will be the same for all your clients.
-        self.port = 5555
+        self.port = 5556
         self.addr = (self.host, self.port)
         self.id, self.session_id = self.connect_lobby(msg)
         # self.gid, self.id = self.connect()
@@ -24,7 +26,9 @@ class Network:
         """
         self.client.connect(self.addr)
         self.client.sendall(str.encode(p))
-        pid, msg = self.client.recv(2048).decode().split(",")
+        rply = self.client.recv(2048).decode()
+        print(rply)
+        pid, msg = rply.split(",")
         return pid, msg
 
     def connect(self):
@@ -48,6 +52,23 @@ class Network:
     def check_lobby(self):
         return self.send("lobby_check")
 
+    def start_game(self):
+        """{
+            "0" : [50,50],
+            "1" : [100,100],
+            "2" : [150,150],
+            "3" : [200,200]
+          }"""
+        self.spawnpoints = json.loads(self.send("get_spawnpoints"))
+        return self.send("ready") == "ready"
+
+    def getSpawnpoint(self, id):
+        return self.spawnpoints[str(id)]
+
+    def get_max_number_of_players(self):
+        return self.send("get max players")
+        pass
+
 
 if __name__ == '__main__':
     # create networkelement also creates connection
@@ -56,9 +77,9 @@ if __name__ == '__main__':
     # check for errors, like full lobby, or unknown session_id or server, or if none no connection
     if net.id == 5 or net.id is None:
         print(net.session_id)
+        exit(1)
     pressed_button = False
     while True:
-        sleep(1)
         try:
             number_of_players_connected = int(net.check_lobby())
             print(number_of_players_connected)
@@ -66,10 +87,16 @@ if __name__ == '__main__':
             # display connected players
             # ...
 
-            if pressed_button or number_of_players_connected == 4:
+            if pressed_button or number_of_players_connected == int(net.get_max_number_of_players()):
                 break
         except ValueError:
             print(net.check_lobby())
             exit(1)
+        sleep(1)
+    if net.start_game():
+        # start game
+        g = game.Game(1600, 900, net)
+        g.run()
+    else:
+        print("something went wrong with starting the game")
 
-    net.
