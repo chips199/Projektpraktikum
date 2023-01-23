@@ -1,6 +1,7 @@
 import json
 import socket
 import struct
+from _thread import start_new_thread
 from time import sleep
 from src.game import game
 
@@ -16,6 +17,7 @@ class Network:
         self.port = 5556
         self.addr = (self.host, self.port)
         self.id, self.session_id = self.connect_lobby(msg)
+        self.map_name = self.get_map()
         # self.gid, self.id = self.connect()
 
     def connect_lobby(self, p):
@@ -62,12 +64,14 @@ class Network:
 
     def get_max_number_of_players(self):
         return self.send("get max players")
-        pass
+
+    def get_map(self):
+        return self.send("get Mapname")
 
 
-if __name__ == '__main__':
+def sth(str):
     # create networkelement also creates connection
-    net = Network("basicmap")
+    net = Network(str)
     # net = Network("ASDF")
     # check for errors, like full lobby, or unknown session_id or server, or if none no connection
     if net.id == 5 or net.id is None:
@@ -77,7 +81,7 @@ if __name__ == '__main__':
     while True:
         try:
             number_of_players_connected = int(net.check_lobby())
-            print(number_of_players_connected)
+            # print(number_of_players_connected)
 
             # display connected players
             # ...
@@ -87,8 +91,14 @@ if __name__ == '__main__':
         except ValueError:
             print(net.check_lobby())
             exit(1)
-        sleep(1)
     # start game
     map = net.start_game()
-    g = game.Game(1600, 900, net, map)
+    g = game.Game(1600, 900, net, net.map_name)
     g.run()
+
+
+if __name__ == '__main__':
+    try:
+        sth("basicmap")
+    except ConnectionRefusedError:
+        print("Connection failed")

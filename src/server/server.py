@@ -27,7 +27,7 @@ def get_random_ids(number_of_ids, length):
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 number_of_games_at_a_time = 1
-number_of_players_per_game = 3
+number_of_players_per_game = 2
 server = 'localhost'
 port = 5556
 
@@ -150,7 +150,14 @@ def threaded_client(conn):
     start_waiting = datetime.datetime.now()
     last_msg = datetime.datetime.now()
     while True:
-        msg = conn.recv(2048).decode()
+        try:
+            msg = conn.recv(2048).decode()
+        except ConnectionResetError:
+            print("connection lost")
+            players_connected[this_gid][this_pid] = 2
+            reset_games()
+            conn.close()
+            exit(0)
         print(msg)
         if players_connected[this_gid][this_pid] != 1:
             print("Lobby was reseted")
@@ -164,6 +171,8 @@ def threaded_client(conn):
         elif msg == "get_spawnpoints":
             conn.sendall(str.encode(json.dumps(this_spawn_points)))
             last_msg = datetime.datetime.now()
+        elif msg == "get Mapname":
+            conn.send(str.encode(maps_dict[game_id]))
         elif msg == "ready":
             conn.send(str.encode(maps_dict[game_id]))
             # set all not connected players to disconnected, to make sure that reset_game() sees this lobby as done after all players disconnected
