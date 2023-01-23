@@ -62,7 +62,7 @@ maps_dict = dict(zip(game_data_dict.keys(), repeat("none")))
 
 def reset_games():
     for i, g in enumerate(players_connected):
-        if g.count(2) == number_of_players_per_game:
+        if g.count(2) + g.count(0) == number_of_players_per_game:
             players_connected[i] = [0] * number_of_players_per_game
             game_id = game_data_dict.keys()[n]
             game_data_dict[game_id] = copy(game_data)
@@ -75,7 +75,6 @@ def reset_games():
 def threaded_client(conn):
     global game_data_dict, players_connected, maps_dict
     start_msg = conn.recv(2048).decode()
-    print(start_msg)
     # splitting create game and join
     if len(start_msg) == 4:
         # join lobby
@@ -151,6 +150,12 @@ def threaded_client(conn):
     last_msg = datetime.datetime.now()
     while True:
         msg = conn.recv(2048).decode
+        if players_connected[this_gid][this_pid] != 0:
+            print("Lobby was reseted")
+            conn.send(str.encode("Lobby was deleted"))
+            reset_games()
+            conn.close()
+            exit(0)
         if msg == "lobby_check":
             conn.send(str.encode(f"{players_connected[this_gid].count(1)}"))
             last_msg = datetime.datetime.now()
@@ -163,7 +168,6 @@ def threaded_client(conn):
             for n, p in enumerate(players_connected[this_gid]):
                 if p == 0:
                     players_connected[this_gid][n] = 2
-            last_msg = datetime.datetime.now()
             break
         elif msg == "get max players":
             conn.send(str.encode(f"{number_of_players_per_game}"))
@@ -174,7 +178,7 @@ def threaded_client(conn):
             reset_games()
             conn.close()
             exit(0)
-        elif (datetime.datetime.now() - start_waiting).seconds > 60:
+        elif (datetime.datetime.now() - last_msg).seconds > 60:
             print("connection lost")
             players_connected[this_gid][this_pid] = 2
             reset_games()

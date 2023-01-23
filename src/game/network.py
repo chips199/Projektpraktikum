@@ -25,6 +25,7 @@ class Network:
         :return: player_id and session_id, if player_id = 5 error message in session_id
         """
         self.client.connect(self.addr)
+        # sth = self.client.recv(2048)
         self.client.sendall(str.encode(p))
         rply = self.client.recv(2048).decode()
         print(rply)
