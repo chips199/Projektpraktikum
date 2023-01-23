@@ -3,7 +3,7 @@ import socket
 import struct
 from _thread import start_new_thread
 from time import sleep
-from src.game import game
+# from src.game import game
 
 
 class Network:
@@ -93,8 +93,8 @@ def sth(str):
             exit(1)
     # start game
     net.start_game()
-    g = game.Game(1600, 900, net)
-    g.run()
+    # g = game.Game(1600, 900, net)
+    # g.run()
 
 
 if __name__ == '__main__':

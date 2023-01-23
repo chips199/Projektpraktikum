@@ -18,12 +18,15 @@ class MyLabel(tk.CTkLabel):
     def label_hide_show(self,
                         x: int,
                         y: int,
-                        time: int) -> None:
+                        time: int,
+                        message: str = "No message given") -> None:
 
         # Check if there's an scheduled event
         if self.after_id is not None:
             # cancel the scheduled event
             self.after_cancel(self.after_id)
+
+        self.configure(text=message)
 
         # place the label at x, y with center anchor
         self.place(x=x, y=y, anchor=tk.CENTER)
