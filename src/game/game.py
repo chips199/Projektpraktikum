@@ -15,20 +15,17 @@ from src.game import weapon as Weapon
 wrk_dir = os.path.abspath(os.path.dirname(__file__))
 config_file = wrk_dir + r'\configuration.json'
 basic_map = wrk_dir + r"\..\basicmap"
-platform_map = wrk_dir + r"\..\basicmap"
-
-clock = pygame.time.Clock()
+map_names_dict = {"basicmap": basic_map}
 
 
 class Game:
 
-    def __init__(self, w, h):
-        # setting basic varibals
-        self.net = Network()
+    def __init__(self, w, h, net):
+        self.net = net
         self.width = w
         self.height = h
         self.canvas = canvas.Canvas(self.width, self.height, str(self.net.id) + "Stick Wars")
-        self.map = Map(self, basic_map)
+        self.map = Map(self, map_names_dict[net.map_name])
         # load the config for default values
         # this will later be done in the map to configure spawnpoints
         with open(config_file) as file:
