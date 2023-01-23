@@ -11,6 +11,7 @@ class Network:
     def __init__(self, msg):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.host = "localhost"
+        # self.host = "172.29.14.153"
         # For this to work on your machine this must be equal to the ipv4 address of the machine running the server
         # You can find this address by typing ipconfig in CMD and copying the ipv4 address. Again this must be the servers
         # ipv4 address. This feild will be the same for all your clients.
@@ -68,6 +69,9 @@ class Network:
     def get_map(self):
         return self.send("get Mapname")
 
+    def game_started(self):
+        return bool(self.send("game started"))
+
 
 def sth(str):
     # create networkelement also creates connection
@@ -78,7 +82,7 @@ def sth(str):
         print(net.session_id)
         exit(1)
     pressed_button = True
-    while True:
+    while not net.game_started():
         try:
             number_of_players_connected = int(net.check_lobby())
             # print(number_of_players_connected)
