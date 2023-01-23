@@ -110,8 +110,6 @@ def threaded_client(conn):
         this_spawn_points = copy(spawn_points[maps_dict[game_id]])
         conn.send(str.encode(f"{this_pid},{game_id}"))
         # finished connecting player
-
-
     else:
         # Create new game
         try:
