@@ -34,8 +34,8 @@ class MyWindow(tk.CTk):
 
     def on_closing(self):
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
-            self.destroy()
             self.run = False
+            self.destroy()
 
     def move_out_of_window(self,
                            widget_list: list['MyFrame|MyLabel'],
@@ -82,13 +82,11 @@ class MyWindow(tk.CTk):
             else:
                 # if the widget is a MyFrame instance, clear the frame and forget its placement
                 if isinstance(widget, MyFrame):
-                    print("frame")
                     widget.clear_frame()
                     widget.place_forget()
 
                 # if the widget is not a MyFrame instance, destroy the widget
                 else:
-                    print("not frame")
                     widget.destroy()
 
                 # remove the widget from widget_list and direction from direction_list, since no moving can be done
@@ -103,4 +101,4 @@ class MyWindow(tk.CTk):
                                                                         delay,
                                                                         stepsize,
                                                                         anchor))
-        self.update()
+        # self.update()

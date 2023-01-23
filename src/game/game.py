@@ -6,15 +6,16 @@ import datetime
 import pandas as pd
 import pygame
 
-import canvas
-from map import Map
+from src.game import canvas
+from src.game.map import Map
 from src.game import player as Player
 from src.game.network import Network
-from src.game.weapon import Weapon
+from src.game import weapon as Weapon
 
 wrk_dir = os.path.abspath(os.path.dirname(__file__))
 config_file = wrk_dir + r'\configuration.json'
 basic_map = wrk_dir + r"\..\basicmap"
+platform_map = wrk_dir + r"\..\basicmap"
 
 clock = pygame.time.Clock()
 
@@ -26,7 +27,7 @@ class Game:
         self.net = Network()
         self.width = w
         self.height = h
-        self.canvas = canvas.Canvas(self.width, self.height, str(self.net.id) + " Testing...")
+        self.canvas = canvas.Canvas(self.width, self.height, str(self.net.id) + "Stick Wars")
         self.map = Map(self, basic_map)
         # load the config for default values
         # this will later be done in the map to configure spawnpoints
@@ -46,6 +47,7 @@ class Game:
                 Player.Player(config['1']['position'][0], config['1']['position'][1], (255, 255, 0)),
                 Player.Player(config['2']['position'][0], config['2']['position'][1], (0, 255, 255)),
                 Player.Player(config['3']['position'][0], config['3']['position'][1], (255, 0, 255))]
+
 
     def run(self):
         """

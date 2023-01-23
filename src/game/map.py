@@ -64,7 +64,7 @@ class Map():
         # horizontal edges
         for x in range(self.game.width):
             solid.append((x, 0))
-            solid.append((x, self.game.height))
+            # solid.append((x, self.game.height))
         # vertical edges
         for y in range(self.game.height):
             solid.append((0, y))

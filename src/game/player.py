@@ -3,7 +3,7 @@ from copy import copy
 from typing import List, Tuple
 import pandas as pd
 import pygame
-import weapon
+from src.game import weapon
 
 
 class Player():

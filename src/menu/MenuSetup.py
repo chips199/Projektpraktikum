@@ -1,22 +1,20 @@
 import os
-from tkinter import Canvas
-
 import customtkinter as tk
 
 from src.menu.MyEntry import MyEntry
 from src.menu.MyFrame import MyFrame
 from src.menu.MyLabel import MyLabel
 from src.menu.MyWindow import MyWindow
-from PIL import Image, ImageTk
+from src.game import game
+
+from PIL import Image
 
 wrk_dir = os.path.abspath(os.path.dirname(__file__))
 
 
 class MenuSetup:
-    def __init__(self, *args, **kwargs):
+    def __init__(self):
         # -------------------------------------------  Parameters  -------------------------------------------
-        self.interaction_frame = None
-        self.main_frame = None
         self.w = 300
         self.h = 60
         self.window_width_planned = self.window_width = 1600
@@ -29,7 +27,7 @@ class MenuSetup:
         # -------------------------------------------  Window  -------------------------------------------
         # configure root window
         self.root = MyWindow()
-        self.root.title('TestName')
+        self.root.title('Stick Wars')
 
         # get screen width and height
         self.ws = self.root.winfo_screenwidth()  # width of the screen
@@ -58,6 +56,12 @@ class MenuSetup:
         self.root.geometry("{}x{}+{}+{}".format(self.window_width, self.window_height, self.x, self.y))
         self.root.resizable(False, False)
 
+        self.main_frame = MyFrame(master=self.root, width=self.window_width, height=self.window_height)
+        self.main_frame.place(anchor='center', relx=0.5, rely=0.5)
+        self.interaction_frame = None
+        self.lobby_frame = None
+        self.choose_map_frame = None
+
     def run(self):
         self.load_main_frame()
         self.load_interaction_frame()
@@ -67,8 +71,6 @@ class MenuSetup:
 
     def load_main_frame(self):
         # -------------------------------------------  MainFrame  -------------------------------------------
-        self.main_frame = MyFrame(master=self.root, width=self.window_width, height=self.window_height)
-        self.main_frame.place(anchor='center', relx=0.5, rely=0.5)
 
         # Hintergrundbild
         background_image = tk.CTkImage(dark_image=Image.open(wrk_dir + r"\..\basicmap\solid\basic_map_structures.png"),
@@ -107,13 +109,6 @@ class MenuSetup:
                               justify='left')
 
         # Create 'Play/Start Button'
-        success_function = lambda: self.root.move_out_of_window(widget_list=[self.interaction_frame,
-                                                                             self.main_frame.winfo_children()[0]],  # type:ignore[union-attr]
-                                                                direction_list=["up",
-                                                                                "down"],
-                                                                stepsize=5)
-
-        success_function2 = lambda: self.main_frame.after(1800, lambda: self.load_lobby_frame())  # type:ignore[union-attr]
 
         failure_function = lambda: label_error.label_hide_show(
             x=int((entry_session_id.winfo_x() + entry_session_id.winfo_width() / 2) * self.sizing_width),
@@ -122,14 +117,20 @@ class MenuSetup:
 
         button_play = tk.CTkButton(master=self.interaction_frame,
                                    text="Play",
-                                   command=lambda: entry_session_id.check_text(target_text=self.s_id,
-                                                                               success_function=success_function,
-                                                                               failure_function=failure_function,
-                                                                               success_function2=success_function2),
                                    width=self.h,
                                    height=self.h,
                                    font=("None", self.h * 0.4),
                                    corner_radius=int(self.h / 3), )
+        button_play.configure(command=lambda: entry_session_id.check_text(target_text=self.s_id,
+                                                                          success_function=lambda: self.clear_frame_sliding(
+                                                                              widget_list=[self.interaction_frame,
+                                                                                           self.main_frame.winfo_children()[
+                                                                                               0]],
+                                                                              direction_list=["up",
+                                                                                              "down"],
+                                                                              time=1800,
+                                                                              func=lambda: self.load_lobby_frame()),
+                                                                          failure_function=failure_function))
         button_play.place(x=int((entry_session_id.winfo_x() + entry_session_id.winfo_width() + 10) * self.sizing_width),
                           y=int(entry_session_id.winfo_y() * self.sizing_height))
         self.root.update()
@@ -140,22 +141,47 @@ class MenuSetup:
                                           width=int((button_play.winfo_x() - entry_session_id.winfo_x() +
                                                      button_play.winfo_width()) * self.sizing_width),
                                           height=int(self.h / 2 * self.sizing_height),
-                                          # command=lambda: printing(),
-                                          font=("None", self.h * 0.4),
-                                          corner_radius=int(self.h / 3))
+                                          command=lambda: self.clear_frame_sliding(widget_list=[self.interaction_frame,
+                                                                                                self.main_frame.winfo_children()[
+                                                                                                    0]],
+                                                                                   direction_list=["up",
+                                                                                                   "down"],
+                                                                                   time=2000,
+                                                                                   func=lambda: self.load_choose_map_frame()),
+                                          corner_radius=int(self.h / 3),
+                                          font=("None", self.h * 0.4))
         button_new_session.place(x=int(entry_session_id.winfo_x() * self.sizing_width),
                                  y=int((entry_session_id.winfo_y() + entry_session_id.winfo_height() + 15) *
                                        self.sizing_height))
 
     def load_lobby_frame(self):
-        print("frame change")
-        self.interaction_frame.configure(width=self.window_width, height=150 * self.sizing_height)  # type:ignore[union-attr]
-        self.interaction_frame.place(x=0, y=250 * self.sizing_height)  # type:ignore[union-attr]
+        # for widget in self.main_frame.winfo_children():
+        #     widget.destroy()
+
+        self.lobby_frame = MyFrame(master=self.root,
+                                   fg_color="#212121")
+
+        self.lobby_frame.configure(width=self.window_width,
+                                   height=150 * self.sizing_height)  # type:ignore[union-attr]
+        self.lobby_frame.place(x=0, y=250 * self.sizing_height)  # type:ignore[union-attr]
 
         session_id_label = MyLabel(master=self.main_frame,
+                                   width=self.w,
+                                   height=self.h,
                                    text="Session ID: {}".format(self.s_id),
-                                   font=("None", 30))
+                                   font=("None", self.h * 0.6))
         session_id_label.place(x=50 * self.sizing_width, y=30 * self.sizing_height)
+
+        button_start = tk.CTkButton(master=self.main_frame,
+                                    text="Start",
+                                    width=self.w,
+                                    height=self.h,
+                                    command=self.start_game,
+                                    font=("None", self.h * 0.6),
+                                    corner_radius=int(self.h / 3))
+        button_start.place(x=int(self.root.window_width / 2),
+                           y=int(200 * self.sizing_height),
+                           anchor='center')
 
         player_image = tk.CTkImage(dark_image=Image.open(wrk_dir + r"\..\basicmap\player\basic_player_orange.png"),
                                    size=(int(49 * self.sizing_width), int(142 * self.sizing_height)))
@@ -212,129 +238,103 @@ class MenuSetup:
                                                                   pos_two=(1375, 485),
                                                                   next_pos="two")))
 
-# -------------------------------------------  Parameters  -------------------------------------------
-# w = 300
-# h = 60
-# window_width_planned = window_width = 1600
-# window_height_planned = window_height = 900
-# sizing = round(window_width_planned/1920, 5)
-# self.sizing_width = 1
-# self.sizing_height = 1
-# s_id = "1"
+    def load_choose_map_frame(self):
+        for widget in self.main_frame.winfo_children():
+            widget.destroy()
 
-# # -------------------------------------------  Window  -------------------------------------------
-# # configure root window
-# root = MyWindow()
-# root.title('TestName')
-#
-# # get screen width and height
-# ws = root.winfo_screenwidth()  # width of the screen
-# hs = root.winfo_screenheight()  # height of the screen
-#
-# # change size of window and other widgets, if the actual screen size is smaller than the planned screen size
-# if ws < window_width_planned or hs < window_height_planned:
-#     window_width = int(ws * sizing)
-#     window_height = int(hs * sizing)
-#
-#     self.sizing_width = round(window_width / window_width_planned, 2)  # type: ignore[assignment]
-#     self.sizing_height = round(window_height / window_height_planned, 2)  # type: ignore[assignment]
-#     print(window_width / window_width_planned)
-#
-#     w = int(300 * window_width / window_width_planned)
-#     h = int(60 * window_height / window_height_planned)
-#
-# root.set_size(window_width, window_height)
-# root.set_sizing(self.sizing_width, self.sizing_height)
-#
-# # calculate x and y coordinates for the Tk root window
-# x = int((ws / 2) - (window_width / 2))
-# y = int((hs / 2) - (window_height / 2) - 20)
-# root.geometry("{}x{}+{}+{}".format(window_width, window_height, x, y))
-# root.resizable(False, False)
-#
-# # -------------------------------------------  MainFrame  -------------------------------------------
-# main_frame = MyFrame(master=root, width=window_width, height=window_height)
-# main_frame.place(anchor='center', relx=0.5, rely=0.5)
-#
-# # Hintergrundbild
-# background_image = tk.CTkImage(dark_image=Image.open(wrk_dir + r"\..\basicmap\solid\basic_map_structures.png"),
-#                                size=(window_width, window_height))
-# # noinspection PyTypeChecker
-# label_background = tk.CTkLabel(master=main_frame,
-#                                text=None,
-#                                image=background_image)
-# label_background.place(x=0, y=0)
+        # load basic map
+        basic_map_structures = tk.CTkImage(
+            dark_image=Image.open(wrk_dir + r"\..\menu\maps\basic_map.png"),
+            size=(int(444 * self.sizing_width),
+                  int(250 * self.sizing_height)))
+        map1 = MyLabel(master=self.main_frame,
+                       text=None,
+                       image=basic_map_structures)
+        map1.place(x=int(175 * self.sizing_width),
+                   y=int(300 * self.sizing_height))
 
-# -------------------------------------------  InteractionFrame  -------------------------------------------
-# "#212121"
-# interaction_frame = MyFrame(master=root, width=int(600 * self.sizing_width), height=int(300 * self.sizing_height),
-#                             fg_color="#212121")
-# interaction_frame.place(anchor='center', x=window_width / 2, y=window_height * 0.3)
-#
-# # Session ID Eingabefeld
-# entry_session_id = MyEntry(master=interaction_frame,
-#                            placeholder_text="Session ID",
-#                            width=w,
-#                            height=h,
-#                            font=("None", h * 0.5),
-#                            corner_radius=h / 3)
-# entry_session_id.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
-# root.update()
-#
-# # Session ID not found Fehlermeldung
-# label_error = MyLabel(master=interaction_frame,
-#                       text="Session ID not found",
-#                       text_color="red",
-#                       bg_color="transparent",
-#                       width=0,
-#                       height=10 * self.sizing_height,
-#                       font=("None", 12 * self.sizing_height),
-#                       anchor="w",
-#                       justify='left')
-#
-# # Create 'Play/Start Button'
-# success_function = lambda: root.move_out_of_window(widget_list=[interaction_frame,
-#                                                                 main_frame.winfo_children()[0]],
-#                                                    direction_list=["up",
-#                                                                    "down"],
-#                                                    stepsize=5)
-#
-# success_function2 = lambda: main_frame.after(1800, lambda: load_lobby_frame(root))
-#
-# failure_function = lambda: label_error.label_hide_show(
-#     x=int((entry_session_id.winfo_x() + entry_session_id.winfo_width() / 2) * self.sizing_width),
-#     y=int((entry_session_id.winfo_y() - 20) * self.sizing_height),
-#     time=3000)
-#
-# button_play = tk.CTkButton(master=interaction_frame,
-#                            text="Play",
-#                            command=lambda: entry_session_id.check_text(target_text=s_id,
-#                                                                        success_function=success_function,
-#                                                                        failure_function=failure_function,
-#                                                                        success_function2=success_function2),
-#                            width=h,
-#                            height=h,
-#                            font=("None", h * 0.4),
-#                            corner_radius=int(h / 3), )
-# button_play.place(x=int((entry_session_id.winfo_x() + entry_session_id.winfo_width() + 10) * self.sizing_width),
-#                   y=int(entry_session_id.winfo_y() * self.sizing_height))
-# root.update()
-#
-# # Create 'New Session Button'
-# button_new_session = tk.CTkButton(master=interaction_frame,
-#                                   text="Create New Session",
-#                                   width=int((button_play.winfo_x() - entry_session_id.winfo_x() +
-#                                              button_play.winfo_width()) * self.sizing_width),
-#                                   height=int(h / 2 * self.sizing_height),
-#                                   #                                 command=lambda: printing(),
-#                                   font=("None", h * 0.4),
-#                                   corner_radius=int(h / 3))
-# button_new_session.place(x=int(entry_session_id.winfo_x() * self.sizing_width),
-#                          y=int((entry_session_id.winfo_y() + entry_session_id.winfo_height() + 15) * self.sizing_height))
+        self.root.update()
 
-# root.update()
-#
-# # root.mainloop()
-#
-# while root.run:
-#     root.update()
+        # load space map
+        space_map_platforms = tk.CTkImage(
+            dark_image=Image.open(wrk_dir + r"\..\menu\maps\space_map.png"),
+            size=(map1.winfo_width(),
+                  map1.winfo_height()))
+        map2 = MyLabel(master=self.main_frame,
+                       text=None,
+                       image=space_map_platforms,
+                       fg_color='#252525'
+                       )
+        map2.place(x=int(map1.winfo_x() + map1.winfo_width() + 20 * self.sizing_width),
+                   y=map1.winfo_y())
+
+        self.root.update()
+
+        # add buttons to choose a map
+        button_start = tk.CTkButton(master=self.main_frame,
+                                    text="Basicmap",
+                                    width=map1.winfo_width(),
+                                    height=int(self.h * 0.3),
+                                    font=("None", self.h * 0.4),
+                                    corner_radius=int(self.h / 3))
+        button_start.place(x=int(map1.winfo_x()),
+                           y=int(map1.winfo_y() + map1.winfo_height() + 20 * self.sizing_height))
+
+        button_start2 = tk.CTkButton(master=self.main_frame,
+                                     text="Space Map",
+                                     width=map2.winfo_width(),
+                                     height=int(self.h * 0.3),
+                                     font=("None", self.h * 0.4),
+                                     corner_radius=int(self.h / 3))
+        button_start2.place(x=int(map2.winfo_x()),
+                            y=int(map2.winfo_y() + map2.winfo_height() + 20 * self.sizing_height))
+
+        button_start.configure(
+            command=lambda: self.clear_frame_sliding(widget_list=[self.main_frame.winfo_children()[0],
+                                                                  self.main_frame.winfo_children()[1],
+                                                                  self.main_frame.winfo_children()[2],
+                                                                  self.main_frame.winfo_children()[3]],
+                                                     direction_list=["down",
+                                                                     "down",
+                                                                     "down",
+                                                                     "down"],
+                                                     stepsize=7,
+                                                     time=2500,
+                                                     func=lambda: self.load_lobby_frame()))
+
+        button_start2.configure(
+            command=lambda: self.clear_frame_sliding(widget_list=[self.main_frame.winfo_children()[0],
+                                                                  self.main_frame.winfo_children()[1],
+                                                                  self.main_frame.winfo_children()[2],
+                                                                  self.main_frame.winfo_children()[3]],
+                                                     direction_list=["down",
+                                                                     "down",
+                                                                     "down",
+                                                                     "down"],
+                                                     stepsize=7,
+                                                     time=2500,
+                                                     func=lambda: self.load_lobby_frame()))
+
+    def clear_frame_sliding(self,
+                            widget_list,
+                            direction_list,
+                            stepsize=5,
+                            time=2000,
+                            func=None):
+        self.root.move_out_of_window(widget_list=widget_list,
+                                     direction_list=direction_list,
+                                     stepsize=stepsize)
+        if func is not None:
+            self.main_frame.after(time, lambda: func())
+
+    def start_game(self):
+
+        self.root.run = False
+        self.root.destroy()
+        g = game.Game(1600, 900)
+        g.run()
+
+
+if __name__ == "__main__":
+    m = MenuSetup()
+    m.run()
