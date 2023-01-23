@@ -17,17 +17,24 @@ class Player():
     health = 100
 
     def __init__(self, startx, starty, game, image=None, color=(255, 0, 0)):
+        self.falling_time = datetime.datetime.now()
+        self.jumping_time = datetime.datetime.now()
         self.x = startx
         self.y = starty
         self.game = game
-        self.velocity = 5
+        self.velocity = 4
+        self.velocity_gravity = 1
+        self.velocity_jumping = self.max_jumping_speed = 10
+        self.velocity_time = 30
+        self.is_jumping = False
+        self.is_falling = True
         self.color = color
         self.weapon = weapon
         solid = []  # type: List[Tuple[int, int]]
         relativ_solids = []  # type: List[Tuple[int, int]]
         try:
-            self.image = pygame.image.load(image).convert_alpha()
-            self.image.convert_alpha()
+            self.image = pygame.image.load(image)  # .convert_alpha()
+            # self.image.convert_alpha()
             self.edge_surface = pygame.transform.laplacian(self.image).convert_alpha()
             alpha_array = pygame.surfarray.pixels_alpha(self.edge_surface)
             alpha_array = alpha_array.swapaxes(0, 1)
@@ -90,6 +97,7 @@ class Player():
     def move(self, dirn, v=-99):
         """
         :param dirn: 0 - 3 (right, left, up, down)
+        :param    v: velocity
         :return: None
         """
         if v == -99:
@@ -105,13 +113,41 @@ class Player():
             self.y += v
         self.solid_df = Player.shift_df(self.solid_df, dirn, v)
 
-    def jump(self, h):
+    def jump(self, func):
         """
-        moves player upwards
-        :param h: hight of the jump
+        moves player upwards when possible
+        :param func: function to check if there is no collision while jumping
         """
-        self.move(2, h)
-        self.status_jump += h
+
+        # when player is not falling
+        if not self.is_falling:
+
+            # check is moving upwards is possible
+            vel = func(player=self, dirn=2, distance=int(self.velocity_jumping))
+
+            # when upwards is possible
+            if vel > 0:
+
+                # initialize jumping when velocity_jumping is reseted (= max_jumping_speed) and the player
+                # is currently not jumping
+                if not self.is_jumping:
+                    self.is_jumping = True
+                    # reset timer to current time
+                    self.jumping_time = datetime.datetime.now()
+
+                # after certain time, decrease jumping speed
+                elif datetime.datetime.now() - self.jumping_time > datetime.timedelta(milliseconds=self.velocity_time):
+                    self.velocity_jumping -= 1
+                    # reset timer to current time
+                    self.jumping_time = datetime.datetime.now()
+
+                # jump with speed calculated in func()
+                self.move(2, vel)
+
+            # when jumping speed reaches 0 or jumping is not possible, stop jumping
+            if vel <= 0:
+                self.is_jumping = False
+                self.velocity_jumping = self.max_jumping_speed
 
     def beaten(self, weapon_enemy):
         """
@@ -138,3 +174,41 @@ class Player():
         new_pos['x'] = new_pos['x'].map(lambda x: x + self.x)
         new_pos['y'] = new_pos['y'].map(lambda y: y + self.y)
         self.solid_df = new_pos
+
+    def gravity(self, func):
+        """
+        moves player downwards when possible
+        :param func: function to check if there is no collision while falling
+        """
+        # when player is not jumping
+        if not self.is_jumping:
+
+            # calculate if player is able to fall (vel > 0 means yes)
+            vel = func(player=self, dirn=3, distance=int(self.velocity_gravity))
+
+            # if able to fall
+            if vel > 0:
+
+                # initialize falling when the player is currently not falling
+                if not self.is_falling:
+                    self.is_falling = True
+                    # reset timer to current time
+                    self.falling_time = datetime.datetime.now()
+
+                # after certain time increase the falling speed until it's maximum
+                elif datetime.datetime.now() - self.falling_time > datetime.timedelta(milliseconds=self.velocity_time):
+                    self.velocity_gravity += 1
+                    # reset timer to current time
+                    self.falling_time = datetime.datetime.now()
+
+                    # limit the falling speed to it's maximum
+                    if self.velocity_gravity > self.max_jumping_speed:
+                        self.velocity_gravity = self.max_jumping_speed
+
+                # move player down with speed calculated in func()
+                self.move(dirn=3, v=int(vel))
+
+            # otherwise reset gravity settings after falling
+            elif vel <= 0:
+                self.is_falling = False
+                self.velocity_gravity = 1
