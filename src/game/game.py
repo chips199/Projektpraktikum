@@ -48,7 +48,6 @@ class Game:
                 Player.Player(config['2']['position'][0], config['2']['position'][1], (0, 255, 255)),
                 Player.Player(config['3']['position'][0], config['3']['position'][1], (255, 0, 255))]
 
-
     def run(self):
         """
         the core method of the game containing the game loop

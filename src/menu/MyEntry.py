@@ -17,7 +17,7 @@ class MyEntry(tk.CTkEntry):
                    **kwargs: Optional[Union[Callable, None]]) -> None:          # type:ignore[type-arg]
 
         # Check if entered text is equal to target text
-        if self.get() == target_text or True:               # For Testing
+        if self.get() == target_text:               # For Testing
             # Execute success_function if provided
             if success_function is not None:
                 success_function()
