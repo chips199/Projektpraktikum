@@ -92,4 +92,3 @@ if __name__ == '__main__':
     map = net.start_game()
     g = game.Game(1600, 900, net, map)
     g.run()
-
