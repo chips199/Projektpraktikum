@@ -92,8 +92,8 @@ def sth(str):
             print(net.check_lobby())
             exit(1)
     # start game
-    map = net.start_game()
-    g = game.Game(1600, 900, net, net.map_name)
+    net.start_game()
+    g = game.Game(1600, 900, net)
     g.run()
 
 
