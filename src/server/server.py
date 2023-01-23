@@ -9,11 +9,12 @@ import string
 from copy import copy
 from itertools import repeat
 from time import sleep
+from typing import List
 
 
 def get_random_ids(number_of_ids, length):
     # returns a string of integers dealing as an id for the games
-    res = list()
+    res: list[str] = list()
     while len(res) < number_of_ids:
         letters = string.digits
         result_str = ''.join(random.choice(letters) for i in range(length))
