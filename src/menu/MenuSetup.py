@@ -1,3 +1,4 @@
+import inspect
 import os
 import time
 from _thread import start_new_thread
@@ -33,6 +34,8 @@ class MenuSetup:
         self.sizing_height = 1
         self.s_id = "1"
         self.amount_player = 0
+        self.game_started = False
+        self.player = []
 
         self.player_dict = {
             "0": [wrk_dir + r"\..\basicmap\player\basic_player_magenta.png", 175],
@@ -59,7 +62,6 @@ class MenuSetup:
                                       self.window_width_planned, 2)  # type: ignore[assignment]
             self.sizing_height = round(self.window_height /
                                        self.window_height_planned, 2)  # type: ignore[assignment]
-            print(self.window_width / self.window_width_planned)
 
             self.w = int(300 * self.window_width / self.window_width_planned)
             self.h = int(60 * self.window_height / self.window_height_planned)
@@ -80,37 +82,59 @@ class MenuSetup:
         self.choose_map_frame = None
 
     def update_player(self):
-        time.sleep(1.5)
-        # task to get amount of player from server, needs to be performed in asynchronus thread
-        while self.root.run and self.net is not None:
-            if self.net.game_started():
-                # Start game here
-                print("hi")
-                self.start_game()
-                return
-            server_amount_player = int(self.net.check_lobby())
-            for i in range(server_amount_player - self.amount_player):
-                if self.amount_player < server_amount_player:
-                    time.sleep(1)
-                    print("amount player saved", self.amount_player)
-                    # print("i", i)
-                    print("amount player from server", server_amount_player)
-                    # self.amount_player = int(self.net.check_lobby())
-                    self.load_player(path=self.player_dict[str(self.amount_player)][0],
-                                     x_pos=self.player_dict[str(self.amount_player)][1])
-                    self.amount_player += 1
-                print()
+        # time.sleep(1.5)
+        # # task to get amount of player from server, needs to be performed in asynchronus thread
+        # while self.root.run and self.net is not None:
+        #     # if self.net.game_started():
+        #     #     # Start game here
+        #     #     print("hi")
+        #     #     self.start_game()
+        #     # self.game_started = True
+        #     # else:
+        #     server_amount_player = int(self.net.check_lobby())
+        #     for i in range(server_amount_player - self.amount_player):
+        #         if self.amount_player < server_amount_player:
+        #             time.sleep(1)
+        #             # print("amount player saved", self.amount_player)
+        #             # print("i", i)
+        #             # print("amount player from server", server_amount_player)
+        #             # self.amount_player = int(self.net.check_lobby())
+        #             self.load_player(path=self.player_dict[str(self.amount_player)][0],
+        #                              x_pos=self.player_dict[str(self.amount_player)][1])
+        #             self.amount_player += 1
+        #         print()
+        server_amount_player = int(self.net.check_lobby())
+        print(server_amount_player)
+        for i in range(abs(server_amount_player - self.amount_player)):
+            if self.amount_player < server_amount_player:
+                print("load player", self.amount_player)
+                # time.sleep(1)
+                print("amount player saved", self.amount_player)
+                # print("i", i)
+                print("amount player from server", server_amount_player)
+                # self.amount_player = int(self.net.check_lobby())
+                self.load_player(path=self.player_dict[str(self.amount_player)][0],
+                                 x_pos=self.player_dict[str(self.amount_player)][1])
+                self.amount_player += 1
+            else:
+                print("else")
+                player_to_remove = self.player.pop()
+                player_to_remove.destroy()
+                self.amount_player -= 1
+        print()
+        if self.root.run and self.net is not None:
+            self.main_frame.after(1000, lambda: self.update_player())
+
+    def check_if_game_started(self):
+        if self.net.game_started():
+            self.start_game()
+        else:
+            self.root.after(1500, lambda: self.check_if_game_started())
 
     def run(self):
         self.load_main_frame()
         self.load_interaction_frame()
         self.root.mainloop()
-
-        while self.root.run:
-            self.root.update()
-
-            # if self.net is not None:
-            #     self.amount_player = int(self.net.check_lobby())
 
     def load_main_frame(self):
         # -------------------------------------------  MainFrame  -------------------------------------------
@@ -162,20 +186,6 @@ class MenuSetup:
         entry_session_id.place(relx=0.5, rely=0.0, anchor='n')
         self.root.update()
 
-        # # Game Name Label
-        # game_name_image = tk.CTkImage(dark_image=Image.open(wrk_dir + r"\..\stick_wars_schriftzug.png"),
-        #                            size=(int(1225 * self.sizing_width * 0.9), int(164 * self.sizing_height * 0.9)))
-        # label_image = MyLabel(master=self.interaction_frame,
-        #                       text=None,
-        #                       image=game_name_image)
-        # label_image.place(x=int((entry_session_id.winfo_x() + entry_session_id.winfo_width()/2) * self.sizing_width),
-        #                   y=int((entry_session_id.winfo_y() - entry_session_id.winfo_height()/2 - 30) * self.sizing_height),
-        #                   anchor='s')
-
-        # label_image.place(x=0,
-        #                   y=0,
-        #                   anchor='center')
-
         # Create 'Play/Start Button'
         button_play = tk.CTkButton(master=self.interaction_frame,
                                    text="Play",
@@ -191,7 +201,10 @@ class MenuSetup:
                                                                      direction_list=["up",
                                                                                      "down"],
                                                                      after_time=2400,
-                                                                     func=lambda: self.load_lobby_frame())))
+                                                                     func=lambda: self.load_lobby_frame(),
+                                                                     fun2=lambda: self.check_if_game_started(),
+                                                                     func3=lambda: self.main_frame.after(2300,
+                                                                                                         lambda: self.update_player()))))
 
         button_play.place(x=int((entry_session_id.winfo_x() + entry_session_id.winfo_width() + 10) * self.sizing_width),
                           y=int(entry_session_id.winfo_y() * self.sizing_height))
@@ -217,9 +230,6 @@ class MenuSetup:
                                        self.sizing_height))
 
     def load_lobby_frame(self):
-        # for widget in self.main_frame.winfo_children():
-        #     widget.destroy()
-
         self.lobby_frame = MyFrame(master=self.root,
                                    fg_color="#212121")
 
@@ -250,12 +260,8 @@ class MenuSetup:
                            y=0,
                            anchor='n')
 
-        # self.amount_player = int(self.net.check_lobby())
-        # for i in range(self.amount_player):
-        #     print("yes")
-        #     self.load_player(path=self.player_dict[str(i)][0], x_pos=self.player_dict[str(i)][1])
-
     def load_player(self, x_pos, path):
+        print("load player")
         player_image = tk.CTkImage(dark_image=Image.open(path),
                                    size=(int(49 * self.sizing_width), int(142 * self.sizing_height)))
         label_image = MyLabel(master=self.main_frame,
@@ -263,6 +269,8 @@ class MenuSetup:
                               image=player_image)
         label_image.place(x=int(x_pos * self.sizing_width), y=int(250 * self.sizing_height))
         label_image.set_sizing(self.sizing_width, self.sizing_height)
+
+        self.player.append(label_image)
 
         self.root.update()
 
@@ -273,9 +281,6 @@ class MenuSetup:
                                                                                next_pos="two"))
 
     def load_choose_map_frame(self):
-        # for widget in self.main_frame.winfo_children():
-        #     widget.place_forget()
-        #     widget.destroy()
         self.interaction_frame.destroy()
 
         self.choose_map_frame = MyFrame(master=self.root, width=int(self.window_width),
@@ -327,7 +332,10 @@ class MenuSetup:
                                                    direction_list=["down"],
                                                    stepsize=7,
                                                    after_time=2500,
-                                                   func=lambda: self.load_lobby_frame())))
+                                                   func=lambda: self.load_lobby_frame(),
+                                                   func2=lambda: self.check_if_game_started(),
+                                                   func3=lambda: self.main_frame.after(2800,
+                                                                                       lambda: self.update_player()))))
 
         button_start2 = tk.CTkButton(master=self.choose_map_frame,
                                      text="Space Map",
@@ -344,28 +352,38 @@ class MenuSetup:
                                                    direction_list=["down"],
                                                    stepsize=7,
                                                    after_time=2500,
-                                                   func=lambda: self.load_lobby_frame())))
+                                                   func=lambda: self.load_lobby_frame(),
+                                                   func2=lambda: self.check_if_game_started(),
+                                                   func3=lambda: self.main_frame.after(2800,
+                                                                                       lambda: self.update_player()))))
 
     def clear_frame_sliding(self,
                             widget_list: list['MyLabel|tk.CTkButton|MyFrame'],
                             direction_list: list[str],
                             stepsize: int = 5,
                             after_time: int = 2000,
-                            func: Optional[Union[Callable, None]] = None) -> None:  # type:ignore[type-arg]
+                            func: Optional[Union[Callable, None]] = None,
+                            **kwargs: Optional[Union[Callable, None]]) -> None:  # type:ignore[type-arg]
         self.root.move_out_of_window(widget_list=widget_list,
                                      direction_list=direction_list,
                                      stepsize=stepsize)
         if func is not None:
             self.main_frame.after(after_time, lambda: func())
+        for key, value in kwargs.items():
+            if inspect.isfunction(value):
+                value()
 
     def start_game(self):
-
         self.root.run = False
+        self.root.destroy()
         sleep(1)
+        # self.root.destroy()
+        # start_new_thread(self.close_window(), tuple())
         self.net.start_game()  # type:ignore[union-attr]
         # sleep(1)
-        self.root.destroy()
         g = game.Game(w=1600, h=900, net=self.net)
+        # self.root.quit()
+        # self.root.destroy()
         g.run()
 
     def start_network(self, argument, func):
@@ -382,7 +400,7 @@ class MenuSetup:
                     message=self.net.session_id)
             else:
                 self.s_id = self.net.session_id
-                start_new_thread(self.update_player, tuple())
+                # start_new_thread(self.update_player, tuple())
                 func()
 
         except ConnectionRefusedError:
