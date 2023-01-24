@@ -35,19 +35,22 @@ class Game:
         with open(config_file) as file:
             config = json.load(file)
 
+        # Create list of weapons
+        self.weapon_list = [Weapon.Weapon(distance=100, damage=15, durability=15, cooldown=1)]
+
         # if a map has player images generate use them if not don't
         if len(self.map.player_uris) == 4:
             self.playerList = [
-                Player.Player(config['0']['position'][0], config['0']['position'][1], self, self.map.player_uris[0]),
-                Player.Player(config['1']['position'][0], config['1']['position'][1], self, self.map.player_uris[1]),
-                Player.Player(config['2']['position'][0], config['2']['position'][1], self, self.map.player_uris[2]),
-                Player.Player(config['3']['position'][0], config['3']['position'][1], self, self.map.player_uris[3])]
+                Player.Player(config['0']['position'][0], config['0']['position'][1], self, self.weapon_list[0], self.map.player_uris[0]),
+                Player.Player(config['1']['position'][0], config['1']['position'][1], self, self.weapon_list[0], self.map.player_uris[1]),
+                Player.Player(config['2']['position'][0], config['2']['position'][1], self, self.weapon_list[0], self.map.player_uris[2]),
+                Player.Player(config['3']['position'][0], config['3']['position'][1], self, self.weapon_list[0], self.map.player_uris[3])]
         else:
             self.playerList = [
-                Player.Player(config['0']['position'][0], config['0']['position'][1], (0, 255, 0)),
-                Player.Player(config['1']['position'][0], config['1']['position'][1], (255, 255, 0)),
-                Player.Player(config['2']['position'][0], config['2']['position'][1], (0, 255, 255)),
-                Player.Player(config['3']['position'][0], config['3']['position'][1], (255, 0, 255))]
+                Player.Player(config['0']['position'][0], config['0']['position'][1], self.weapon_list[0], (0, 255, 0)),
+                Player.Player(config['1']['position'][0], config['1']['position'][1], self.weapon_list[0], (255, 255, 0)),
+                Player.Player(config['2']['position'][0], config['2']['position'][1], self.weapon_list[0], (0, 255, 255)),
+                Player.Player(config['3']['position'][0], config['3']['position'][1], self.weapon_list[0], (255, 0, 255))]
 
     def run(self):
         """

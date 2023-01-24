@@ -13,10 +13,9 @@ class Player():
     status_jump = 0
     is_connected = False
     mousepos = (0, 0)
-    user_weapon = weapon.Weapon(100, 15, 15, 1)
     health = 100
 
-    def __init__(self, startx, starty, game, image=None, color=(255, 0, 0)):
+    def __init__(self, startx, starty, game, user_weapon, image=None, color=(255, 0, 0)):
         self.falling_time = datetime.datetime.now()
         self.jumping_time = datetime.datetime.now()
         self.x = startx
@@ -31,7 +30,7 @@ class Player():
         self.is_falling = True
         self.block_x_axis = False
         self.color = color
-        self.weapon = weapon
+        self.user_weapon = user_weapon
         solid = []  # type: List[Tuple[int, int]]
         relativ_solids = []  # type: List[Tuple[int, int]]
         try:
