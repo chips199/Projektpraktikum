@@ -103,7 +103,7 @@ class MenuSetup:
         #                              x_pos=self.player_dict[str(self.amount_player)][1])
         #             self.amount_player += 1
         #         print()
-        server_amount_player = int(self.net.check_lobby())
+        server_amount_player = int(self.net.check_lobby())  # type:ignore[union-attr]
         print(server_amount_player)
         for i in range(abs(server_amount_player - self.amount_player)):
             if self.amount_player < server_amount_player:
@@ -126,7 +126,7 @@ class MenuSetup:
             self.main_frame.after(1000, lambda: self.update_player())
 
     def check_if_game_started(self):
-        if self.net.game_started():
+        if self.net.game_started():  # type:ignore[union-attr]
             self.start_game()
         else:
             self.root.after(1500, lambda: self.check_if_game_started())
@@ -281,7 +281,7 @@ class MenuSetup:
                                                                                next_pos="two"))
 
     def load_choose_map_frame(self):
-        self.interaction_frame.destroy()
+        self.interaction_frame.destroy()  # type:ignore[union-attr]
 
         self.choose_map_frame = MyFrame(master=self.root, width=int(self.window_width),
                                         height=int(400 * self.sizing_height),
@@ -362,7 +362,7 @@ class MenuSetup:
                             direction_list: list[str],
                             stepsize: int = 5,
                             after_time: int = 2000,
-                            func: Optional[Union[Callable, None]] = None,
+                            func: Optional[Union[Callable, None]] = None,  # type:ignore[union-attr]
                             **kwargs: Optional[Union[Callable, None]]) -> None:  # type:ignore[type-arg]
         self.root.move_out_of_window(widget_list=widget_list,
                                      direction_list=direction_list,
