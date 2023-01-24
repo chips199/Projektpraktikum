@@ -10,6 +10,7 @@ class Network:
 
     def __init__(self, msg):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # self.host = "172.29.14.153" Christian Stayery
         self.host = "172.29.14.153"
         # self.host = "localhost"
         # self.host = "10.170.48.131"

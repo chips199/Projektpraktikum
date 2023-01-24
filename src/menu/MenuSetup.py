@@ -362,7 +362,7 @@ class MenuSetup:
                             direction_list: list[str],
                             stepsize: int = 5,
                             after_time: int = 2000,
-                            func: Optional[Union[Callable, None]] = None,  # type:ignore[union-attr]
+                            func: Optional[Union[Callable, None]] = None,  # type:ignore[type-arg]
                             **kwargs: Optional[Union[Callable, None]]) -> None:  # type:ignore[type-arg]
         self.root.move_out_of_window(widget_list=widget_list,
                                      direction_list=direction_list,
