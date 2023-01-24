@@ -1,4 +1,5 @@
 import os
+import time
 from _thread import start_new_thread
 from time import sleep
 
@@ -77,15 +78,28 @@ class MenuSetup:
         self.lobby_frame = None
         self.choose_map_frame = None
 
-    def get_amount_player(self):
+    def update_player(self):
+        time.sleep(2.5)
         # task to get amount of player from server, needs to be performed in asynchronus thread
         while self.root.run and self.net is not None:
-            self.amount_player = int(self.net.check_lobby())
-            print(self.amount_player)
+            server_amount_player = int(self.net.check_lobby())
+            for i in range(server_amount_player - self.amount_player):
+                if self.amount_player < server_amount_player:
+                    # self.amount_player += 1
+                    print("amount player saved", self.amount_player)
+                    # print("i", i)
+                    print("amount player from server", server_amount_player)
+                    # self.amount_player = int(self.net.check_lobby())
+                    self.load_player(path=self.player_dict[str(self.amount_player)][0],
+                                     x_pos=self.player_dict[str(self.amount_player)][1])
+                    self.amount_player += 1
+                print()
+            # print(self.amount_player)
 
     def run(self):
         self.load_main_frame()
         self.load_interaction_frame()
+        self.root.mainloop()
 
         while self.root.run:
             self.root.update()
@@ -134,11 +148,11 @@ class MenuSetup:
 
         # Create 'Play/Start Button'
 
-        failure_function = lambda: self.label_error.label_hide_show(
-            x=int((entry_session_id.winfo_x() + entry_session_id.winfo_width() / 2) * self.sizing_width),
-            y=int((entry_session_id.winfo_y() - 20) * self.sizing_height),
-            time=3000,
-            message="Session ID not found")
+        # failure_function = lambda: self.label_error.label_hide_show(
+        #     x=int((entry_session_id.winfo_x() + entry_session_id.winfo_width() / 2) * self.sizing_width),
+        #     y=int((entry_session_id.winfo_y() - 20) * self.sizing_height),
+        #     time=3000,
+        #     message="Session ID not found")
 
         button_play = tk.CTkButton(master=self.interaction_frame,
                                    text="Play",
@@ -146,18 +160,15 @@ class MenuSetup:
                                    height=self.h,
                                    font=("None", self.h * 0.4),
                                    corner_radius=int(self.h / 3), )
-        button_play.configure(command=lambda: self.start_network(session_id=entry_session_id.get(),
-                                                                 func=lambda: entry_session_id.check_text(
-                                                                     # target_text=self.s_id,
-                                                                     success_function=lambda: self.clear_frame_sliding(
-                                                                         widget_list=[self.interaction_frame,
-                                                                                      self.main_frame.winfo_children()[
-                                                                                          0]],
-                                                                         direction_list=["up",
-                                                                                         "down"],
-                                                                         time=1800,
-                                                                         func=lambda: self.load_lobby_frame()),
-                                                                     failure_function=failure_function)))
+        button_play.configure(command=lambda: self.start_network(argument=entry_session_id.get(),
+                                                                 func=lambda: self.clear_frame_sliding(
+                                                                     widget_list=[self.interaction_frame,
+                                                                                  self.main_frame.winfo_children()[
+                                                                                      0]],
+                                                                     direction_list=["up",
+                                                                                     "down"],
+                                                                     after_time=1800,
+                                                                     func=lambda: self.load_lobby_frame())))
 
         button_play.place(x=int((entry_session_id.winfo_x() + entry_session_id.winfo_width() + 10) * self.sizing_width),
                           y=int(entry_session_id.winfo_y() * self.sizing_height))
@@ -174,7 +185,7 @@ class MenuSetup:
                                                                                                     0]],
                                                                                    direction_list=["up",
                                                                                                    "down"],
-                                                                                   time=2000,
+                                                                                   after_time=2000,
                                                                                    func=lambda: self.load_choose_map_frame()),
                                           corner_radius=int(self.h / 3),
                                           font=("None", self.h * 0.4))
@@ -211,9 +222,10 @@ class MenuSetup:
                            y=int(200 * self.sizing_height),
                            anchor='center')
 
-        for i in range(self.amount_player):
-            print("yes")
-            self.load_player(path=self.player_dict[str(i)][0], x_pos=self.player_dict[str(i)][1])
+        # self.amount_player = int(self.net.check_lobby())
+        # for i in range(self.amount_player):
+        #     print("yes")
+        #     self.load_player(path=self.player_dict[str(i)][0], x_pos=self.player_dict[str(i)][1])
 
     def load_player(self, x_pos, path):
         player_image = tk.CTkImage(dark_image=Image.open(path),
@@ -284,46 +296,46 @@ class MenuSetup:
                             y=int(map2.winfo_y() + map2.winfo_height() + 20 * self.sizing_height))
 
         button_start.configure(
-            command=lambda: self.start_network_map(map_name='basicmap',
-                                                   func=lambda: self.clear_frame_sliding(
-                                                       widget_list=[self.main_frame.winfo_children()[0],
-                                                                    self.main_frame.winfo_children()[1],
-                                                                    self.main_frame.winfo_children()[2],
-                                                                    self.main_frame.winfo_children()[3]],
-                                                       direction_list=["down",
-                                                                       "down",
-                                                                       "down",
-                                                                       "down"],
-                                                       stepsize=7,
-                                                       time=2500,
-                                                       func=lambda: self.load_lobby_frame())))
+            command=lambda: self.start_network(argument='basicmap',
+                                               func=lambda: self.clear_frame_sliding(
+                                                   widget_list=[self.main_frame.winfo_children()[0],
+                                                                self.main_frame.winfo_children()[1],
+                                                                self.main_frame.winfo_children()[2],
+                                                                self.main_frame.winfo_children()[3]],
+                                                   direction_list=["down",
+                                                                   "down",
+                                                                   "down",
+                                                                   "down"],
+                                                   stepsize=7,
+                                                   after_time=2500,
+                                                   func=lambda: self.load_lobby_frame())))
 
         button_start2.configure(
-            command=lambda: self.start_network_map(map_name='platformmap',
-                                                   func=lambda: self.clear_frame_sliding(
-                                                       widget_list=[self.main_frame.winfo_children()[0],
-                                                                    self.main_frame.winfo_children()[1],
-                                                                    self.main_frame.winfo_children()[2],
-                                                                    self.main_frame.winfo_children()[3]],
-                                                       direction_list=["down",
-                                                                       "down",
-                                                                       "down",
-                                                                       "down"],
-                                                       stepsize=7,
-                                                       time=2500,
-                                                       func=lambda: self.load_lobby_frame())))
+            command=lambda: self.start_network(argument='platformmap',
+                                               func=lambda: self.clear_frame_sliding(
+                                                   widget_list=[self.main_frame.winfo_children()[0],
+                                                                self.main_frame.winfo_children()[1],
+                                                                self.main_frame.winfo_children()[2],
+                                                                self.main_frame.winfo_children()[3]],
+                                                   direction_list=["down",
+                                                                   "down",
+                                                                   "down",
+                                                                   "down"],
+                                                   stepsize=7,
+                                                   after_time=2500,
+                                                   func=lambda: self.load_lobby_frame())))
 
     def clear_frame_sliding(self,
                             widget_list: list['MyLabel|tk.CTkButton'],
                             direction_list: list[str],
                             stepsize: int = 5,
-                            time: int = 2000,
+                            after_time: int = 2000,
                             func: Optional[Union[Callable, None]] = None) -> None:  # type:ignore[type-arg]
         self.root.move_out_of_window(widget_list=widget_list,
                                      direction_list=direction_list,
                                      stepsize=stepsize)
         if func is not None:
-            self.main_frame.after(time, lambda: func())
+            self.main_frame.after(after_time, lambda: func())
 
     def start_game(self):
 
@@ -334,51 +346,49 @@ class MenuSetup:
         g = game.Game(w=1600, h=900, net=self.net)
         g.run()
 
-    def start_network(self, session_id, func):
+    def start_network(self, argument, func):
         try:
-            self.net = Network(session_id)
+            self.net = Network(argument)
 
             if self.net.id == "5":
-                self.label_error.label_hide_show(
+                self.label_error.label_hide_show(  # type:ignore[union-attr]
                     x=int(400),
                     y=int(50),
                     time=3000,
                     message=self.net.session_id)
             else:
                 self.s_id = self.net.session_id
-                start_new_thread(self.get_amount_player, tuple())
-                func(target_text=self.net.id)
-
-        except ConnectionRefusedError:
-            self.label_error.label_hide_show(
-                x=int(400),
-                y=int(50),
-                time=3000,
-                message="No answer from server")
-
-    def start_network_map(self, map_name, func):
-        try:
-            self.net = Network(map_name)
-
-            if self.net.id == "5":
-                self.label_error.label_hide_show(
-                    x=int(400),
-                    y=int(50),
-                    time=3000,
-                    message=self.net.session_id)
-            else:
-                self.s_id = self.net.session_id
-                # self.amount_player = int(self.net.check_lobby())
-                # self.amount_player = 3
-                start_new_thread(self.get_amount_player, tuple())
+                start_new_thread(self.update_player, tuple())
                 func()
 
         except ConnectionRefusedError:
-            self.label_error.label_hide_show(
+            self.label_error.label_hide_show(  # type:ignore[union-attr]
                 x=int(400),
                 y=int(50),
                 time=3000,
                 message="No answer from server")
+
+    # def start_network_map(self, map_name, func):
+    #     try:
+    #         self.net = Network(map_name)
+    #
+    #         if self.net.id == "5":
+    #             self.label_error.label_hide_show(  # type:ignore[union-attr]
+    #                 x=int(400),
+    #                 y=int(50),
+    #                 time=3000,
+    #                 message=self.net.session_id)
+    #         else:
+    #             self.s_id = self.net.session_id
+    #             start_new_thread(self.update_player, tuple())
+    #             func()
+    #
+    #     except ConnectionRefusedError:
+    #         self.label_error.label_hide_show(  # type:ignore[union-attr]
+    #             x=int(400),
+    #             y=int(50),
+    #             time=3000,
+    #             message="No answer from server")
 
 
 if __name__ == "__main__":
