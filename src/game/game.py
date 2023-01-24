@@ -21,6 +21,7 @@ map_names_dict = {"basicmap": basic_map,
 
 clock = pygame.time.Clock()
 
+
 class Game:
 
     def __init__(self, w, h, net):
@@ -107,10 +108,10 @@ class Game:
                 # get the key presses
                 keys = pygame.key.get_pressed()
 
-                if keys[pygame.K_d]:
+                if keys[pygame.K_d] and not self.playerList[id].block_x_axis:
                     self.playerList[id].move(0, self.nextToSolid(self.playerList[id], 0, self.playerList[id].velocity))
 
-                if keys[pygame.K_a]:
+                if keys[pygame.K_a] and not self.playerList[id].block_x_axis:
                     self.playerList[id].move(1, self.nextToSolid(self.playerList[id], 1, self.playerList[id].velocity))
 
                 # Jump
