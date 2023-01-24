@@ -28,7 +28,7 @@ def get_random_ids(number_of_ids, length):
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 number_of_games_at_a_time = 1
-number_of_players_per_game = 2
+number_of_players_per_game = 4
 server = 'localhost'
 port = 5556
 
