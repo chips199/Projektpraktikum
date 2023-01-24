@@ -179,6 +179,10 @@ class Game:
         data['position'] = [int(self.playerList[int(self.net.id)].x), int(self.playerList[int(self.net.id)].y)]
         data['connected'] = True
         data['mouse'] = self.playerList[int(self.net.id)].mousepos
+        data["health_0"] = self.playerList[int(0)].health
+        data["health_1"] = self.playerList[int(1)].health
+        data["health_2"] = self.playerList[int(2)].health
+        data["health_3"] = self.playerList[int(3)].health
         reply = self.net.send(json.dumps(data))
         return reply
 
