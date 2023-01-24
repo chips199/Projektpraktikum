@@ -29,8 +29,10 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 number_of_games_at_a_time = 1
 number_of_players_per_game = 4
-server = 'localhost'
-port = 5556
+# server = "localhost"
+server = '10.170.48.131'
+# port = 5556
+port = 6200
 
 server_ip = socket.gethostbyname(server)
 

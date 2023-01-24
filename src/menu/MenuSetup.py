@@ -277,16 +277,21 @@ class MenuSetup:
         #     widget.destroy()
         self.interaction_frame.destroy()
 
+        self.choose_map_frame = MyFrame(master=self.root, width=int(self.window_width),
+                                        height=int(400 * self.sizing_height),
+                                        fg_color="#212121")
+        self.choose_map_frame.place(anchor='n', x=self.window_width / 2, y=self.window_height * 0.3)
+
         # load basic map
         basic_map_structures = tk.CTkImage(
             dark_image=Image.open(wrk_dir + r"\..\menu\maps\basic_map.png"),
             size=(int(444 * self.sizing_width),
                   int(250 * self.sizing_height)))
-        map1 = MyLabel(master=self.main_frame,
+        map1 = MyLabel(master=self.choose_map_frame,
                        text=None,
                        image=basic_map_structures)
         map1.place(x=int(175 * self.sizing_width),
-                   y=int(300 * self.sizing_height))
+                   y=int(20 * self.sizing_height))
 
         self.root.update()
 
@@ -295,7 +300,7 @@ class MenuSetup:
             dark_image=Image.open(wrk_dir + r"\..\menu\maps\space_map.png"),
             size=(map1.winfo_width(),
                   map1.winfo_height()))
-        map2 = MyLabel(master=self.main_frame,
+        map2 = MyLabel(master=self.choose_map_frame,
                        text=None,
                        image=space_map_platforms,
                        fg_color='#252525'
@@ -306,7 +311,7 @@ class MenuSetup:
         self.root.update()
 
         # add buttons to choose a map
-        button_start = tk.CTkButton(master=self.main_frame,
+        button_start = tk.CTkButton(master=self.choose_map_frame,
                                     text="Basicmap",
                                     width=map1.winfo_width(),
                                     height=int(self.h * 0.3),
@@ -314,8 +319,16 @@ class MenuSetup:
                                     corner_radius=int(self.h / 3))
         button_start.place(x=int(map1.winfo_x()),
                            y=int(map1.winfo_y() + map1.winfo_height() + 20 * self.sizing_height))
+        button_start.configure(
+            command=lambda: self.start_network(argument='basicmap',
+                                               func=lambda: self.clear_frame_sliding(
+                                                   widget_list=[self.choose_map_frame],
+                                                   direction_list=["down"],
+                                                   stepsize=7,
+                                                   after_time=2500,
+                                                   func=lambda: self.load_lobby_frame())))
 
-        button_start2 = tk.CTkButton(master=self.main_frame,
+        button_start2 = tk.CTkButton(master=self.choose_map_frame,
                                      text="Space Map",
                                      width=map2.winfo_width(),
                                      height=int(self.h * 0.3),
@@ -323,39 +336,17 @@ class MenuSetup:
                                      corner_radius=int(self.h / 3))
         button_start2.place(x=int(map2.winfo_x()),
                             y=int(map2.winfo_y() + map2.winfo_height() + 20 * self.sizing_height))
-
-        button_start.configure(
-            command=lambda: self.start_network(argument='basicmap',
-                                               func=lambda: self.clear_frame_sliding(
-                                                   widget_list=[self.main_frame.winfo_children()[3],
-                                                                self.main_frame.winfo_children()[4],
-                                                                self.main_frame.winfo_children()[5],
-                                                                self.main_frame.winfo_children()[6]],
-                                                   direction_list=["down",
-                                                                   "down",
-                                                                   "down",
-                                                                   "down"],
-                                                   stepsize=7,
-                                                   after_time=2500,
-                                                   func=lambda: self.load_lobby_frame())))
-
         button_start2.configure(
             command=lambda: self.start_network(argument='platformmap',
                                                func=lambda: self.clear_frame_sliding(
-                                                   widget_list=[self.main_frame.winfo_children()[3],
-                                                                self.main_frame.winfo_children()[4],
-                                                                self.main_frame.winfo_children()[5],
-                                                                self.main_frame.winfo_children()[6]],
-                                                   direction_list=["down",
-                                                                   "down",
-                                                                   "down",
-                                                                   "down"],
+                                                   widget_list=[self.choose_map_frame],
+                                                   direction_list=["down"],
                                                    stepsize=7,
                                                    after_time=2500,
                                                    func=lambda: self.load_lobby_frame())))
 
     def clear_frame_sliding(self,
-                            widget_list: list['MyLabel|tk.CTkButton'],
+                            widget_list: list['MyLabel|tk.CTkButton|MyFrame'],
                             direction_list: list[str],
                             stepsize: int = 5,
                             after_time: int = 2000,
@@ -370,9 +361,9 @@ class MenuSetup:
 
         self.root.run = False
         sleep(1)
-        # self.root.destroy()
         self.net.start_game()  # type:ignore[union-attr]
-        sleep(1)
+        # sleep(1)
+        self.root.destroy()
         g = game.Game(w=1600, h=900, net=self.net)
         g.run()
 
