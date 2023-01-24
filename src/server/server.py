@@ -201,7 +201,7 @@ def threaded_client(conn):
             conn.close()
             exit(0)
         print(f"Waiting for players in {game_id}")
-        sleep(1)
+        sleep(0.2)
 
     print("Game starts")
     # set player status in game_data to online
