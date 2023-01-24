@@ -160,7 +160,7 @@ def threaded_client(conn):
             conn.close()
             exit(0)
         print(msg)
-        if players_connected[this_gid][this_pid] != 1:
+        if players_connected[this_gid][this_pid] != 1 and players_connected[this_gid][this_pid] != 3:
             print("Lobby was reseted")
             conn.send(str.encode("Lobby was deleted"))
             reset_games()
