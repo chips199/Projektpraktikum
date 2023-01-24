@@ -328,7 +328,7 @@ class MenuSetup:
     def start_game(self):
 
         self.root.run = False
-        sleep(0.5)
+        sleep(1)
         # self.root.destroy()
         self.net.start_game()  # type:ignore[union-attr]
         g = game.Game(w=1600, h=900, net=self.net)
