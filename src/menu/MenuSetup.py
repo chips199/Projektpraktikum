@@ -22,6 +22,7 @@ class MenuSetup:
     def __init__(self):
         # -------------------------------------------  Parameters  -------------------------------------------
         self.label_error = None
+        self.label_game_name = None
         self.net = None
         self.w = 300
         self.h = 60
@@ -122,24 +123,19 @@ class MenuSetup:
                                        image=background_image)
         label_background.place(x=0, y=0)
 
-    def load_interaction_frame(self):
-        self.interaction_frame = MyFrame(master=self.root, width=int(600 * self.sizing_width),
-                                         height=int(300 * self.sizing_height),
-                                         fg_color="#212121")
-        self.interaction_frame.place(anchor='center', x=self.window_width / 2, y=self.window_height * 0.3)
-
-        # Session ID Eingabefeld
-        entry_session_id = MyEntry(master=self.interaction_frame,
-                                   placeholder_text="Session ID",
-                                   width=self.w,
-                                   height=self.h,
-                                   font=("None", self.h * 0.5),
-                                   corner_radius=self.h / 3)
-        entry_session_id.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
-        self.root.update()
+        # Game Name Label
+        game_name_image = tk.CTkImage(dark_image=Image.open(wrk_dir + r"\..\stick_wars_schriftzug.png"),
+                                      size=(int(1225 * self.sizing_width * 0.9), int(164 * self.sizing_height * 0.9)))
+        self.label_game_name = MyLabel(master=self.main_frame,
+                                       text=None,
+                                       image=game_name_image,
+                                       fg_color="#212121")
+        self.label_game_name.place(x=int(self.window_width / 2),
+                                   y=int(164 * self.sizing_height),
+                                   anchor='s')
 
         # Session ID not found Fehlermeldung
-        self.label_error = MyLabel(master=self.interaction_frame,
+        self.label_error = MyLabel(master=self.main_frame,
                                    text="Session ID not found",
                                    text_color="red",
                                    bg_color="transparent",
@@ -149,14 +145,37 @@ class MenuSetup:
                                    anchor="w",
                                    justify='left')
 
+    def load_interaction_frame(self):
+        self.interaction_frame = MyFrame(master=self.root, width=int(self.window_width),
+                                         height=int(280 * self.sizing_height),
+                                         fg_color="#212121")
+        self.interaction_frame.place(anchor='center', x=self.window_width / 2, y=self.window_height * 0.45)
+
+        # Session ID Eingabefeld
+        entry_session_id = MyEntry(master=self.interaction_frame,
+                                   placeholder_text="Session ID",
+                                   width=self.w,
+                                   height=self.h,
+                                   font=("None", self.h * 0.5),
+                                   corner_radius=self.h / 3)
+        entry_session_id.place(relx=0.5, rely=0.0, anchor='n')
+        self.root.update()
+
+        # # Game Name Label
+        # game_name_image = tk.CTkImage(dark_image=Image.open(wrk_dir + r"\..\stick_wars_schriftzug.png"),
+        #                            size=(int(1225 * self.sizing_width * 0.9), int(164 * self.sizing_height * 0.9)))
+        # label_image = MyLabel(master=self.interaction_frame,
+        #                       text=None,
+        #                       image=game_name_image)
+        # label_image.place(x=int((entry_session_id.winfo_x() + entry_session_id.winfo_width()/2) * self.sizing_width),
+        #                   y=int((entry_session_id.winfo_y() - entry_session_id.winfo_height()/2 - 30) * self.sizing_height),
+        #                   anchor='s')
+
+        # label_image.place(x=0,
+        #                   y=0,
+        #                   anchor='center')
+
         # Create 'Play/Start Button'
-
-        # failure_function = lambda: self.label_error.label_hide_show(
-        #     x=int((entry_session_id.winfo_x() + entry_session_id.winfo_width() / 2) * self.sizing_width),
-        #     y=int((entry_session_id.winfo_y() - 20) * self.sizing_height),
-        #     time=3000,
-        #     message="Session ID not found")
-
         button_play = tk.CTkButton(master=self.interaction_frame,
                                    text="Play",
                                    width=self.h,
@@ -170,7 +189,7 @@ class MenuSetup:
                                                                                       0]],
                                                                      direction_list=["up",
                                                                                      "down"],
-                                                                     after_time=1800,
+                                                                     after_time=2400,
                                                                      func=lambda: self.load_lobby_frame())))
 
         button_play.place(x=int((entry_session_id.winfo_x() + entry_session_id.winfo_width() + 10) * self.sizing_width),
@@ -188,7 +207,7 @@ class MenuSetup:
                                                                                                     0]],
                                                                                    direction_list=["up",
                                                                                                    "down"],
-                                                                                   after_time=2000,
+                                                                                   after_time=2400,
                                                                                    func=lambda: self.load_choose_map_frame()),
                                           corner_radius=int(self.h / 3),
                                           font=("None", self.h * 0.4))
@@ -207,23 +226,28 @@ class MenuSetup:
                                    height=150 * self.sizing_height)  # type:ignore[union-attr]
         self.lobby_frame.place(x=0, y=250 * self.sizing_height)  # type:ignore[union-attr]
 
+        self.root.update()
+
         session_id_label = MyLabel(master=self.main_frame,
                                    width=self.w,
                                    height=self.h,
                                    text="Session ID: {}".format(self.s_id),
                                    font=("None", self.h * 0.6))
-        session_id_label.place(x=50 * self.sizing_width, y=30 * self.sizing_height)
+        session_id_label.place(x=50 * self.sizing_width,
+                               y=int(self.label_game_name.winfo_y() +  # type:ignore[union-attr]
+                                     self.label_game_name.winfo_height() +  # type:ignore[union-attr]
+                                     10 * self.sizing_height))
 
-        button_start = tk.CTkButton(master=self.main_frame,
+        button_start = tk.CTkButton(master=self.lobby_frame,
                                     text="Start",
                                     width=self.w,
                                     height=self.h,
                                     command=self.start_game,
                                     font=("None", self.h * 0.6),
                                     corner_radius=int(self.h / 3))
-        button_start.place(x=int(self.root.window_width / 2),
-                           y=int(200 * self.sizing_height),
-                           anchor='center')
+        button_start.place(x=int(self.lobby_frame.winfo_width() / 2),
+                           y=0,
+                           anchor='n')
 
         # self.amount_player = int(self.net.check_lobby())
         # for i in range(self.amount_player):
@@ -248,8 +272,10 @@ class MenuSetup:
                                                                                next_pos="two"))
 
     def load_choose_map_frame(self):
-        for widget in self.main_frame.winfo_children():
-            widget.destroy()
+        # for widget in self.main_frame.winfo_children():
+        #     widget.place_forget()
+        #     widget.destroy()
+        self.interaction_frame.destroy()
 
         # load basic map
         basic_map_structures = tk.CTkImage(
@@ -301,10 +327,10 @@ class MenuSetup:
         button_start.configure(
             command=lambda: self.start_network(argument='basicmap',
                                                func=lambda: self.clear_frame_sliding(
-                                                   widget_list=[self.main_frame.winfo_children()[0],
-                                                                self.main_frame.winfo_children()[1],
-                                                                self.main_frame.winfo_children()[2],
-                                                                self.main_frame.winfo_children()[3]],
+                                                   widget_list=[self.main_frame.winfo_children()[3],
+                                                                self.main_frame.winfo_children()[4],
+                                                                self.main_frame.winfo_children()[5],
+                                                                self.main_frame.winfo_children()[6]],
                                                    direction_list=["down",
                                                                    "down",
                                                                    "down",
@@ -316,10 +342,10 @@ class MenuSetup:
         button_start2.configure(
             command=lambda: self.start_network(argument='platformmap',
                                                func=lambda: self.clear_frame_sliding(
-                                                   widget_list=[self.main_frame.winfo_children()[0],
-                                                                self.main_frame.winfo_children()[1],
-                                                                self.main_frame.winfo_children()[2],
-                                                                self.main_frame.winfo_children()[3]],
+                                                   widget_list=[self.main_frame.winfo_children()[3],
+                                                                self.main_frame.winfo_children()[4],
+                                                                self.main_frame.winfo_children()[5],
+                                                                self.main_frame.winfo_children()[6]],
                                                    direction_list=["down",
                                                                    "down",
                                                                    "down",
@@ -356,8 +382,10 @@ class MenuSetup:
 
             if self.net.id == "5":
                 self.label_error.label_hide_show(  # type:ignore[union-attr]
-                    x=int(400),
-                    y=int(50),
+                    x=int(self.window_width / 2),
+                    y=int(self.label_game_name.winfo_y() +  # type:ignore[union-attr]
+                          self.label_game_name.winfo_height() +  # type:ignore[union-attr]
+                          30 * self.sizing_height),
                     time=3000,
                     message=self.net.session_id)
             else:
@@ -367,8 +395,10 @@ class MenuSetup:
 
         except ConnectionRefusedError:
             self.label_error.label_hide_show(  # type:ignore[union-attr]
-                x=int(400),
-                y=int(50),
+                x=int(self.window_width / 2),
+                y=int(self.label_game_name.winfo_y() +  # type:ignore[union-attr]
+                      self.label_game_name.winfo_height() +  # type:ignore[union-attr]
+                      30 * self.sizing_height),
                 time=3000,
                 message="No answer from server")
 
