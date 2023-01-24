@@ -79,12 +79,13 @@ class MenuSetup:
         self.choose_map_frame = None
 
     def update_player(self):
-        time.sleep(2.5)
+        time.sleep(1.5)
         # task to get amount of player from server, needs to be performed in asynchronus thread
         while self.root.run and self.net is not None:
             server_amount_player = int(self.net.check_lobby())
             for i in range(server_amount_player - self.amount_player):
                 if self.amount_player < server_amount_player:
+                    time.sleep(1)
                     # self.amount_player += 1
                     print("amount player saved", self.amount_player)
                     # print("i", i)
@@ -343,6 +344,7 @@ class MenuSetup:
         sleep(1)
         # self.root.destroy()
         self.net.start_game()  # type:ignore[union-attr]
+        sleep(1)
         g = game.Game(w=1600, h=900, net=self.net)
         g.run()
 
@@ -367,28 +369,6 @@ class MenuSetup:
                 y=int(50),
                 time=3000,
                 message="No answer from server")
-
-    # def start_network_map(self, map_name, func):
-    #     try:
-    #         self.net = Network(map_name)
-    #
-    #         if self.net.id == "5":
-    #             self.label_error.label_hide_show(  # type:ignore[union-attr]
-    #                 x=int(400),
-    #                 y=int(50),
-    #                 time=3000,
-    #                 message=self.net.session_id)
-    #         else:
-    #             self.s_id = self.net.session_id
-    #             start_new_thread(self.update_player, tuple())
-    #             func()
-    #
-    #     except ConnectionRefusedError:
-    #         self.label_error.label_hide_show(  # type:ignore[union-attr]
-    #             x=int(400),
-    #             y=int(50),
-    #             time=3000,
-    #             message="No answer from server")
 
 
 if __name__ == "__main__":
