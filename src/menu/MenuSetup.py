@@ -86,7 +86,6 @@ class MenuSetup:
             for i in range(server_amount_player - self.amount_player):
                 if self.amount_player < server_amount_player:
                     time.sleep(1)
-                    # self.amount_player += 1
                     print("amount player saved", self.amount_player)
                     # print("i", i)
                     print("amount player from server", server_amount_player)
@@ -95,7 +94,6 @@ class MenuSetup:
                                      x_pos=self.player_dict[str(self.amount_player)][1])
                     self.amount_player += 1
                 print()
-            # print(self.amount_player)
 
     def run(self):
         self.load_main_frame()
