@@ -83,8 +83,9 @@ class MenuSetup:
         time.sleep(1.5)
         # task to get amount of player from server, needs to be performed in asynchronus thread
         while self.root.run and self.net is not None:
-            if not self.net.game_started():
+            if self.net.game_started():
                 # Start game here
+                print("hi")
                 self.start_game()
                 return
             server_amount_player = int(self.net.check_lobby())
