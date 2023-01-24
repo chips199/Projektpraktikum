@@ -28,7 +28,7 @@ class Game:
         self.net = net
         self.width = w
         self.height = h
-        self.canvas = canvas.Canvas(self.width, self.height, str(self.net.id) + "Stick Wars")
+        self.canvas = canvas.Canvas(self.width, self.height, str(self.net.id) + "Stick  Wars")
         self.map = Map(self, map_names_dict[net.map_name])
         # load the config for default values
         # this will later be done in the map to configure spawnpoints

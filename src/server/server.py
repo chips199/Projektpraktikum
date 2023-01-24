@@ -28,7 +28,7 @@ def get_random_ids(number_of_ids, length):
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 number_of_games_at_a_time = 1
-number_of_players_per_game = 2
+number_of_players_per_game = 4
 server = 'localhost'
 port = 5556
 
@@ -201,7 +201,7 @@ def threaded_client(conn):
             conn.close()
             exit(0)
         print(f"Waiting for players in {game_id}")
-        sleep(1)
+        sleep(0.2)
 
     print("Game starts")
     # set player status in game_data to online
