@@ -64,10 +64,10 @@ class Game:
         while run:
             # pygame stuff for the max fps
             clock.tick(60)
-            # print()
-            # print("FPS:", self.update_fps())
+            print()
+            print("FPS:", self.update_fps())
             if self.playerList[id].is_alive():
-                # time = datetime.datetime.now()
+                time = datetime.datetime.now()
                 # handling pygame events
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
@@ -102,8 +102,8 @@ class Game:
                                     # Draw damage from opponent
                                     player.beaten(self.playerList[id].user_weapon)
                                     break
-                # print("Handling Events:", datetime.datetime.now() - time)
-                # time = datetime.datetime.now()
+                print("Handling Events:", datetime.datetime.now() - time)
+                time = datetime.datetime.now()
 
                 # get the key presses
                 keys = pygame.key.get_pressed()
@@ -121,13 +121,13 @@ class Game:
                 # gravity
                 self.playerList[id].gravity(func=self.nextToSolid)
 
-                # print("Handling Keys:", datetime.datetime.now() - time)
-                # time = datetime.datetime.now()
+                print("Handling Keys:", datetime.datetime.now() - time)
+                time = datetime.datetime.now()
 
             # Mouse Position
             self.playerList[id].mousepos = pygame.mouse.get_pos()
-            # print("Handling mouse:", datetime.datetime.now() - time)
-            # time = datetime.datetime.now()
+            print("Handling mouse:", datetime.datetime.now() - time)
+            time = datetime.datetime.now()
 
             # Send Data about this player and get some over the others als reply
             reply = self.send_data()
@@ -148,8 +148,8 @@ class Game:
             for i, on in enumerate(mouse):
                 self.playerList[i].mousepos = on
 
-            # print("Handling Data:", datetime.datetime.now() - time)
-            # time = datetime.datetime.now()
+            print("Handling Data:", datetime.datetime.now() - time)
+            time = datetime.datetime.now()
 
             # Draw Map
             self.map.draw(self.canvas.get_canvas())
@@ -161,8 +161,8 @@ class Game:
             # Update Canvas
             self.canvas.update()
 
-            # print("Handling redraw:", datetime.datetime.now() - time)
-            # time = datetime.datetime.now()
+            print("Handling redraw:", datetime.datetime.now() - time)
+            time = datetime.datetime.now()
 
         pygame.quit()
 
