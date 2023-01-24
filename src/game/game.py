@@ -6,28 +6,30 @@ import datetime
 import pandas as pd
 import pygame
 
-import canvas
-from map import Map
+from src.game import canvas
+from src.game.map import Map
 from src.game import player as Player
 from src.game.network import Network
-from src.game.weapon import Weapon
+from src.game import weapon as Weapon
 
 wrk_dir = os.path.abspath(os.path.dirname(__file__))
 config_file = wrk_dir + r'\configuration.json'
 basic_map = wrk_dir + r"\..\basicmap"
+platformmap = wrk_dir + r"\..\platformmap"
+map_names_dict = {"basicmap": basic_map,
+                  "platformmap": platformmap}
 
 clock = pygame.time.Clock()
 
 
 class Game:
 
-    def __init__(self, w, h):
-        # setting basic varibals
-        self.net = Network()
+    def __init__(self, w, h, net):
+        self.net = net
         self.width = w
         self.height = h
-        self.canvas = canvas.Canvas(self.width, self.height, str(self.net.id) + " Testing...")
-        self.map = Map(self, basic_map)
+        self.canvas = canvas.Canvas(self.width, self.height, str(self.net.id) + "Stick Wars")
+        self.map = Map(self, map_names_dict[net.map_name])
         # load the config for default values
         # this will later be done in the map to configure spawnpoints
         with open(config_file) as file:
@@ -62,11 +64,10 @@ class Game:
         while run:
             # pygame stuff for the max fps
             clock.tick(60)
-            print()
-            print("Start")
-            print("FPS:", self.update_fps())
+            # print()
+            # print("FPS:", self.update_fps())
             if self.playerList[id].is_alive():
-                time = datetime.datetime.now()
+                # time = datetime.datetime.now()
                 # handling pygame events
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
@@ -101,16 +102,16 @@ class Game:
                                     # Draw damage from opponent
                                     player.beaten(self.playerList[id].user_weapon)
                                     break
-                print("Handling Events:", datetime.datetime.now() - time)
-                time = datetime.datetime.now()
+                # print("Handling Events:", datetime.datetime.now() - time)
+                # time = datetime.datetime.now()
 
                 # get the key presses
                 keys = pygame.key.get_pressed()
 
-                if keys[pygame.K_d]:
+                if keys[pygame.K_d] and not self.playerList[id].block_x_axis:
                     self.playerList[id].move(0, self.nextToSolid(self.playerList[id], 0, self.playerList[id].velocity))
 
-                if keys[pygame.K_a]:
+                if keys[pygame.K_a] and not self.playerList[id].block_x_axis:
                     self.playerList[id].move(1, self.nextToSolid(self.playerList[id], 1, self.playerList[id].velocity))
 
                 # Jump
@@ -120,13 +121,13 @@ class Game:
                 # gravity
                 self.playerList[id].gravity(func=self.nextToSolid)
 
-                print("Handling Keys:", datetime.datetime.now() - time)
-                time = datetime.datetime.now()
+                # print("Handling Keys:", datetime.datetime.now() - time)
+                # time = datetime.datetime.now()
 
             # Mouse Position
             self.playerList[id].mousepos = pygame.mouse.get_pos()
-            print("Handling mouse:", datetime.datetime.now() - time)
-            time = datetime.datetime.now()
+            # print("Handling mouse:", datetime.datetime.now() - time)
+            # time = datetime.datetime.now()
 
             # Send Data about this player and get some over the others als reply
             reply = self.send_data()
@@ -147,8 +148,8 @@ class Game:
             for i, on in enumerate(mouse):
                 self.playerList[i].mousepos = on
 
-            print("Handling Data:", datetime.datetime.now() - time)
-            time = datetime.datetime.now()
+            # print("Handling Data:", datetime.datetime.now() - time)
+            # time = datetime.datetime.now()
 
             # Draw Map
             self.map.draw(self.canvas.get_canvas())
@@ -160,8 +161,8 @@ class Game:
             # Update Canvas
             self.canvas.update()
 
-            print("Handling redraw:", datetime.datetime.now() - time)
-            time = datetime.datetime.now()
+            # print("Handling redraw:", datetime.datetime.now() - time)
+            # time = datetime.datetime.now()
 
         pygame.quit()
 

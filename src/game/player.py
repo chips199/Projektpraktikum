@@ -3,7 +3,7 @@ from copy import copy
 from typing import List, Tuple
 import pandas as pd
 import pygame
-import weapon
+from src.game import weapon
 
 
 class Player():
@@ -24,10 +24,12 @@ class Player():
         self.game = game
         self.velocity = 4
         self.velocity_gravity = 1
-        self.velocity_jumping = self.max_jumping_speed = 10
-        self.velocity_time = 30
+        self.velocity_jumping = self.max_jumping_speed = 12
+        self.velocity_time = 50
+        self.landed = False
         self.is_jumping = False
         self.is_falling = True
+        self.block_x_axis = False
         self.color = color
         self.weapon = weapon
         solid = []  # type: List[Tuple[int, int]]
@@ -192,6 +194,7 @@ class Player():
                 # initialize falling when the player is currently not falling
                 if not self.is_falling:
                     self.is_falling = True
+                    self.landed = False
                     # reset timer to current time
                     self.falling_time = datetime.datetime.now()
 
@@ -207,8 +210,39 @@ class Player():
 
                 # move player down with speed calculated in func()
                 self.move(dirn=3, v=int(vel))
+                self.block_x_axis = False
 
-            # otherwise reset gravity settings after falling
+            # otherwise check if the player is really landed or may standing/hanging on an edge
             elif vel <= 0:
-                self.is_falling = False
-                self.velocity_gravity = 1
+
+                if not self.landed:
+                    # shift players df to the right and check if falling would then be possible
+                    # in addition block the movement on x-axis for the player (for the keyboard)
+                    self.block_x_axis = True
+                    self.shift_df(df=self.solid_df, dirn=0, n=self.velocity * 2)
+                    vel = func(player=self, dirn=3, distance=int(self.velocity_gravity * 2))
+
+                    # if falling is then possible
+                    if vel > 0:
+                        # shift back the df and move to the right so in next cycle the player will continue to fall
+                        self.shift_df(df=self.solid_df, dirn=1, n=self.velocity * 2)
+                        self.move(dirn=0, v=int(self.velocity * 2))
+
+                    else:
+                        # try the same for direction left
+                        self.shift_df(df=self.solid_df, dirn=1, n=self.velocity * 4)
+                        vel = func(player=self, dirn=3, distance=int(self.velocity_gravity))
+
+                        # if falling is possible after shifting to left, shift df back to original position and move left
+                        if vel > 0:
+                            self.shift_df(df=self.solid_df, dirn=0, n=self.velocity * 2)
+                            self.move(dirn=1, v=int(self.velocity * 2))
+
+                        # otherwise it means that the player is standing on its feet, so he is landed correctly
+                        # so stop falling and reset the parameters
+                        else:
+                            self.shift_df(df=self.solid_df, dirn=0, n=self.velocity * 2)
+                            self.landed = True
+                            self.block_x_axis = False
+                            self.is_falling = False
+                            self.velocity_gravity = 1
