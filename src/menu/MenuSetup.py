@@ -344,6 +344,7 @@ class MenuSetup:
         g = game.Game(w=1600, h=900, net=self.net)
         # self.root.quit()
         # self.root.destroy()
+        sleep(1)
         g.run()
 
     # __________________other Functions__________________
