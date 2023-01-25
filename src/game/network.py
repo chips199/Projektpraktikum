@@ -83,7 +83,6 @@ class Network:
 def sth(str):
     # create networkelement also creates connection
     net = Network(str)
-    # net = Network("ASDF")
     # check for errors, like full lobby, or unknown session_id or server, or if none no connection
     if net.id == 5 or net.id is None:
         print(net.session_id)

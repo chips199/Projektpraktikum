@@ -2,9 +2,7 @@ import datetime
 import json
 import os
 import socket
-import struct
 from _thread import start_new_thread
-import sys
 import random
 import string
 from copy import copy
@@ -32,6 +30,7 @@ def get_random_ids(number_of_ids, length):
         if not res.__contains__(result_str):
             res.append(str(result_str))
     return res
+
 
 # create socket server
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -81,14 +80,14 @@ def reset_games():
     for i, g in enumerate(players_connected):
         # going through all games
         if g.count(2) + g.count(0) == number_of_players_per_game and g.count(2) > 0:
-        # if g.count(2) + g.count(0) + g.count(3) == number_of_players_per_game and g.count(2) > 0:
+            # if g.count(2) + g.count(0) + g.count(3) == number_of_players_per_game and g.count(2) > 0:
             players_connected[i] = [0] * number_of_players_per_game
             game_id = list(game_data_dict.keys())[i]
             game_data_dict[game_id] = copy(game_data)
             maps_dict[game_id] = "none"
             for n in range(number_of_players_per_game):
                 game_data_dict[game_id][str(n)]["connected"] = False
-            print("game reset, because no player was there anymore")
+            print(f"{list(game_data_dict.keys())[i]} reset, because no player was there anymore")
 
 
 def threaded_client(conn):
@@ -146,9 +145,7 @@ def threaded_client(conn):
         game_found = False
         this_gid = -9999
         this_pid = -9999
-        print(players_connected)
         for i, g in enumerate(players_connected):
-            print(g)
             if g.count(0) == number_of_players_per_game:
                 # if empty game found set first player as connected
                 this_gid = i
@@ -162,8 +159,6 @@ def threaded_client(conn):
             conn.send(str.encode("5, Server is full"))
             conn.close()
             exit(1)
-        print(this_gid)
-        print(players_connected)
         # get real game_id
         game_id = list(game_data_dict.keys())[this_gid]
         maps_dict[game_id] = start_msg
@@ -171,6 +166,7 @@ def threaded_client(conn):
         # finished creating game and booking player
 
     # reuniting join and create game
+    print(f"Lobby starts: {game_id}")
     start_waiting = datetime.datetime.now()
     last_msg = datetime.datetime.now()
     while True:
@@ -183,7 +179,6 @@ def threaded_client(conn):
             reset_games()
             conn.close()
             exit(0)
-        print(msg)
         if players_connected[this_gid][this_pid] != 1 and players_connected[this_gid][this_pid] != 3:
             # handles if the lobby is reset, can happen if the admin has disconnected
             print("Lobby was reseted")
@@ -203,8 +198,7 @@ def threaded_client(conn):
             conn.send(str.encode(maps_dict[game_id]))
         elif msg == "ready":
             conn.send(str.encode(maps_dict[game_id]))
-            players_connected[this_gid] = list(map(lambda x: 3 if x==1 else 2, players_connected[this_gid]))
-            # players_connected[this_gid] = [3] * number_of_players_per_game
+            players_connected[this_gid] = list(map(lambda x: 3 if x == 1 else 2, players_connected[this_gid]))
             break
         elif msg == "get max players":
             conn.send(str.encode(f"{number_of_players_per_game}"))
@@ -221,10 +215,9 @@ def threaded_client(conn):
             reset_games()
             conn.close()
             exit(0)
-        print(f"Waiting for players in {game_id}")
         sleep(0.2)
 
-    print("Game starts")
+    print("Game starts: " + game_id)
     # set player status in game_data to online
     game_data_dict[game_id][str(this_pid)]["connected"] = True
     # enter game loop
