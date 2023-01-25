@@ -39,11 +39,9 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # set number of maximal parallel games that can be opened, and how many players can play in each.
 number_of_games_at_a_time = 3
 number_of_players_per_game = 4
-# Localhost for tunneling with ngrok, by name for local hosting
-server = '10.170.48.131'
-# server = socket.gethostname()
-port = 17586
-server_ip = socket.gethostbyname(server)
+# Localhost for tunneling with ngrok, for local hosting
+server = 'localhost'
+port = 5556
 
 # set host and port of server
 try:
