@@ -3,8 +3,6 @@ import socket
 import struct
 from _thread import start_new_thread
 from time import sleep
-
-
 # from src.game import game
 
 
@@ -12,16 +10,21 @@ class Network:
 
     def __init__(self, msg):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.host = "172.29.14.153"  # Christian Stayery
+        # self.host = "172.29.14.153"  # Christian Stayery
         # self.host = "4.tcp.eu.ngrok.io"
         # self.host = "localhost"
         # self.host = "10.170.48.131"
         # For this to work on your machine this must be equal to the ipv4 address of the machine running the server
         # You can find this address by typing ipconfig in CMD and copying the ipv4 address. Again this must be the servers
         # ipv4 address. This feild will be the same for all your clients.
-        self.port = 5556
         # self.port = 17586
         # self.port = 6200
+        # use the url for connecting to an external server
+        # use tht second line to connect to a local server, which is visible in a network
+        # use the third if it is just local
+        self.host, self.port = "4.tcp.eu.ngrok.io", 17586
+        # self.host, self.port = socket.gethostbyname(socket.gethostname()), 5556
+        # self.host, self.port = "localhost", 5556
         self.addr = (self.host, self.port)
         self.id, self.session_id = self.connect_lobby(msg)
         self.map_name = self.get_map()
@@ -35,6 +38,8 @@ class Network:
         """
         self.client.connect(self.addr)
         # sth = self.client.recv(2048)
+        if len(p) == 0:
+            return "5", "Enter Session ID"
         self.client.sendall(str.encode(p))
         rply = self.client.recv(2048).decode()
         print(rply)
