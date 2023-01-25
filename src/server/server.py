@@ -33,6 +33,7 @@ def get_random_ids(number_of_ids, length):
             res.append(str(result_str))
     return res
 
+
 # create socket server
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -81,7 +82,7 @@ def reset_games():
     for i, g in enumerate(players_connected):
         # going through all games
         if g.count(2) + g.count(0) == number_of_players_per_game and g.count(2) > 0:
-        # if g.count(2) + g.count(0) + g.count(3) == number_of_players_per_game and g.count(2) > 0:
+            # if g.count(2) + g.count(0) + g.count(3) == number_of_players_per_game and g.count(2) > 0:
             players_connected[i] = [0] * number_of_players_per_game
             game_id = list(game_data_dict.keys())[i]
             game_data_dict[game_id] = copy(game_data)
@@ -203,7 +204,7 @@ def threaded_client(conn):
             conn.send(str.encode(maps_dict[game_id]))
         elif msg == "ready":
             conn.send(str.encode(maps_dict[game_id]))
-            players_connected[this_gid] = list(map(lambda x: 3 if x==1 else 2, players_connected[this_gid]))
+            players_connected[this_gid] = list(map(lambda x: 3 if x == 1 else 2, players_connected[this_gid]))
             # players_connected[this_gid] = [3] * number_of_players_per_game
             break
         elif msg == "get max players":
