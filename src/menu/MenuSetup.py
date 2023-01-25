@@ -322,7 +322,7 @@ class MenuSetup:
                                                                    lambda: self.update_player())))
 
     def join_lobby(self):
-        self.start_network(argument=self.entry_session_id.get(),
+        self.start_network(argument=self.entry_session_id.get(), # type:ignore[union-attr]
                            func=lambda: self.clear_frame_sliding(
                                widget_list=[self.interaction_frame,
                                             self.main_frame.winfo_children()[0]],
