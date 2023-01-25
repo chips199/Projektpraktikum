@@ -88,7 +88,7 @@ def reset_games():
             maps_dict[game_id] = "none"
             for n in range(number_of_players_per_game):
                 game_data_dict[game_id][str(n)]["connected"] = False
-            print("game reset, because no player was there anymore")
+            print(f"{list(game_data_dict.keys())[i]} reset, because no player was there anymore")
 
 
 def threaded_client(conn):
@@ -224,7 +224,7 @@ def threaded_client(conn):
         print(f"Waiting for players in {game_id}")
         sleep(0.2)
 
-    print("Game starts")
+    print("Game starts: " + game_id)
     # set player status in game_data to online
     game_data_dict[game_id][str(this_pid)]["connected"] = True
     # enter game loop
