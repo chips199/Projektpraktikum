@@ -69,13 +69,13 @@ class Game:
         while run:
             self.time = datetime.datetime.now()
             time = self.time
-            thread = Thread(target=self.send_data)
-            thread.start()
-            thread.join()
+            # thread = Thread(target=self.send_data)
+            # thread.start()
+            # thread.join()
 
             # pygame stuff for the max fps
-            clock.tick(60)
-            print()
+            clock.tick(35)
+            # print()
             print("FPS:", self.update_fps())
             if self.playerList[id].is_alive():
                 # time = datetime.datetime.now()
@@ -113,7 +113,7 @@ class Game:
                                     # Draw damage from opponent
                                     player.beaten(self.playerList[id].user_weapon)
                                     break
-                print("Handling Events:", datetime.datetime.now() - time)
+                # print("Handling Events:", datetime.datetime.now() - time)
                 # time = datetime.datetime.now()
 
                 # get the key presses
@@ -132,32 +132,32 @@ class Game:
                 # gravity
                 self.playerList[id].gravity(func=self.nextToSolid)
 
-                print("Handling Keys:", datetime.datetime.now() - time)
+                # print("Handling Keys:", datetime.datetime.now() - time)
                 # time = datetime.datetime.now()
 
             # Mouse Position
             self.playerList[id].mousepos = pygame.mouse.get_pos()
-            print("Handling mouse:", datetime.datetime.now() - time)
+            # print("Handling mouse:", datetime.datetime.now() - time)
             # time = datetime.datetime.now()
 
             # Send Data about this player and get some over the others als reply
-            # reply = self.send_data()
+            reply = self.send_data()
             # synchronise positions
-            # pos = self.parse_pos(reply)
-            # for i, position in enumerate(pos):
-            #     self.playerList[i].x, self.playerList[i].y = position
-            # for p in self.playerList:
-            #     if p == self.playerList[id]:
-            #         continue
-            #     p.refresh_solids()
-            # # synchronise Online stati
-            # online = self.parse_online(reply)
-            # for i, on in enumerate(online):
-            #     self.playerList[i].is_connected = on
-            # # sync mouse
-            # mouse = self.parse_mouse(reply)
-            # for i, on in enumerate(mouse):
-            #     self.playerList[i].mousepos = on
+            pos = self.parse_pos(reply)
+            for i, position in enumerate(pos):
+                self.playerList[i].x, self.playerList[i].y = position
+            for p in self.playerList:
+                if p == self.playerList[id]:
+                    continue
+                p.refresh_solids()
+            # synchronise Online stati
+            online = self.parse_online(reply)
+            for i, on in enumerate(online):
+                self.playerList[i].is_connected = on
+            # sync mouse
+            mouse = self.parse_mouse(reply)
+            for i, on in enumerate(mouse):
+                self.playerList[i].mousepos = on
 
             # print("Handling Data:", datetime.datetime.now() - time)
             # time = datetime.datetime.now()
@@ -172,56 +172,18 @@ class Game:
             # Update Canvas
             self.canvas.update()
 
-            print("Handling redraw:", datetime.datetime.now() - time)
+            # print("Handling redraw:", datetime.datetime.now() - time)
             # time = datetime.datetime.now()
 
         pygame.quit()
-
-    def send_data(self):
-        """
-        Send position to server
-        :return: String with data of all players
-        """
-        # time = datetime.datetime.now()
-        # while True:
-        with open(config_file) as file:
-            sample = json.load(file)
-
-        data = sample[str(self.net.id)]
-        data['id'] = int(self.net.id)
-        data['position'] = [int(self.playerList[int(self.net.id)].x), int(self.playerList[int(self.net.id)].y)]
-        data['connected'] = True
-        data['mouse'] = self.playerList[int(self.net.id)].mousepos
-        reply = self.net.send(json.dumps(data))
-
-        pos = self.parse_pos(reply)
-        for i, position in enumerate(pos):
-            self.playerList[i].x, self.playerList[i].y = position
-        for p in self.playerList:
-            if p == self.playerList[int(self.net.id)]:
-                continue
-            p.refresh_solids()
-        # synchronise Online stati
-        online = self.parse_online(reply)
-        for i, on in enumerate(online):
-            self.playerList[i].is_connected = on
-        # sync mouse
-        mouse = self.parse_mouse(reply)
-        for i, on in enumerate(mouse):
-            self.playerList[i].mousepos = on
-
-        print("SENT DATA")
-        print("Handling Data:", datetime.datetime.now() - self.time)
-        # t.sleep(0.3)
-        # return reply
 
     # def send_data(self):
     #     """
     #     Send position to server
     #     :return: String with data of all players
     #     """
-    #     while self.running:
-    #         print("ASYNC")
+    #     time = datetime.datetime.now()
+    #     while True:
     #         with open(config_file) as file:
     #             sample = json.load(file)
     #
@@ -231,12 +193,49 @@ class Game:
     #         data['connected'] = True
     #         data['mouse'] = self.playerList[int(self.net.id)].mousepos
     #         reply = self.net.send(json.dumps(data))
-    #         self.reply = reply
     #
-    #         self.online = self.parse_online(self.reply)
-    #         self.pos = self.parse_pos(self.reply)
-    #         self.mouse = self.parse_mouse(self.reply)
-    #         # return  # reply
+    #         pos = self.parse_pos(reply)
+    #         for i, position in enumerate(pos):
+    #             self.playerList[i].x, self.playerList[i].y = position
+    #         for p in self.playerList:
+    #             if p == self.playerList[int(self.net.id)]:
+    #                 continue
+    #             p.refresh_solids()
+    #         # synchronise Online stati
+    #         online = self.parse_online(reply)
+    #         for i, on in enumerate(online):
+    #             self.playerList[i].is_connected = on
+    #         # sync mouse
+    #         mouse = self.parse_mouse(reply)
+    #         for i, on in enumerate(mouse):
+    #             self.playerList[i].mousepos = on
+
+            # print("SENT DATA")
+            # print("Handling Data this function:", datetime.datetime.now() - time)
+            # print("Handling Data overall:", datetime.datetime.now() - self.time)
+            # t.sleep(0.5)
+        # return reply
+
+    def send_data(self):
+        """
+        Send position to server
+        :return: String with data of all players
+        """
+        with open(config_file) as file:
+            sample = json.load(file)
+
+        data = sample[str(self.net.id)]
+        data['id'] = int(self.net.id)
+        data['position'] = [int(self.playerList[int(self.net.id)].x), int(self.playerList[int(self.net.id)].y)]
+        data['connected'] = True
+        data['mouse'] = self.playerList[int(self.net.id)].mousepos
+        reply = self.net.send(json.dumps(data))
+        # self.reply = reply
+        #
+        # self.online = self.parse_online(self.reply)
+        # self.pos = self.parse_pos(self.reply)
+        # self.mouse = self.parse_mouse(self.reply)
+        return  reply
 
     @staticmethod
     def update_fps():
