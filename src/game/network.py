@@ -7,6 +7,7 @@ class Network:
 
     def __init__(self, msg):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.client.settimeout(2)
         # use the url for connecting to an external server
         # use tht second line to connect to a local server, which is visible in a network
         # use the third if it is just local
@@ -24,12 +25,14 @@ class Network:
         :param p: session_id or map name
         :return: player_id and session_id, if player_id = 5 error message in session_id
         """
-        self.client.connect(self.addr)
-        # sth = self.client.recv(2048)
         if len(p) == 0:
             return "5", "Enter Session ID"
-        self.client.sendall(str.encode(p))
-        rply = self.client.recv(2048).decode()
+        try:
+            self.client.connect(self.addr)
+            self.client.sendall(str.encode(p))
+            rply = self.client.recv(2048).decode()
+        except socket.timeout:
+            rply = "5,No connection possible"
         print(rply)
         pid, msg = rply.split(",")
         return pid, msg

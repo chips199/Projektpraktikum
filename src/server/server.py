@@ -81,8 +81,9 @@ def reset_games():
         checks each game if a game has been used and rests them after it isn't used anymore
     """
     for i, g in enumerate(players_connected):
-        print(g)
-        if g.count(2) + g.count(0) + g.count(3) == number_of_players_per_game and g.count(2) > 0:
+        # going through all games
+        if g.count(2) + g.count(0) == number_of_players_per_game and g.count(2) > 0:
+        # if g.count(2) + g.count(0) + g.count(3) == number_of_players_per_game and g.count(2) > 0:
             players_connected[i] = [0] * number_of_players_per_game
             game_id = list(game_data_dict.keys())[i]
             game_data_dict[game_id] = copy(game_data)
@@ -204,7 +205,8 @@ def threaded_client(conn):
             conn.send(str.encode(maps_dict[game_id]))
         elif msg == "ready":
             conn.send(str.encode(maps_dict[game_id]))
-            players_connected[this_gid] = [3] * number_of_players_per_game
+            players_connected[this_gid] = list(map(lambda x: 3 if x==1 else 2, players_connected[this_gid]))
+            # players_connected[this_gid] = [3] * number_of_players_per_game
             break
         elif msg == "get max players":
             conn.send(str.encode(f"{number_of_players_per_game}"))
@@ -227,27 +229,32 @@ def threaded_client(conn):
     print("Game starts")
     # set player status in game_data to online
     game_data_dict[game_id][str(this_pid)]["connected"] = True
-    reply = ''
-    last_msg = datetime.datetime.now()
+    # enter game loop
     while True:
         try:
+            # receive data from client
             data = conn.recv(2048).decode('utf-8')
             reply = data
+            # if no data has been sent the connection has been closed
             if data:
+                # parse the client data into the game_data Dictionary, and send the result back to the client
                 game_data_dict[game_id][this_pid] = json.loads(reply)
                 conn.sendall(str.encode(json.dumps(game_data_dict[game_id])))
+                # to track how often the client sends a message track the time
                 last_msg = datetime.datetime.now()
             else:
                 conn.send(str.encode("Goodbye"))
                 break
         except:
+            # if the connection doesn't exist anymore break the loop
             break
         if (datetime.datetime.now() - last_msg).seconds > 5:
+            # if the last message is more than 5 seconds old the connection timedout
             print("Connection timeout")
             break
 
     print("Connection Closed")
-    # set lost player to connected false and disconected
+    # set lost player to connected false and disconected and close the connection
     game_data_dict[game_id][str(this_pid)]["connected"] = False
     players_connected[this_gid][this_pid] = 2
     conn.close()
@@ -256,6 +263,7 @@ def threaded_client(conn):
 
 
 while True:
+    # constantly accept new connection, and start a new thread to handle the connection
     conn, addr = s.accept()
     print("Connected to: ", addr)
     start_new_thread(threaded_client, (conn,))
