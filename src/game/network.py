@@ -1,8 +1,5 @@
 import json
 import socket
-import struct
-from _thread import start_new_thread
-from time import sleep
 # from src.game import game
 
 
