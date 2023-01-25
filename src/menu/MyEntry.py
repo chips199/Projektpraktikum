@@ -32,29 +32,3 @@ class MyEntry(tk.CTkEntry):
             # Execute failure_function if provided
             if failure_function is not None:
                 failure_function()
-
-
-def threaded_function(arg):
-    for i in range(arg):
-        print("running")
-        sleep(0.0001)
-
-
-def threaded_function2():
-    print("running 2")
-    sleep(0.0001)
-    print("running test")
-    sleep(0.0001)
-
-
-if __name__ == "__main__":
-    thread = Thread(target=threaded_function, args=(10,))
-    thread2 = Thread(target=threaded_function2, args=())
-    thread.start()
-    thread2.start()
-    while True:
-        print("running")
-        sleep(0.1)
-    # thread.join()
-    # thread2.join()
-    # print("thread finished...exiting")

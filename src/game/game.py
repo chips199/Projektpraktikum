@@ -2,8 +2,6 @@ import json
 import os
 from copy import copy
 import datetime
-import time as t
-from threading import Thread
 
 import pandas as pd
 import pygame
@@ -61,17 +59,9 @@ class Game:
         # just for comfort
         id = int(self.net.id)
 
-        # thread = Thread(target=self.send_data)
-        # thread.start()
-        # thread.join()
-
         # game loop
         while run:
-            self.time = datetime.datetime.now()
-            time = self.time
-            # thread = Thread(target=self.send_data)
-            # thread.start()
-            # thread.join()
+            time = datetime.datetime.now()
 
             # pygame stuff for the max fps
             clock.tick(35)
@@ -177,45 +167,6 @@ class Game:
 
         pygame.quit()
 
-    # def send_data(self):
-    #     """
-    #     Send position to server
-    #     :return: String with data of all players
-    #     """
-    #     time = datetime.datetime.now()
-    #     while True:
-    #         with open(config_file) as file:
-    #             sample = json.load(file)
-    #
-    #         data = sample[str(self.net.id)]
-    #         data['id'] = int(self.net.id)
-    #         data['position'] = [int(self.playerList[int(self.net.id)].x), int(self.playerList[int(self.net.id)].y)]
-    #         data['connected'] = True
-    #         data['mouse'] = self.playerList[int(self.net.id)].mousepos
-    #         reply = self.net.send(json.dumps(data))
-    #
-    #         pos = self.parse_pos(reply)
-    #         for i, position in enumerate(pos):
-    #             self.playerList[i].x, self.playerList[i].y = position
-    #         for p in self.playerList:
-    #             if p == self.playerList[int(self.net.id)]:
-    #                 continue
-    #             p.refresh_solids()
-    #         # synchronise Online stati
-    #         online = self.parse_online(reply)
-    #         for i, on in enumerate(online):
-    #             self.playerList[i].is_connected = on
-    #         # sync mouse
-    #         mouse = self.parse_mouse(reply)
-    #         for i, on in enumerate(mouse):
-    #             self.playerList[i].mousepos = on
-
-            # print("SENT DATA")
-            # print("Handling Data this function:", datetime.datetime.now() - time)
-            # print("Handling Data overall:", datetime.datetime.now() - self.time)
-            # t.sleep(0.5)
-        # return reply
-
     def send_data(self):
         """
         Send position to server
@@ -230,12 +181,7 @@ class Game:
         data['connected'] = True
         data['mouse'] = self.playerList[int(self.net.id)].mousepos
         reply = self.net.send(json.dumps(data))
-        # self.reply = reply
-        #
-        # self.online = self.parse_online(self.reply)
-        # self.pos = self.parse_pos(self.reply)
-        # self.mouse = self.parse_mouse(self.reply)
-        return  reply
+        return reply
 
     @staticmethod
     def update_fps():
@@ -314,10 +260,10 @@ class Game:
         :return: integer representing the distance to the next object within the range
         """
         # first combining all solid pixels in one dataframe
-        other_players = self.playerList[:int(self.net.id)] + self.playerList[int(self.net.id) + 1:]
+        # other_players = self.playerList[:int(self.net.id)] + self.playerList[int(self.net.id) + 1:]
         solid_pixels_df = copy(self.map.solid_df)
-        for op in other_players:
-            solid_pixels_df = pd.concat([solid_pixels_df, op.solid_df])
+        # for op in other_players:
+        #     solid_pixels_df = pd.concat([solid_pixels_df, op.solid_df])
         # getting copy of the players solid dataframe
         simulated_player = copy(player.solid_df)
         erg = 0
