@@ -10,7 +10,6 @@ import pygame
 from src.game import canvas
 from src.game.map import Map
 from src.game import player as Player
-from src.game.network import Network
 from src.game import weapon as Weapon
 
 wrk_dir = os.path.abspath(os.path.dirname(__file__))
