@@ -2,6 +2,7 @@ import json
 import os
 from copy import copy
 import datetime
+import time as t
 from threading import Thread
 
 import pandas as pd
@@ -66,6 +67,10 @@ class Game:
 
         # game loop
         while run:
+            thread = Thread(target=self.send_data)
+            thread.start()
+            thread.join()
+
             # pygame stuff for the max fps
             clock.tick(60)
             print()
@@ -175,6 +180,7 @@ class Game:
         Send position to server
         :return: String with data of all players
         """
+        # while True:
         with open(config_file) as file:
             sample = json.load(file)
 
@@ -200,6 +206,9 @@ class Game:
         mouse = self.parse_mouse(reply)
         for i, on in enumerate(mouse):
             self.playerList[i].mousepos = on
+
+        print("SENT DATA")
+        # t.sleep(0.1)
         # return reply
 
     # def send_data(self):

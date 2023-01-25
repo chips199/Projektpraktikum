@@ -40,9 +40,9 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 number_of_games_at_a_time = 3
 number_of_players_per_game = 4
 # Localhost for tunneling with ngrok, by name for local hosting
-server = 'localhost'
+server = '10.170.48.131'
 # server = socket.gethostname()
-port = 5556
+port = 17586
 server_ip = socket.gethostbyname(server)
 
 # set host and port of server

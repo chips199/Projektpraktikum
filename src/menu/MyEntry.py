@@ -41,11 +41,10 @@ def threaded_function(arg):
         sleep(0.0001)
 
 def threaded_function2():
-    for i in range(10):
-        print("running 2")
-        sleep(0.0001)
-        print("running test")
-        sleep(0.0001)
+    print("running 2")
+    sleep(0.0001)
+    print("running test")
+    sleep(0.0001)
 
 
 if __name__ == "__main__":
@@ -53,6 +52,9 @@ if __name__ == "__main__":
     thread2 = Thread(target=threaded_function2, args=())
     thread.start()
     thread2.start()
+    while True:
+        print("running")
+        sleep(0.1)
     # thread.join()
     # thread2.join()
-    print("thread finished...exiting")
+    # print("thread finished...exiting")
