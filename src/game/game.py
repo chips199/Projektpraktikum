@@ -238,6 +238,7 @@ class Game:
     #         with open(config_file) as file:
     #             sample = json.load(file)
     #
+    #
     #         data = sample[str(self.net.id)]
     #         data['id'] = int(self.net.id)
     #         data['position'] = [int(self.playerList[int(self.net.id)].x), int(self.playerList[int(self.net.id)].y)]
