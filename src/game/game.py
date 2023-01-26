@@ -26,6 +26,7 @@ clock = pygame.time.Clock()
 class Game:
 
     def __init__(self, w, h, net):
+        pygame.display.set_icon(pygame.image.load(wrk_dir + r"\..\stick_wars_logo.png"))
         self.net = net
         self.width = w
         self.height = h
