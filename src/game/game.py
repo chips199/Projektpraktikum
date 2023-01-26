@@ -221,8 +221,13 @@ class Game:
         data['position'] = [int(self.playerList[int(self.net.id)].x), int(self.playerList[int(self.net.id)].y)]
         data['connected'] = True
         data['mouse'] = self.playerList[int(self.net.id)].mousepos
-        reply = self.net.send(json.dumps(data))
-        return reply
+        print("ein Aufruf")
+        for item in data.items():
+            print(data)
+        # reply = self.net.send(json.dumps(data))
+        # print(reply)
+        return data
+        # return reply
 
     # def update_all_data(self):
     #     while True:
