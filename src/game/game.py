@@ -15,8 +15,10 @@ wrk_dir = os.path.abspath(os.path.dirname(__file__))
 config_file = wrk_dir + r'\configuration.json'
 basic_map = wrk_dir + r"\..\basicmap"
 platformmap = wrk_dir + r"\..\platformmap"
+schneemap = wrk_dir + r"\..\schneemap"
 map_names_dict = {"basicmap": basic_map,
-                  "platformmap": platformmap}
+                  "platformmap": platformmap,
+                  "schneemap": schneemap}
 
 clock = pygame.time.Clock()
 
@@ -24,6 +26,7 @@ clock = pygame.time.Clock()
 class Game:
 
     def __init__(self, w, h, net):
+        pygame.display.set_icon(pygame.image.load(wrk_dir + r"\..\stick_wars_logo.png"))
         self.net = net
         self.width = w
         self.height = h
