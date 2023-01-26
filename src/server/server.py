@@ -217,12 +217,12 @@ def threaded_client(conn):
             reset_games()
             conn.close()
             exit(0)
-        elif msg == "":
-            print("connection lost")
-            players_connected[this_gid][this_pid] = 0
-            reset_games()
-            conn.close()
-            exit(0)
+        # elif msg == "":
+        #     print("connection lost")
+        #     players_connected[this_gid][this_pid] = 0
+        #     reset_games()
+        #     conn.close()
+        #     exit(0)
 
         sleep(0.2)
 
