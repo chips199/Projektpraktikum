@@ -1,80 +1,37 @@
 import datetime
 from copy import copy
-from typing import List, Tuple
-import pandas as pd
-import pygame
+
 from src.game import weapon
+from src.game.Animated import Animated
 
 
-class Player():
+class Player(Animated):
     width, height = 50, 100
     last_jump = datetime.datetime.now()
     height_jump = 200
     status_jump = 0
     is_connected = False
     mousepos = (0, 0)
+    user_weapon = weapon.Weapon(100, 15, 15, 1)
     health = 100
 
-    def __init__(self, startx, starty, game, user_weapon, image=None, color=(255, 0, 0)):
+    def __init__(self, *args, **kwargs):
+        super(Player, self).__init__(self.width, self.height, *args, **kwargs)
+
         self.falling_time = datetime.datetime.now()
         self.jumping_time = datetime.datetime.now()
-        self.x = startx
-        self.y = starty
-        self.game = game
-        self.velocity = 4
+        # self.x = startx
+        # self.y = starty
+        self.velocity = 8
         self.velocity_gravity = 1
-        self.velocity_jumping = self.max_jumping_speed = 12
-        self.velocity_time = 50
+        self.velocity_jumping = self.max_jumping_speed = 20
+        self.velocity_time = 15
         self.landed = False
         self.is_jumping = False
         self.is_falling = True
         self.block_x_axis = False
-        self.color = color
-        self.user_weapon = user_weapon
-        solid = []  # type: List[Tuple[int, int]]
-        relativ_solids = []  # type: List[Tuple[int, int]]
-        try:
-            self.image = pygame.image.load(image)  # .convert_alpha()
-            # self.image.convert_alpha()
-            self.edge_surface = pygame.transform.laplacian(self.image).convert_alpha()
-            alpha_array = pygame.surfarray.pixels_alpha(self.edge_surface)
-            alpha_array = alpha_array.swapaxes(0, 1)
-            for yi, y in enumerate(alpha_array):
-                for xi, x in enumerate(y):
-                    if x > 200:
-                        solid.append((xi + self.x, yi + self.y))
-                        relativ_solids.append((xi, yi))
-        except:
-            self.image = "no image found"  # type: ignore[assignment]
-            # horizontal edges
-            for x in range(self.width):
-                solid.append((x + self.x, self.y))
-                relativ_solids.append((x, self.y))
-                solid.append((x + self.x, self.y + self.height))
-                relativ_solids.append((x, self.y + self.height))
-            # vertical edges
-            for y in range(self.height):
-                solid.append((self.x, self.y + y))
-                relativ_solids.append((self.x, y))
-                solid.append((self.x + self.width, self.y + y))
-                relativ_solids.append((self.x + self.width, y))
-        self.relativ_solids_df = pd.DataFrame(relativ_solids, columns=['x', 'y'])
-        self.solid_df = pd.DataFrame(solid, columns=['x', 'y'])
-
-    def draw(self, g):
-        """
-        displays a player to the canvas
-        :param g: pygame canvas
-        """
-        # draw Player
-        player_rec = pygame.Rect(self.x, self.y, self.width, self.height)
-        if type(self.image) == pygame.Surface:
-            g.blit(self.image, player_rec)
-        else:
-            pygame.draw.rect(g, self.color, player_rec, 0)
-
-        # draw weapon
-        # ...wip...
+        # self.color = color
+        self.weapon = weapon
 
     @staticmethod
     def shift_df(df, dirn, n):

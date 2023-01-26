@@ -9,15 +9,16 @@ import pygame
 from src.game import canvas
 from src.game.map import Map
 from src.game import player as Player
-from src.game.network import Network
 from src.game import weapon as Weapon
 
 wrk_dir = os.path.abspath(os.path.dirname(__file__))
 config_file = wrk_dir + r'\configuration.json'
 basic_map = wrk_dir + r"\..\basicmap"
 platformmap = wrk_dir + r"\..\platformmap"
+schneemap = wrk_dir + r"\..\schneemap"
 map_names_dict = {"basicmap": basic_map,
-                  "platformmap": platformmap}
+                  "platformmap": platformmap,
+                  "schneemap": schneemap}
 
 clock = pygame.time.Clock()
 
@@ -25,32 +26,30 @@ clock = pygame.time.Clock()
 class Game:
 
     def __init__(self, w, h, net):
+        pygame.display.set_icon(pygame.image.load(wrk_dir + r"\..\stick_wars_logo.png"))
         self.net = net
         self.width = w
         self.height = h
-        self.canvas = canvas.Canvas(self.width, self.height, str(self.net.id) + "Stick Wars")
+        self.canvas = canvas.Canvas(self.width, self.height, str(self.net.id) + "Stick  Wars")
         self.map = Map(self, map_names_dict[net.map_name])
         # load the config for default values
         # this will later be done in the map to configure spawnpoints
         with open(config_file) as file:
             config = json.load(file)
 
-        # Create list of weapons
-        self.weapon_list = [Weapon.Weapon(distance=100, damage=15, durability=15, cooldown=1)]
-
         # if a map has player images generate use them if not don't
         if len(self.map.player_uris) == 4:
             self.playerList = [
-                Player.Player(config['0']['position'][0], config['0']['position'][1], self, self.weapon_list[0], self.map.player_uris[0]),
-                Player.Player(config['1']['position'][0], config['1']['position'][1], self, self.weapon_list[0], self.map.player_uris[1]),
-                Player.Player(config['2']['position'][0], config['2']['position'][1], self, self.weapon_list[0], self.map.player_uris[2]),
-                Player.Player(config['3']['position'][0], config['3']['position'][1], self, self.weapon_list[0], self.map.player_uris[3])]
+                Player.Player(config['0']['position'][0], config['0']['position'][1], self.map.player_uris[0]),
+                Player.Player(config['1']['position'][0], config['1']['position'][1], self.map.player_uris[1]),
+                Player.Player(config['2']['position'][0], config['2']['position'][1], self.map.player_uris[2]),
+                Player.Player(config['3']['position'][0], config['3']['position'][1], self.map.player_uris[3])]
         else:
             self.playerList = [
-                Player.Player(config['0']['position'][0], config['0']['position'][1], self.weapon_list[0], (0, 255, 0)),
-                Player.Player(config['1']['position'][0], config['1']['position'][1], self.weapon_list[0], (255, 255, 0)),
-                Player.Player(config['2']['position'][0], config['2']['position'][1], self.weapon_list[0], (0, 255, 255)),
-                Player.Player(config['3']['position'][0], config['3']['position'][1], self.weapon_list[0], (255, 0, 255))]
+                Player.Player(config['0']['position'][0], config['0']['position'][1], (0, 255, 0)),
+                Player.Player(config['1']['position'][0], config['1']['position'][1], (255, 255, 0)),
+                Player.Player(config['2']['position'][0], config['2']['position'][1], (0, 255, 255)),
+                Player.Player(config['3']['position'][0], config['3']['position'][1], (255, 0, 255))]
 
     def run(self):
         """
@@ -65,12 +64,14 @@ class Game:
 
         # game loop
         while run:
+            # time = datetime.datetime.now()
+
             # pygame stuff for the max fps
-            clock.tick(60)
+            clock.tick(35)
             # print()
-            # print("FPS:", self.update_fps())
+            print("FPS:", self.update_fps())
             if self.playerList[id].is_alive():
-                # time = datetime.datetime.now()
+                time = datetime.datetime.now()
                 # handling pygame events
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
@@ -112,13 +113,21 @@ class Game:
                 keys = pygame.key.get_pressed()
 
                 if keys[pygame.K_d] and not self.playerList[id].block_x_axis:
+                    if self.playerList[id].landed:
+                        self.playerList[id].set_animation_direction(1)
                     self.playerList[id].move(0, self.nextToSolid(self.playerList[id], 0, self.playerList[id].velocity))
 
-                if keys[pygame.K_a] and not self.playerList[id].block_x_axis:
+                elif keys[pygame.K_a] and not self.playerList[id].block_x_axis:
+                    if self.playerList[id].landed:
+                        self.playerList[id].set_animation_direction(2)
                     self.playerList[id].move(1, self.nextToSolid(self.playerList[id], 1, self.playerList[id].velocity))
+
+                # else:
+                #     self.playerList[id].do_animation_left = self.playerList[id].do_animation_left = False
 
                 # Jump
                 if keys[pygame.K_SPACE] or self.playerList[id].is_jumping:
+                    self.playerList[id].stop_animation()
                     self.playerList[id].jump(func=self.nextToSolid)
 
                 # gravity
@@ -182,10 +191,6 @@ class Game:
         data['position'] = [int(self.playerList[int(self.net.id)].x), int(self.playerList[int(self.net.id)].y)]
         data['connected'] = True
         data['mouse'] = self.playerList[int(self.net.id)].mousepos
-        data["health_0"] = self.playerList[int(0)].health
-        data["health_1"] = self.playerList[int(1)].health
-        data["health_2"] = self.playerList[int(2)].health
-        data["health_3"] = self.playerList[int(3)].health
         reply = self.net.send(json.dumps(data))
         return reply
 
@@ -266,10 +271,10 @@ class Game:
         :return: integer representing the distance to the next object within the range
         """
         # first combining all solid pixels in one dataframe
-        other_players = self.playerList[:int(self.net.id)] + self.playerList[int(self.net.id) + 1:]
+        # other_players = self.playerList[:int(self.net.id)] + self.playerList[int(self.net.id) + 1:]
         solid_pixels_df = copy(self.map.solid_df)
-        for op in other_players:
-            solid_pixels_df = pd.concat([solid_pixels_df, op.solid_df])
+        # for op in other_players:
+        #     solid_pixels_df = pd.concat([solid_pixels_df, op.solid_df])
         # getting copy of the players solid dataframe
         simulated_player = copy(player.solid_df)
         erg = 0
