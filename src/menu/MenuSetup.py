@@ -367,19 +367,20 @@ class MenuSetup:
 
     def start_game(self):
         self.root.run = False
-        self.root.destroy()
-        sleep(1)
+        # self.root.destroy()
+        # sleep(1)
         # self.root.destroy()
         # start_new_thread(self.close_window(), tuple())
         net = self.data["net"]
-        # self.data["net"].start_game()
+        print(net.session_id)
         net.start_game()  # type:ignore[union-attr]
+        # self.data["net"].start_game()
+        # # sleep(1)
+        # # g = game.Game(w=1600, h=900, net=self.data["net"])
+        # # self.root.quit()
+        # # self.root.destroy()
         # sleep(1)
-        # g = game.Game(w=1600, h=900, net=self.data["net"])
-        # self.root.quit()
-        # self.root.destroy()
-        sleep(1)
-        g.run()
+        # g.run()
 
     # __________________other Functions__________________
 
@@ -466,7 +467,7 @@ class MenuSetup:
             self.data = self.conn1.recv()
             # self.data["amount_player"] = int(2),
             # self.data["game_started"] = False
-            print("data=", self.data)
+            # print("data=", self.data)
         self.update_background_after_id = self.main_frame.after(10, self.update_background_process)
 
     def send_data(self, msg):
