@@ -20,13 +20,23 @@ class Map():
         except:
             self.background = "no image found"  # type: ignore[assignment]
 
+        # # load player images
+        # for filename in os.listdir(self.directory + r'/player'):
+        #     playerimg = os.path.join(self.directory + r'/player', filename)
+        #     if not os.path.isfile(playerimg) or filename[-3:] != 'png':
+        #         print(str(playerimg) + ' is not a  png file')
+        #         continue
+        #     self.player_uris.append(playerimg)
+
         # load player images
-        for filename in os.listdir(self.directory + r'/player'):
-            playerimg = os.path.join(self.directory + r'/player', filename)
-            if not os.path.isfile(playerimg) or filename[-3:] != 'png':
-                print(str(playerimg) + ' is not a  png file')
+        for directory in next(os.walk(self.directory + r'/player/animation'))[1]:
+            folder = os.path.join(self.directory + r'/player', directory)
+            print(folder)
+            if directory[-3:] == 'png':
+                print(str(directory) + ' is no folder')
                 continue
-            self.player_uris.append(playerimg)
+            self.player_uris.append(os.path.join(self.directory + r'/player/animation', directory))
+            print("directory:", os.path.join(self.directory + r'/player', directory))
 
         # load solid images and add solid pixels to solid list
         for filename in os.listdir(self.directory + r'/solid'):
