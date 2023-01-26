@@ -239,9 +239,9 @@ class MenuSetup:
                                    text="Session ID: {}".format(self.s_id),
                                    font=("None", self.h * 0.6))
         session_id_label.place(x=50 * self.sizing_width,
-                               y=int(self.label_game_name.winfo_y() +  # type:ignore[union-attr]
-                                     self.label_game_name.winfo_height() +  # type:ignore[union-attr]
-                                     10 * self.sizing_height))
+                               y=int((self.label_game_name.winfo_y() +  # type:ignore[union-attr]
+                                      self.label_game_name.winfo_height() +  # type:ignore[union-attr]
+                                      10) * self.sizing_height))
 
         button_start = tk.CTkButton(master=self.lobby_frame,
                                     text="Start",
@@ -250,7 +250,7 @@ class MenuSetup:
                                     command=self.start_game,
                                     font=("None", self.h * 0.6),
                                     corner_radius=int(self.h / 3))
-        button_start.place(x=int(self.lobby_frame.winfo_width() / 2),
+        button_start.place(relx=0.5,
                            y=0,
                            anchor='n')
 
@@ -322,7 +322,7 @@ class MenuSetup:
                                                                    lambda: self.update_player())))
 
     def join_lobby(self):
-        self.start_network(argument=self.entry_session_id.get(), # type:ignore[union-attr]
+        self.start_network(argument=self.entry_session_id.get(),  # type:ignore[union-attr]
                            func=lambda: self.clear_frame_sliding(
                                widget_list=[self.interaction_frame,
                                             self.main_frame.winfo_children()[0]],
