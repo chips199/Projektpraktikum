@@ -202,6 +202,21 @@ class MenuSetup:
 
         self.root.update()
 
+        # load space map
+        schnee_map_platforms = tk.CTkImage(
+            dark_image=Image.open(wrk_dir + r"\..\menu\maps\schnee_map.png"),
+            size=(int(map2.winfo_width() * self.sizing_width),
+                  int(map2.winfo_height() * self.sizing_height)))
+        map3 = MyLabel(master=self.choose_map_frame,
+                       text=None,
+                       image=schnee_map_platforms,
+                       fg_color='#252525'
+                       )
+        map3.place(x=int((map2.winfo_x() + map2.winfo_width() + 20) * self.sizing_width),
+                   y=map2.winfo_y() * self.sizing_height)
+
+        self.root.update()
+
         # add buttons to choose a map
         button_start = tk.CTkButton(master=self.choose_map_frame,
                                     text="Basicmap",
@@ -222,6 +237,16 @@ class MenuSetup:
                                      command=lambda: self.create_lobby(map_name='platformmap'))
         button_start2.place(x=int(map2.winfo_x() * self.sizing_width),
                             y=int((map2.winfo_y() + map2.winfo_height() + 20) * self.sizing_height))
+
+        button_start3 = tk.CTkButton(master=self.choose_map_frame,
+                                     text="Snow Map",
+                                     width=int(map3.winfo_width() * self.sizing_width),
+                                     height=int(self.h * 0.3),
+                                     font=("None", self.h * 0.4),
+                                     corner_radius=int(self.h / 3),
+                                     command=lambda: self.create_lobby(map_name='schneemap'))
+        button_start3.place(x=int(map3.winfo_x() * self.sizing_width),
+                            y=int((map3.winfo_y() + map3.winfo_height() + 20) * self.sizing_height))
 
     def load_lobby_frame(self):
         self.lobby_frame = MyFrame(master=self.root,
