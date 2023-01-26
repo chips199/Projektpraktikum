@@ -28,11 +28,10 @@ class Animated:
 
         solid = []  # type: List[Tuple[int, int]]
         relativ_solids = []  # type: List[Tuple[int, int]]
-
-        print("should be a png:", self.image_path)
+        print()
 
         try:
-            self.image = pygame.image.load(self.image_path)  # .convert_alpha()
+            self.image = pygame.image.load(self.image_path).convert_alpha()
             # self.image.convert_alpha()
             print("IMAGE FOUND")
             self.edge_surface = pygame.transform.laplacian(self.image).convert_alpha()

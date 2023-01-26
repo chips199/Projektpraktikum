@@ -30,8 +30,6 @@ class Map():
 
         # load player images
         for directory in next(os.walk(self.directory + r'/player/animation'))[1]:
-            folder = os.path.join(self.directory + r'/player', directory)
-            print(folder)
             if directory[-3:] == 'png':
                 print(str(directory) + ' is no folder')
                 continue
