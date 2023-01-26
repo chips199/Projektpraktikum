@@ -371,9 +371,11 @@ class MenuSetup:
         sleep(1)
         # self.root.destroy()
         # start_new_thread(self.close_window(), tuple())
-        self.net.start_game()  # type:ignore[union-attr]
+        net = self.data["net"]
+        # self.data["net"].start_game()
+        net.start_game()  # type:ignore[union-attr]
         # sleep(1)
-        g = game.Game(w=1600, h=900, net=self.net)
+        # g = game.Game(w=1600, h=900, net=self.data["net"])
         # self.root.quit()
         # self.root.destroy()
         sleep(1)
@@ -462,9 +464,9 @@ class MenuSetup:
             self.counter += 1
         if self.conn1.poll():
             self.data = self.conn1.recv()
-            self.data["amount_player"] = int(2),
-            self.data["game_started"] = False
-            # print("data=", self.data)
+            # self.data["amount_player"] = int(2),
+            # self.data["game_started"] = False
+            print("data=", self.data)
         self.update_background_after_id = self.main_frame.after(10, self.update_background_process)
 
     def send_data(self, msg):

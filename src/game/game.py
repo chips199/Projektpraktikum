@@ -51,7 +51,7 @@ def update_all_data(net, playerList):
 
 class Game:
 
-    def __init__(self, w, h, net):
+    def __init__(self, w, h, net, conn):
         # pygame.init()
         pygame.display.set_icon(pygame.image.load(wrk_dir + r"\..\stick_wars_logo.png"))
         self.net = net

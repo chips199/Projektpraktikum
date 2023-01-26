@@ -11,8 +11,8 @@ class Network:
         # use the url for connecting to an external server
         # use tht second line to connect to a local server, which is visible in a network
         # use the third if it is just local
-        # self.host, self.port = "6.tcp.eu.ngrok.io", 19252
         self.host, self.port = "6.tcp.eu.ngrok.io", 18577
+        # self.host, self.port = "10.170.48.131", 17586
         # self.host, self.port = socket.gethostbyname(socket.gethostname()), 5556
         # self.host, self.port = "localhost", 5556
         self.addr = (self.host, self.port)
@@ -34,22 +34,9 @@ class Network:
             rply = self.client.recv(2048).decode()
         except socket.timeout:
             rply = "5,No connection possible"
-        print("Reply:", rply)
+        print(rply)
         pid, msg = rply.split(",")
-        print("s_id:", pid)
         return pid, msg
-
-    def send_new_session_id(self, msg):
-        try:
-            self.client.sendall(str.encode(msg))
-            rply = self.client.recv(2048).decode()
-        except socket.timeout:
-            rply = "5,No connection possible"
-        print("Reply:", rply)
-        self.id, self.session_id = rply.split(",")
-        print("s_id:", self.id)
-        # return pid, msg
-
 
     def connect(self):
         self.client.connect(self.addr)
