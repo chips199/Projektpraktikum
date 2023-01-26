@@ -80,11 +80,13 @@ def reset_games():
     for i, g in enumerate(players_connected):
         # going through all games
         if g.count(2) + g.count(0) == number_of_players_per_game and g.count(2) > 0:
-            # if g.count(2) + g.count(0) + g.count(3) == number_of_players_per_game and g.count(2) > 0:
+            # set all players to not connected
             players_connected[i] = [0] * number_of_players_per_game
+            # get session_id and set game_data to default and reset map
             game_id = list(game_data_dict.keys())[i]
             game_data_dict[game_id] = copy(game_data)
             maps_dict[game_id] = "none"
+            # game_data_dict does not reset online, so manually reset it
             for n in range(number_of_players_per_game):
                 game_data_dict[game_id][str(n)]["connected"] = False
             print(f"{list(game_data_dict.keys())[i]} reset, because no player was there anymore")
@@ -209,12 +211,19 @@ def threaded_client(conn):
             reset_games()
             conn.close()
             exit(0)
-        elif (datetime.datetime.now() - last_msg).seconds > 10:
-            print("connection lost")
-            players_connected[this_gid][this_pid] = 2
+        elif (datetime.datetime.now() - last_msg).seconds > 2:
+            print("connection timeout")
+            players_connected[this_gid][this_pid] = 0
             reset_games()
             conn.close()
             exit(0)
+        elif msg == "":
+            print("connection lost")
+            players_connected[this_gid][this_pid] = 0
+            reset_games()
+            conn.close()
+            exit(0)
+
         sleep(0.2)
 
     print("Game starts: " + game_id)
