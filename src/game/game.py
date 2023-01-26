@@ -1,10 +1,13 @@
 import json
 import os
+import time
 from copy import copy
 import datetime
 
 import pandas as pd
 import pygame
+
+import multiprocessing
 
 from src.game import canvas
 from src.game.map import Map
@@ -23,15 +26,42 @@ map_names_dict = {"basicmap": basic_map,
 clock = pygame.time.Clock()
 
 
+def printing():
+    while True:
+        print("Hi")
+        time.sleep(0.05)
+
+
+def update_all_data(net, playerList):
+    while True:
+        print("in Process")
+        with open(config_file) as file:
+            sample = json.load(file)
+
+        data = sample[str(net.id)]
+        data['id'] = int(net.id)
+        data['position'] = [int(playerList[int(net.id)].x), int(playerList[int(net.id)].y)]
+        data['connected'] = True
+        data['mouse'] = playerList[int(net.id)].mousepos
+        reply = net.send(json.dumps(data))
+        # pos = self.parse_pos(reply)
+        # mouse = self.parse_mouse(reply)
+        # online = self.parse_online(reply)
+
+
 class Game:
 
     def __init__(self, w, h, net):
+        # pygame.init()
         pygame.display.set_icon(pygame.image.load(wrk_dir + r"\..\stick_wars_logo.png"))
         self.net = net
         self.width = w
         self.height = h
         self.canvas = canvas.Canvas(self.width, self.height, str(self.net.id) + "Stick  Wars")
         self.map = Map(self, map_names_dict[net.map_name])
+        self.online = [True, True, True, True]
+        self.pos = [[100, 100], [200, 100], [300, 100], [400, 100]]
+        self.mouse = [[0, 0], [0, 0], [0, 0], [0, 0]]
         # load the config for default values
         # this will later be done in the map to configure spawnpoints
         with open(config_file) as file:
@@ -62,16 +92,24 @@ class Game:
         # just for comfort
         id = int(self.net.id)
 
+        process = multiprocessing.Process(target=update_all_data, args=(self.net, self.playerList))
+        # process = multiprocessing.Process(target=printing)
+        process.start()
+
+        # while True:
+        #     print("main")
+        #     # time.sleep(1)
+
         # game loop
         while run:
             # time = datetime.datetime.now()
 
             # pygame stuff for the max fps
-            clock.tick(35)
+            clock.tick(60)
             # print()
             print("FPS:", self.update_fps())
             if self.playerList[id].is_alive():
-                time = datetime.datetime.now()
+                # time = datetime.datetime.now()
                 # handling pygame events
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
@@ -142,22 +180,22 @@ class Game:
             # time = datetime.datetime.now()
 
             # Send Data about this player and get some over the others als reply
-            reply = self.send_data()
+            # reply = self.send_data()
             # synchronise positions
-            pos = self.parse_pos(reply)
-            for i, position in enumerate(pos):
+            # pos = self.parse_pos(reply)
+            for i, position in enumerate(self.pos):
                 self.playerList[i].x, self.playerList[i].y = position
             for p in self.playerList:
                 if p == self.playerList[id]:
                     continue
                 p.refresh_solids()
             # synchronise Online stati
-            online = self.parse_online(reply)
-            for i, on in enumerate(online):
+            # online = self.parse_online(reply)
+            for i, on in enumerate(self.online):
                 self.playerList[i].is_connected = on
             # sync mouse
-            mouse = self.parse_mouse(reply)
-            for i, on in enumerate(mouse):
+            # mouse = self.parse_mouse(reply)
+            for i, on in enumerate(self.mouse):
                 self.playerList[i].mousepos = on
 
             # print("Handling Data:", datetime.datetime.now() - time)
@@ -193,6 +231,22 @@ class Game:
         data['mouse'] = self.playerList[int(self.net.id)].mousepos
         reply = self.net.send(json.dumps(data))
         return reply
+
+    # def update_all_data(self):
+    #     while True:
+    #         print("in Process")
+    #         with open(config_file) as file:
+    #             sample = json.load(file)
+    #
+    #         data = sample[str(self.net.id)]
+    #         data['id'] = int(self.net.id)
+    #         data['position'] = [int(self.playerList[int(self.net.id)].x), int(self.playerList[int(self.net.id)].y)]
+    #         data['connected'] = True
+    #         data['mouse'] = self.playerList[int(self.net.id)].mousepos
+    #         reply = self.net.send(json.dumps(data))
+    #         self.pos = self.parse_pos(reply)
+    #         self.mouse = self.parse_mouse(reply)
+    #         self.online = self.parse_online(reply)
 
     @staticmethod
     def update_fps():

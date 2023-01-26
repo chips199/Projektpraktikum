@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import inspect
-from time import sleep
-from threading import Thread
 
 import customtkinter as tk
 
@@ -32,3 +30,21 @@ class MyEntry(tk.CTkEntry):
             # Execute failure_function if provided
             if failure_function is not None:
                 failure_function()
+
+
+import multiprocessing
+import time
+
+
+def printing(text):
+    while True:
+        print(text)
+        time.sleep(0.014)
+
+
+if __name__ == "__main__":
+    process = multiprocessing.Process(target=printing, args=("Process", ))
+    process.start()
+    while True:
+        print("Main")
+        # time.sleep(0.014)

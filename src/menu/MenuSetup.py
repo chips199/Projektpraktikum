@@ -1,20 +1,17 @@
 import inspect
 import os
-import time
-from _thread import start_new_thread
 from time import sleep
+from typing import Optional, Callable, Union
 
 import customtkinter as tk
+from PIL import Image
 
+from src.game import game
+from src.game.network import Network
 from src.menu.MyEntry import MyEntry
 from src.menu.MyFrame import MyFrame
 from src.menu.MyLabel import MyLabel
 from src.menu.MyWindow import MyWindow
-from src.game.network import Network
-from src.game import game
-from typing import Optional, Callable, Union
-
-from PIL import Image
 
 wrk_dir = os.path.abspath(os.path.dirname(__file__))
 
