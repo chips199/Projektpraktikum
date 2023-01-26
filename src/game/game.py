@@ -68,7 +68,7 @@ class Game:
             # print()
             print("FPS:", self.update_fps())
             if self.playerList[id].is_alive():
-                # time = datetime.datetime.now()
+                time = datetime.datetime.now()
                 # handling pygame events
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
@@ -110,13 +110,21 @@ class Game:
                 keys = pygame.key.get_pressed()
 
                 if keys[pygame.K_d] and not self.playerList[id].block_x_axis:
+                    if self.playerList[id].landed:
+                        self.playerList[id].set_animation_direction(1)
                     self.playerList[id].move(0, self.nextToSolid(self.playerList[id], 0, self.playerList[id].velocity))
 
-                if keys[pygame.K_a] and not self.playerList[id].block_x_axis:
+                elif keys[pygame.K_a] and not self.playerList[id].block_x_axis:
+                    if self.playerList[id].landed:
+                        self.playerList[id].set_animation_direction(2)
                     self.playerList[id].move(1, self.nextToSolid(self.playerList[id], 1, self.playerList[id].velocity))
+
+                # else:
+                #     self.playerList[id].do_animation_left = self.playerList[id].do_animation_left = False
 
                 # Jump
                 if keys[pygame.K_SPACE] or self.playerList[id].is_jumping:
+                    self.playerList[id].stop_animation()
                     self.playerList[id].jump(func=self.nextToSolid)
 
                 # gravity

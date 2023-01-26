@@ -8,11 +8,12 @@ class Network:
     def __init__(self, msg):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client.settimeout(2)
+        # ping -t 6.tcp.eu.ngrok.io -l 500
         # use the url for connecting to an external server
         # use tht second line to connect to a local server, which is visible in a network
         # use the third if it is just local
-        self.host, self.port = "5.tcp.eu.ngrok.io", 15040
-        # self.host, self.port = "10.170.48.131", 17586
+        # self.host, self.port = "5.tcp.eu.ngrok.io", 15040
+        self.host, self.port = "6.tcp.eu.ngrok.io", 19252
         # self.host, self.port = socket.gethostbyname(socket.gethostname()), 5556
         # self.host, self.port = "localhost", 5556
         self.addr = (self.host, self.port)
