@@ -20,10 +20,10 @@ class Animated:
         self.solid = []  # type: List[Tuple[int, int]]
         self.relativ_solids = []  # type: List[Tuple[int, int]]
         self.current_frame = None
-        self.width = width
-        self.height = height
         self.x = startx
         self.y = starty
+        self.width = width
+        self.height = height
         self.animation_direction = 1  # 1 mean right, 2 means left
         self.animation_running = False
 

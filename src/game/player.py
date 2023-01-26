@@ -12,7 +12,6 @@ class Player(Animated):
     status_jump = 0
     is_connected = False
     mousepos = (0, 0)
-    user_weapon = weapon.Weapon(100, 15, 15, 1)
     health = 100
 
     def __init__(self, *args, **kwargs):
@@ -31,7 +30,17 @@ class Player(Animated):
         self.is_falling = True
         self.block_x_axis = False
         # self.color = color
-        self.weapon = weapon
+        map_dir = "\\".join(str(self.directory).split('\\')[:-3])
+        fist_path = map_dir + f"\\waffen\\faeuste\\animation\\fists_{self.get_color(self.directory)}_animation"
+        sword_path = map_dir + f"\\waffen\\schwert\\animation\\sword_hold_animation_{self.get_color(self.directory)}"
+        # print(fist_path)
+        # self.weapon = weapon.Weapon(weapon.WeaponType.Fist, self.width, self.height, self.x, self.y, fist_path)
+        self.weapon = weapon.Weapon(weapon.WeaponType.Sword, self.width, self.height, self.x, self.y, sword_path)
+
+    def draw(self, g):
+        super(Player, self).draw(g)
+        self.weapon.animation_direction = self.animation_direction
+        self.weapon.draw(g)
 
     @staticmethod
     def shift_df(df, dirn, n):
@@ -69,6 +78,9 @@ class Player(Animated):
             self.y -= v
         else:
             self.y += v
+
+        self.weapon.x = self.x
+        self.weapon.y = self.y
         self.solid_df = Player.shift_df(self.solid_df, dirn, v)
 
     def jump(self, func):
@@ -202,3 +214,13 @@ class Player(Animated):
                             self.block_x_axis = False
                             self.is_falling = False
                             self.velocity_gravity = 1
+    @staticmethod
+    def get_color(p):
+        if p.__contains__("magenta"):
+            return "magenta"
+        elif p.__contains__("orange"):
+            return "orange"
+        elif p.__contains__("purple"):
+            return "purple"
+        else:
+            return "turquoise"

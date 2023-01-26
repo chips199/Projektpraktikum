@@ -13,9 +13,9 @@ from src.game import weapon as Weapon
 
 wrk_dir = os.path.abspath(os.path.dirname(__file__))
 config_file = wrk_dir + r'\configuration.json'
-basic_map = wrk_dir + r"\..\basicmap"
-platformmap = wrk_dir + r"\..\platformmap"
-schneemap = wrk_dir + r"\..\schneemap"
+basic_map = "\\".join(str(wrk_dir).split("\\")[:-1]) + r"\basicmap"
+platformmap = "\\".join(str(wrk_dir).split("\\")[:-1]) + r"\platformmap"
+schneemap = "\\".join(str(wrk_dir).split("\\")[:-1]) + r"\schneemap"
 map_names_dict = {"basicmap": basic_map,
                   "platformmap": platformmap,
                   "schneemap": schneemap}
@@ -37,19 +37,11 @@ class Game:
         with open(config_file) as file:
             config = json.load(file)
 
-        # if a map has player images generate use them if not don't
-        if len(self.map.player_uris) == 4:
-            self.playerList = [
-                Player.Player(config['0']['position'][0], config['0']['position'][1], self.map.player_uris[0]),
-                Player.Player(config['1']['position'][0], config['1']['position'][1], self.map.player_uris[1]),
-                Player.Player(config['2']['position'][0], config['2']['position'][1], self.map.player_uris[2]),
-                Player.Player(config['3']['position'][0], config['3']['position'][1], self.map.player_uris[3])]
-        else:
-            self.playerList = [
-                Player.Player(config['0']['position'][0], config['0']['position'][1], (0, 255, 0)),
-                Player.Player(config['1']['position'][0], config['1']['position'][1], (255, 255, 0)),
-                Player.Player(config['2']['position'][0], config['2']['position'][1], (0, 255, 255)),
-                Player.Player(config['3']['position'][0], config['3']['position'][1], (255, 0, 255))]
+        self.playerList = [
+            Player.Player(config['0']['position'][0], config['0']['position'][1], directory=self.map.player_uris[0]),
+            Player.Player(config['1']['position'][0], config['1']['position'][1], directory=self.map.player_uris[1]),
+            Player.Player(config['2']['position'][0], config['2']['position'][1], directory=self.map.player_uris[2]),
+            Player.Player(config['3']['position'][0], config['3']['position'][1], directory=self.map.player_uris[3])]
 
     def run(self):
         """
@@ -83,29 +75,30 @@ class Game:
                     # Hit
                     elif event.type == pygame.MOUSEBUTTONDOWN:
                         # Check if Player can use his weapon
-                        if self.playerList[id].user_weapon.can_hit():
+                        if self.playerList[id].weapon.can_hit():
                             # Check if an enemy player is in range
-                            self.playerList[id].user_weapon.hit()
-                            for player in self.playerList:
-                                #  Do not beat your own player
-                                if player == self.playerList[id]:
-                                    continue
-                                # Check if the player was hit
-                                # First check if the opponent is in range of the weapon
-                                # Then check if the player's mouse is on the opponent
-                                if player.x < self.playerList[id].x + self.playerList[id].width + self.playerList[
-                                    id].user_weapon.distance and player.x + player.width > self.playerList[id].x - \
-                                        self.playerList[
-                                            id].user_weapon.distance and player.y < self.playerList[id].y + \
-                                        self.playerList[id].height + self.playerList[
-                                    id].user_weapon.distance and player.y + player.height > self.playerList[id].y - \
-                                        self.playerList[
-                                            id].user_weapon.distance and player.x < self.playerList[id].mousepos[
-                                    0] < player.x + player.width \
-                                        and player.y < self.playerList[id].mousepos[1] < player.y + player.height:
-                                    # Draw damage from opponent
-                                    player.beaten(self.playerList[id].user_weapon)
-                                    break
+                            self.playerList[id].weapon.hit()
+                            self.playerList[id].weapon.set_animation_direction(self.playerList[id].animation_direction)
+                            # for player in self.playerList:
+                            #     #  Do not beat your own player
+                            #     if player == self.playerList[id]:
+                            #         continue
+                            #     # Check if the player was hit
+                            #     # First check if the opponent is in range of the weapon
+                            #     # Then check if the player's mouse is on the opponent
+                            #     if player.x < self.playerList[id].x + self.playerList[id].width + self.playerList[
+                            #         id].weapon.distance and player.x + player.width > self.playerList[id].x - \
+                            #             self.playerList[
+                            #                 id].weapon.distance and player.y < self.playerList[id].y + \
+                            #             self.playerList[id].height + self.playerList[
+                            #         id].weapon.distance and player.y + player.height > self.playerList[id].y - \
+                            #             self.playerList[
+                            #                 id].weapon.distance and player.x < self.playerList[id].mousepos[
+                            #         0] < player.x + player.width \
+                            #             and player.y < self.playerList[id].mousepos[1] < player.y + player.height:
+                            #         # Draw damage from opponent
+                            #         player.beaten(self.playerList[id].weapon)
+                            #         break
                 # print("Handling Events:", datetime.datetime.now() - time)
                 # time = datetime.datetime.now()
 
