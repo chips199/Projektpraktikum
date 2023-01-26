@@ -61,7 +61,7 @@ class Game:
 
         # game loop
         while run:
-            time = datetime.datetime.now()
+            # time = datetime.datetime.now()
 
             # pygame stuff for the max fps
             clock.tick(35)
