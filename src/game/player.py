@@ -4,9 +4,10 @@ from typing import List, Tuple
 import pandas as pd
 import pygame
 from src.game import weapon
+from src.game.Animated import Animated
 
 
-class Player():
+class Player(Animated):
     width, height = 50, 100
     last_jump = datetime.datetime.now()
     height_jump = 200
@@ -16,7 +17,9 @@ class Player():
     user_weapon = weapon.Weapon(100, 15, 15, 1)
     health = 100
 
-    def __init__(self, startx, starty, game, image=None, color=(255, 0, 0)):
+    def __init__(self, startx, starty, game, image=None, color=(255, 0, 0), *args, **kwargs):
+        super(Player, self).__init__(*args, **kwargs)
+
         self.falling_time = datetime.datetime.now()
         self.jumping_time = datetime.datetime.now()
         self.x = startx
