@@ -190,38 +190,38 @@ class MenuSetup:
         # load space map
         space_map_platforms = tk.CTkImage(
             dark_image=Image.open(wrk_dir + r"\..\menu\maps\space_map.png"),
-            size=(map1.winfo_width(),
-                  map1.winfo_height()))
+            size=(int(map1.winfo_width() * self.sizing_width),
+                  int(map1.winfo_height() * self.sizing_height)))
         map2 = MyLabel(master=self.choose_map_frame,
                        text=None,
                        image=space_map_platforms,
                        fg_color='#252525'
                        )
-        map2.place(x=int(map1.winfo_x() + map1.winfo_width() + 20 * self.sizing_width),
-                   y=map1.winfo_y())
+        map2.place(x=int((map1.winfo_x() + map1.winfo_width() + 20) * self.sizing_width),
+                   y=map1.winfo_y() * self.sizing_height)
 
         self.root.update()
 
         # add buttons to choose a map
         button_start = tk.CTkButton(master=self.choose_map_frame,
                                     text="Basicmap",
-                                    width=map1.winfo_width(),
+                                    width=int(map1.winfo_width() * self.sizing_width),
                                     height=int(self.h * 0.3),
                                     font=("None", self.h * 0.4),
                                     corner_radius=int(self.h / 3),
                                     command=lambda: self.create_lobby(map_name='basicmap'))
-        button_start.place(x=int(map1.winfo_x()),
-                           y=int(map1.winfo_y() + map1.winfo_height() + 20 * self.sizing_height))
+        button_start.place(x=int(map1.winfo_x() * self.sizing_width),
+                           y=int((map1.winfo_y() + map1.winfo_height() + 20) * self.sizing_height))
 
         button_start2 = tk.CTkButton(master=self.choose_map_frame,
                                      text="Space Map",
-                                     width=map2.winfo_width(),
+                                     width=int(map2.winfo_width() * self.sizing_width),
                                      height=int(self.h * 0.3),
                                      font=("None", self.h * 0.4),
                                      corner_radius=int(self.h / 3),
                                      command=lambda: self.create_lobby(map_name='platformmap'))
-        button_start2.place(x=int(map2.winfo_x()),
-                            y=int(map2.winfo_y() + map2.winfo_height() + 20 * self.sizing_height))
+        button_start2.place(x=int(map2.winfo_x() * self.sizing_width),
+                            y=int((map2.winfo_y() + map2.winfo_height() + 20) * self.sizing_height))
 
     def load_lobby_frame(self):
         self.lobby_frame = MyFrame(master=self.root,
