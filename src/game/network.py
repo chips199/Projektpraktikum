@@ -60,8 +60,8 @@ class Network:
         return self.send("lobby_check")
 
     def start_game(self):
-        self.spawnpoints = json.loads(self.send("get_spawnpoints"))
-        print(self.spawnpoints)
+        # self.spawnpoints = json.loads(self.send("get_spawnpoints"))
+        # print(self.spawnpoints)
         return self.send("ready")
 
     def getSpawnpoint(self, id):

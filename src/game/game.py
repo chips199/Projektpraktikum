@@ -62,6 +62,7 @@ class Game:
         self.online = [True, True, True, True]
         self.pos = [[100, 100], [200, 100], [300, 100], [400, 100]]
         self.mouse = [[0, 0], [0, 0], [0, 0], [0, 0]]
+        self.conn = conn
         # load the config for default values
         # this will later be done in the map to configure spawnpoints
         with open(config_file) as file:
@@ -205,7 +206,7 @@ class Game:
 
             # print("Handling redraw:", datetime.datetime.now() - time)
             # time = datetime.datetime.now()
-
+        # self.process.kill() # muss noch übergeben werden
         pygame.quit()
 
     def send_data(self):
@@ -217,10 +218,10 @@ class Game:
             sample = json.load(file)
 
         data = sample[str(self.net.id)]
-        data['id'] = int(self.net.id)
-        data['position'] = [int(self.playerList[int(self.net.id)].x), int(self.playerList[int(self.net.id)].y)]
-        data['connected'] = True
-        data['mouse'] = self.playerList[int(self.net.id)].mousepos
+        # data['id'] = int(self.net.id)
+        # data['position'] = [int(self.playerList[int(self.net.id)].x), int(self.playerList[int(self.net.id)].y)]
+        # data['connected'] = True
+        # data['mouse'] = self.playerList[int(self.net.id)].mousepos
         print("ein Aufruf")
         for item in data.items():
             print(data)
