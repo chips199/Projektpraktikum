@@ -190,38 +190,38 @@ class MenuSetup:
         # load space map
         space_map_platforms = tk.CTkImage(
             dark_image=Image.open(wrk_dir + r"\..\menu\maps\space_map.png"),
-            size=(map1.winfo_width(),
-                  map1.winfo_height()))
+            size=(int(map1.winfo_width() * self.sizing_width),
+                  int(map1.winfo_height() * self.sizing_height)))
         map2 = MyLabel(master=self.choose_map_frame,
                        text=None,
                        image=space_map_platforms,
                        fg_color='#252525'
                        )
-        map2.place(x=int(map1.winfo_x() + map1.winfo_width() + 20 * self.sizing_width),
-                   y=map1.winfo_y())
+        map2.place(x=int((map1.winfo_x() + map1.winfo_width() + 20) * self.sizing_width),
+                   y=map1.winfo_y() * self.sizing_height)
 
         self.root.update()
 
         # add buttons to choose a map
         button_start = tk.CTkButton(master=self.choose_map_frame,
                                     text="Basicmap",
-                                    width=map1.winfo_width(),
+                                    width=int(map1.winfo_width() * self.sizing_width),
                                     height=int(self.h * 0.3),
                                     font=("None", self.h * 0.4),
                                     corner_radius=int(self.h / 3),
                                     command=lambda: self.create_lobby(map_name='basicmap'))
-        button_start.place(x=int(map1.winfo_x()),
-                           y=int(map1.winfo_y() + map1.winfo_height() + 20 * self.sizing_height))
+        button_start.place(x=int(map1.winfo_x() * self.sizing_width),
+                           y=int((map1.winfo_y() + map1.winfo_height() + 20) * self.sizing_height))
 
         button_start2 = tk.CTkButton(master=self.choose_map_frame,
                                      text="Space Map",
-                                     width=map2.winfo_width(),
+                                     width=int(map2.winfo_width() * self.sizing_width),
                                      height=int(self.h * 0.3),
                                      font=("None", self.h * 0.4),
                                      corner_radius=int(self.h / 3),
                                      command=lambda: self.create_lobby(map_name='platformmap'))
-        button_start2.place(x=int(map2.winfo_x()),
-                            y=int(map2.winfo_y() + map2.winfo_height() + 20 * self.sizing_height))
+        button_start2.place(x=int(map2.winfo_x() * self.sizing_width),
+                            y=int((map2.winfo_y() + map2.winfo_height() + 20) * self.sizing_height))
 
     def load_lobby_frame(self):
         self.lobby_frame = MyFrame(master=self.root,
@@ -239,9 +239,9 @@ class MenuSetup:
                                    text="Session ID: {}".format(self.s_id),
                                    font=("None", self.h * 0.6))
         session_id_label.place(x=50 * self.sizing_width,
-                               y=int(self.label_game_name.winfo_y() +  # type:ignore[union-attr]
-                                     self.label_game_name.winfo_height() +  # type:ignore[union-attr]
-                                     10 * self.sizing_height))
+                               y=int((self.label_game_name.winfo_y() +  # type:ignore[union-attr]
+                                      self.label_game_name.winfo_height() +  # type:ignore[union-attr]
+                                      10) * self.sizing_height))
 
         button_start = tk.CTkButton(master=self.lobby_frame,
                                     text="Start",
@@ -250,7 +250,7 @@ class MenuSetup:
                                     command=self.start_game,
                                     font=("None", self.h * 0.6),
                                     corner_radius=int(self.h / 3))
-        button_start.place(x=int(self.lobby_frame.winfo_width() / 2),
+        button_start.place(relx=0.5,
                            y=0,
                            anchor='n')
 
@@ -322,7 +322,7 @@ class MenuSetup:
                                                                    lambda: self.update_player())))
 
     def join_lobby(self):
-        self.start_network(argument=self.entry_session_id.get(), # type:ignore[union-attr]
+        self.start_network(argument=self.entry_session_id.get(),  # type:ignore[union-attr]
                            func=lambda: self.clear_frame_sliding(
                                widget_list=[self.interaction_frame,
                                             self.main_frame.winfo_children()[0]],
