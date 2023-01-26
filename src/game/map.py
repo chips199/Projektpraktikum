@@ -81,20 +81,20 @@ class Map():
         self.solid_df = pd.DataFrame(solid, columns=['x', 'y'])
 
         # load unsolid images
-        for filename in os.listdir(self.directory + r'/not_solid'):
-            nsimg = os.path.join(self.directory + r'/not_solid', filename)
-            if not os.path.isfile(nsimg):
-                print(str(nsimg) + ' is not a file')
-                continue
-
-            # load image for displaying
-            try:
-                img = pygame.image.load(nsimg)
-                img = img.convert_alpha()
-            except:
-                continue
-            print(str(nsimg) + ' erfolgreich in pygame geladen')
-            self.staticimages.append(img)
+        # for filename in os.listdir(self.directory + r'/not_solid'):
+        #     nsimg = os.path.join(self.directory + r'/not_solid', filename)
+        #     if not os.path.isfile(nsimg):
+        #         print(str(nsimg) + ' is not a file')
+        #         continue
+        #
+        #     # load image for displaying
+        #     try:
+        #         img = pygame.image.load(nsimg)
+        #         img = img.convert_alpha()
+        #     except:
+        #         continue
+        #     print(str(nsimg) + ' erfolgreich in pygame geladen')
+        #     self.staticimages.append(img)
 
         # generate one picture out of all solid and not solid images.
         comb_images = self.staticimages.copy()
