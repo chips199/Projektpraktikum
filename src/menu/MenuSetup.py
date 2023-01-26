@@ -1,3 +1,4 @@
+import datetime
 import inspect
 import os
 from time import sleep
@@ -8,10 +9,15 @@ from PIL import Image
 
 from src.game import game
 from src.game.network import Network
+from src.game.backgroundProzess import backgroundProzess
+
 from src.menu.MyEntry import MyEntry
 from src.menu.MyFrame import MyFrame
 from src.menu.MyLabel import MyLabel
 from src.menu.MyWindow import MyWindow
+
+import multiprocessing
+from multiprocessing.connection import Connection
 
 wrk_dir = os.path.abspath(os.path.dirname(__file__))
 
@@ -19,10 +25,17 @@ wrk_dir = os.path.abspath(os.path.dirname(__file__))
 class MenuSetup:
     def __init__(self):
         # -------------------------------------------  Parameters  -------------------------------------------
+        self.counter = 0
+        self.timer = None
+        self.update_background_after_id = None
+        self.network_started = False
+        # self.id = "5"
+        self.conn1 = None
+        self.conn2 = None
         self.entry_session_id = None
         self.label_error = None
         self.label_game_name = None
-        self.net = None
+        # self.net = None
         self.w = 300
         self.h = 60
         self.window_width_planned = self.window_width = 1600
@@ -30,10 +43,15 @@ class MenuSetup:
         self.sizing = round(self.window_width_planned / 1920, 5)
         self.sizing_width = 1
         self.sizing_height = 1
-        self.s_id = "1"
+        # self.s_id = "1"
         self.amount_player = 0
         self.game_started = False
         self.player = []
+        self.data = {
+            "id": 1,
+            "s_id": 2984,
+            "amount_player": 2
+        }
 
         self.player_dict = {
             "0": [wrk_dir + r"\..\basicmap\player\basic_player_magenta.png", 175],
@@ -258,7 +276,7 @@ class MenuSetup:
         session_id_label = MyLabel(master=self.main_frame,
                                    width=self.w,
                                    height=self.h,
-                                   text="Session ID: {}".format(self.s_id),
+                                   text="Session ID: {}".format(self.data["s_id"]),
                                    font=("None", self.h * 0.6))
         session_id_label.place(x=50 * self.sizing_width,
                                y=int((self.label_game_name.winfo_y() +  # type:ignore[union-attr]
@@ -298,8 +316,8 @@ class MenuSetup:
                                                                                next_pos="two"))
 
     def update_player(self):
-        server_amount_player = int(self.net.check_lobby())  # type:ignore[union-attr]
-        print(server_amount_player)
+        server_amount_player = int(self.data["amount_player"])  # type:ignore[union-attr]
+        # print(server_amount_player)
         for i in range(abs(server_amount_player - self.amount_player)):
             if self.amount_player < server_amount_player:
                 self.load_player(path=self.player_dict[str(self.amount_player)][0],
@@ -309,7 +327,7 @@ class MenuSetup:
                 player_to_remove = self.player.pop()
                 player_to_remove.destroy()
                 self.amount_player -= 1
-        if self.root.run and self.net is not None:
+        if self.root.run:  # and self.net is not None:
             self.main_frame.after(1000, lambda: self.update_player())
 
     # __________________command: Functions__________________
@@ -324,27 +342,28 @@ class MenuSetup:
 
     def create_lobby(self, map_name):
         self.start_network(argument=map_name,
-                           func=lambda: self.clear_frame_sliding(
+                           update_func=lambda: self.update_background_process(),
+                           success_func=lambda: self.clear_frame_sliding(
                                widget_list=[self.choose_map_frame],
                                direction_list=["down"],
                                stepsize=7,
                                after_time=2500,
                                func=lambda: self.load_lobby_frame(),
-                               func2=lambda: self.check_if_game_started(),
-                               func3=lambda: self.main_frame.after(2800,
-                                                                   lambda: self.update_player())))
+                               # func2=lambda: self.check_if_game_started(),
+                               func3=lambda: self.main_frame.after(4800, lambda: self.update_player())))
 
     def join_lobby(self):
         self.start_network(argument=self.entry_session_id.get(),  # type:ignore[union-attr]
-                           func=lambda: self.clear_frame_sliding(
+                           update_func=lambda: self.update_background_process(),
+                           success_func=lambda: self.clear_frame_sliding(
                                widget_list=[self.interaction_frame,
                                             self.main_frame.winfo_children()[0]],
                                direction_list=["up",
                                                "down"],
                                after_time=2400,
                                func=lambda: self.load_lobby_frame(),
-                               fun2=lambda: self.check_if_game_started(),
-                               func3=lambda: self.main_frame.after(2300, lambda: self.update_player())))
+                               # fun2=lambda: self.check_if_game_started(),
+                               func3=lambda: self.main_frame.after(4300, lambda: self.update_player())))
 
     def start_game(self):
         self.root.run = False
@@ -363,7 +382,7 @@ class MenuSetup:
     # __________________other Functions__________________
 
     def check_if_game_started(self):
-        if self.net.game_started():  # type:ignore[union-attr]
+        if self.data["game_started"]:  # type:ignore[union-attr]
             self.start_game()
         else:
             self.root.after(1500, lambda: self.check_if_game_started())
@@ -384,22 +403,45 @@ class MenuSetup:
             if inspect.isfunction(value):
                 value()
 
-    def start_network(self, argument, func):
+    def start_network(self, argument, update_func, success_func):
         try:
-            self.net = Network(argument)
+            if argument != "":
+                self.conn1, self.conn2 = multiprocessing.Pipe(duplex=True)
+                process = multiprocessing.Process(target=backgroundProzess, args=(argument, self.conn2))
+                process.daemon = True
+                process.start()
+                # sleep is needed to start the process in background properly
+                # sleep(2)
+                while not self.conn1.poll():
+                    print("wait")
+                    sleep(0.1)
+                self.timer = datetime.datetime.now()
+                update_func()
+            else:
+                process = None
 
-            if self.net.id == "5":
+            if argument == "" or self.data["id"] == "5":
+                if argument == "":
+                    msg = "Enter Session ID"
+                else:
+                    msg = self.data["s_id"]
                 self.label_error.label_hide_show(  # type:ignore[union-attr]
                     x=int(self.window_width / 2),
                     y=int(self.label_game_name.winfo_y() +  # type:ignore[union-attr]
                           self.label_game_name.winfo_height() +  # type:ignore[union-attr]
                           30 * self.sizing_height),
                     time=3000,
-                    message=self.net.session_id)
+                    message=msg)
+                # kill process (network) if session_id is invalid, in future we should be able to update the network
+                if process is not None:
+                    process.kill()
+                # stop the after call from update_background_process
+                if self.update_background_after_id is not None:
+                    self.main_frame.after_cancel(self.update_background_after_id)
             else:
-                self.s_id = self.net.session_id
+                # self.s_id = self.net.session_id
                 # start_new_thread(self.update_player, tuple())
-                func()
+                success_func()
 
         except ConnectionRefusedError:
             self.label_error.label_hide_show(  # type:ignore[union-attr]
@@ -409,6 +451,25 @@ class MenuSetup:
                       30 * self.sizing_height),
                 time=3000,
                 message="No answer from server")
+
+    def update_background_process(self):
+        # print("GET_background")
+        if datetime.datetime.now() - self.timer >= datetime.timedelta(seconds=1):
+            self.timer = datetime.datetime.now()
+            print("count in Menu:", self.counter)
+            self.counter = 0
+        else:
+            self.counter += 1
+        if self.conn1.poll():
+            self.data = self.conn1.recv()
+            self.data["amount_player"] = int(2),
+            self.data["game_started"] = False
+            # print("data=", self.data)
+        self.update_background_after_id = self.main_frame.after(10, self.update_background_process)
+
+    def send_data(self, msg):
+        data = msg
+        self.conn1.send(data)
 
 
 if __name__ == "__main__":
