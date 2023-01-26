@@ -22,10 +22,10 @@ class Player():
         self.x = startx
         self.y = starty
         self.game = game
-        self.velocity = 4
+        self.velocity = 8
         self.velocity_gravity = 1
-        self.velocity_jumping = self.max_jumping_speed = 12
-        self.velocity_time = 50
+        self.velocity_jumping = self.max_jumping_speed = 13
+        self.velocity_time = 15
         self.landed = False
         self.is_jumping = False
         self.is_falling = True

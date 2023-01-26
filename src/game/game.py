@@ -9,7 +9,6 @@ import pygame
 from src.game import canvas
 from src.game.map import Map
 from src.game import player as Player
-from src.game.network import Network
 from src.game import weapon as Weapon
 
 wrk_dir = os.path.abspath(os.path.dirname(__file__))
@@ -28,7 +27,7 @@ class Game:
         self.net = net
         self.width = w
         self.height = h
-        self.canvas = canvas.Canvas(self.width, self.height, str(self.net.id) + "Stick Wars")
+        self.canvas = canvas.Canvas(self.width, self.height, str(self.net.id) + "Stick  Wars")
         self.map = Map(self, map_names_dict[net.map_name])
         # load the config for default values
         # this will later be done in the map to configure spawnpoints
@@ -62,10 +61,12 @@ class Game:
 
         # game loop
         while run:
+            # time = datetime.datetime.now()
+
             # pygame stuff for the max fps
-            clock.tick(60)
+            clock.tick(35)
             # print()
-            # print("FPS:", self.update_fps())
+            print("FPS:", self.update_fps())
             if self.playerList[id].is_alive():
                 # time = datetime.datetime.now()
                 # handling pygame events
@@ -259,10 +260,10 @@ class Game:
         :return: integer representing the distance to the next object within the range
         """
         # first combining all solid pixels in one dataframe
-        other_players = self.playerList[:int(self.net.id)] + self.playerList[int(self.net.id) + 1:]
+        # other_players = self.playerList[:int(self.net.id)] + self.playerList[int(self.net.id) + 1:]
         solid_pixels_df = copy(self.map.solid_df)
-        for op in other_players:
-            solid_pixels_df = pd.concat([solid_pixels_df, op.solid_df])
+        # for op in other_players:
+        #     solid_pixels_df = pd.concat([solid_pixels_df, op.solid_df])
         # getting copy of the players solid dataframe
         simulated_player = copy(player.solid_df)
         erg = 0

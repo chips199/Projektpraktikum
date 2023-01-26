@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import inspect
+from time import sleep
+from threading import Thread
+
 import customtkinter as tk
 
 from typing import Optional, Callable, Union
@@ -12,12 +15,12 @@ class MyEntry(tk.CTkEntry):
 
     def check_text(self,
                    target_text: str = "-200",
-                   success_function: Optional[Union[Callable, None]] = None,    # type:ignore[type-arg]
-                   failure_function: Optional[Union[Callable, None]] = None,    # type:ignore[type-arg]
-                   **kwargs: Optional[Union[Callable, None]]) -> None:          # type:ignore[type-arg]
+                   success_function: Optional[Union[Callable, None]] = None,  # type:ignore[type-arg]
+                   failure_function: Optional[Union[Callable, None]] = None,  # type:ignore[type-arg]
+                   **kwargs: Optional[Union[Callable, None]]) -> None:  # type:ignore[type-arg]
 
         # Check if entered text is equal to target text
-        if self.get() == target_text:               # For Testing
+        if self.get() == target_text:  # For Testing
             # Execute success_function if provided
             if success_function is not None:
                 success_function()
