@@ -92,14 +92,6 @@ class Game:
         # just for comfort
         id = int(self.net.id)
 
-        process = multiprocessing.Process(target=update_all_data, args=(self.net, self.playerList))
-        # process = multiprocessing.Process(target=printing)
-        process.start()
-
-        # while True:
-        #     print("main")
-        #     # time.sleep(1)
-
         # game loop
         while run:
             # time = datetime.datetime.now()
@@ -180,9 +172,9 @@ class Game:
             # time = datetime.datetime.now()
 
             # Send Data about this player and get some over the others als reply
-            # reply = self.send_data()
+            reply = self.send_data()
             # synchronise positions
-            # pos = self.parse_pos(reply)
+            pos = self.parse_pos(reply)
             for i, position in enumerate(self.pos):
                 self.playerList[i].x, self.playerList[i].y = position
             for p in self.playerList:
@@ -190,11 +182,11 @@ class Game:
                     continue
                 p.refresh_solids()
             # synchronise Online stati
-            # online = self.parse_online(reply)
+            online = self.parse_online(reply)
             for i, on in enumerate(self.online):
                 self.playerList[i].is_connected = on
             # sync mouse
-            # mouse = self.parse_mouse(reply)
+            mouse = self.parse_mouse(reply)
             for i, on in enumerate(self.mouse):
                 self.playerList[i].mousepos = on
 

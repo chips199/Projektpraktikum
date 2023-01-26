@@ -367,20 +367,20 @@ class MenuSetup:
 
     def start_game(self):
         self.root.run = False
-        # self.root.destroy()
-        # sleep(1)
+        self.root.destroy()
+        sleep(1)
         # self.root.destroy()
         # start_new_thread(self.close_window(), tuple())
         net = self.data["net"]
         print(net.session_id)
-        net.start_game()  # type:ignore[union-attr]
+        # net.start_game()  # type:ignore[union-attr]
         # self.data["net"].start_game()
         # # sleep(1)
-        # # g = game.Game(w=1600, h=900, net=self.data["net"])
-        # # self.root.quit()
-        # # self.root.destroy()
+        g = game.Game(w=1600, h=900, net=net, conn=self.conn1)
+        # self.root.quit()
+        # self.root.destroy()
         # sleep(1)
-        # g.run()
+        g.run()
 
     # __________________other Functions__________________
 
@@ -411,7 +411,7 @@ class MenuSetup:
             if argument != "":
                 self.conn1, self.conn2 = multiprocessing.Pipe(duplex=True)
                 process = multiprocessing.Process(target=backgroundProzess, args=(argument, self.conn2))
-                process.daemon = True
+                # process.daemon = True
                 process.start()
                 # sleep is needed to start the process in background properly
                 # sleep(2)
