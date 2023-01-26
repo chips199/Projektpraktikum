@@ -282,7 +282,6 @@ class MenuSetup:
     # __________________Player Functions__________________
 
     def load_player(self, x_pos, path):
-        print("load player")
         player_image = tk.CTkImage(dark_image=Image.open(path),
                                    size=(int(49 * self.sizing_width), int(142 * self.sizing_height)))
         label_image = MyLabel(master=self.main_frame,
@@ -306,21 +305,13 @@ class MenuSetup:
         print(server_amount_player)
         for i in range(abs(server_amount_player - self.amount_player)):
             if self.amount_player < server_amount_player:
-                print("load player", self.amount_player)
-                # time.sleep(1)
-                print("amount player saved", self.amount_player)
-                # print("i", i)
-                print("amount player from server", server_amount_player)
-                # self.amount_player = int(self.net.check_lobby())
                 self.load_player(path=self.player_dict[str(self.amount_player)][0],
                                  x_pos=self.player_dict[str(self.amount_player)][1])
                 self.amount_player += 1
             else:
-                print("else")
                 player_to_remove = self.player.pop()
                 player_to_remove.destroy()
                 self.amount_player -= 1
-        print()
         if self.root.run and self.net is not None:
             self.main_frame.after(1000, lambda: self.update_player())
 
