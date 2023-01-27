@@ -1,4 +1,5 @@
 import os
+from copy import copy
 from typing import List, Tuple
 
 import pandas as pd
@@ -100,17 +101,17 @@ class Animated:
         self.solid_df = pd.DataFrame(self.solid, columns=['x', 'y'])
         return images_right, images_left
 
-    def get_dataframe(self, firstFrame = False):
+    def get_dataframe(self, firstFrame=False):
         if firstFrame:
+            return self.frame_dfs[0]
+        else:
             return self.frame_dfs[self.current_frame]
-        else:
-            return self.solid_df
 
-    def get_relativ_dataframe(self, firstFrame = False):
+    def get_relativ_dataframe(self, firstFrame=False):
         if firstFrame:
-            return self.relativ_frame_dfs[self.current_frame]
+            return self.relativ_frame_dfs[0]
         else:
-            return self.relativ_solids_df
+            return self.relativ_frame_dfs[self.current_frame]
 
     def load_dfs(self):
         sprite_sheet = self.directory + ".png"
@@ -119,16 +120,20 @@ class Animated:
         rdfs = list()
         df = list()
         rdf = list()
-        edge_surface = pygame.transform.laplacian(image).convert_alpha()
-        alpha_array = pygame.surfarray.pixels_alpha(edge_surface)
-        alpha_array = alpha_array.swapaxes(0, 1)
-        for yi, y in enumerate(alpha_array):
-            for xi, x in enumerate(y):
-                if x > 200:
-                    df.append((xi + self.x, yi + self.y))
-                    rdf.append((xi, yi))
-
         for i in range(image.get_width() // self.frame_width):
-            dfs.append(pd.DataFrame(df, columns=['x', 'y']))
-            rdfs.append(pd.DataFrame(rdf, columns=['x', 'y']))
+            this_image = pygame.transform.chop(image, (i*self.frame_width, 0, self.frame_width, self.frame_height))
+            edge_surface = pygame.transform.laplacian(this_image).convert_alpha()
+            alpha_array = pygame.surfarray.pixels_alpha(edge_surface)
+            alpha_array = alpha_array.swapaxes(0, 1)
+            erg = list()
+            erg2 = list()
+            for iy, y in enumerate(alpha_array):
+                for ix, x in enumerate(y):
+                    if x > 100:
+                        erg.append((ix + self.x, iy + self.y))
+                        erg2.append((ix, iy))
+            dfs.append(pd.DataFrame(erg, columns=['x', 'y']))
+            rdfs.append(pd.DataFrame(erg2, columns=['x', 'y']))
+
+
         return dfs, rdfs
