@@ -52,8 +52,8 @@ except socket.error as e:
 s.listen(number_of_games_at_a_time * number_of_players_per_game)
 print("Waiting for a connection")
 # load the config file as basis for a fresh game
-config_file = "\\".join(
-    list(os.path.abspath(os.path.dirname(__file__)).split("\\")[:-1])) + "\\game\\configuration.json"
+config_file = "/".join(
+    list(os.path.abspath(os.path.dirname(__file__)).split("/")[:-1])) + "/game/configuration.json"
 # print("\\".join(list(os.path.abspath(os.path.dirname(__file__)).split("\\")[:-1])) + "\\game\\configuration.json")
 with open(config_file) as file:
     game_data = json.load(file)
