@@ -103,7 +103,7 @@ class Animated:
 
     def get_dataframe(self, firstFrame=False):
         if firstFrame:
-            return self.frame_dfs[0]
+            return self.solid_df
         else:
             return self.frame_dfs[self.current_frame]
 
