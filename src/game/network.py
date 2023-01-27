@@ -12,9 +12,9 @@ class Network:
         # use tht second line to connect to a local server, which is visible in a network
         # use the third if it is just local
         # self.host, self.port = "6.tcp.eu.ngrok.io", 18577
-        self.host, self.port = "5.tcp.eu.ngrok.io", 18258
+        # self.host, self.port = "5.tcp.eu.ngrok.io", 18258
         # self.host, self.port = socket.gethostbyname(socket.gethostname()), 5556
-        # self.host, self.port = "localhost", 5556
+        self.host, self.port = "localhost", 5556
         self.addr = (self.host, self.port)
         self.id, self.session_id = self.connect_lobby(msg)
         self.map_name = self.get_map()

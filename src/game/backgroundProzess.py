@@ -22,6 +22,9 @@ class backgroundProzess:
         self.reply = "empty"
         self.game_started = False
 
+        self.position = [int(100), int(100)]
+        self.mouse = [int(100), int(100)]
+
         # self.net.send("ready")
 
         while True:
@@ -35,7 +38,6 @@ class backgroundProzess:
             if datetime.datetime.now() - self.timer >= datetime.timedelta(seconds=1):
                 self.timer = datetime.datetime.now()
                 print("count in Background:", self.counter)
-                print(self.reply)
                 self.counter = 0
             else:
                 self.counter += 1
@@ -45,8 +47,10 @@ class backgroundProzess:
                 if not self.game_started:
                     self.send_menu()
                 else:
+                    self.update_game_pos()
                     self.send_game()
             else:
+                self.update_game_pos()
                 self.send_game()
 
             # print(id)
@@ -58,7 +62,7 @@ class backgroundProzess:
     def check_game_started(self):
         if self.conn.poll():
             msg = self.conn.recv()
-            print(msg)
+            # print(msg)
             if msg == "start":
                 self.net.start_game()
                 print("SHOULD START GAME")
@@ -84,9 +88,17 @@ class backgroundProzess:
 
         data = sample[str(self.net.id)]
         data['id'] = int(self.net.id)
-        data['position'] = [int(100), int(100)]
+        data['position'] = self.position
         data['connected'] = True
-        data['mouse'] = [int(100), int(100)]
+        data['mouse'] = self.mouse
         self.reply = self.net.send(json.dumps(data))
         self.conn.send(data)
+
+    def update_game_pos(self):
+        if self.conn.poll():
+            data = self.conn.recv()
+            # print(msg)
+            self.position = data['position']
+            self.mouse = data['mouse']
+        self.game_started = False
 

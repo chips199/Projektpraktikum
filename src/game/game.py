@@ -179,6 +179,7 @@ class Game:
             # time = datetime.datetime.now()
 
             # Send Data about this player and get some over the others als reply
+            self.send_to_background_process()
             self.update_background_process()
             # reply = self.send_data()
             # for item in reply.items():
@@ -213,7 +214,7 @@ class Game:
                     pygame.draw.circle(self.canvas.get_canvas(), (255, 0, 0), p.mousepos, 20)
             # Update Canvas
             self.canvas.update()
-            time.sleep(0.01)
+            time.sleep(0.001)
 
             # print("Handling redraw:", datetime.datetime.now() - time)
             # time = datetime.datetime.now()
@@ -221,7 +222,6 @@ class Game:
         pygame.quit()
 
     def update_background_process(self):
-        print("GET_background")
         if datetime.datetime.now() - self.timer >= datetime.timedelta(seconds=1):
             self.timer = datetime.datetime.now()
             print("count in Menu:", self.counter)
@@ -229,10 +229,17 @@ class Game:
         else:
             self.counter += 1
         if self.conn.poll():
+            print("GET_background")
             self.data = self.conn.recv()
-            # self.data["amount_player"] = int(2),
-            # self.data["game_started"] = False
-            # print("data=", self.data)
+            print(self.data)
+
+    def send_to_background_process(self):
+        temp_data = {
+            "position": [int(self.playerList[int(self.data['id'])].x), int(self.playerList[int(self.data['id'])].y)],
+            "mouse": self.playerList[int(self.data['id'])].mousepos
+        }
+        self.conn.send(temp_data)
+
 
     # def send_data(self):
     #     """
@@ -285,9 +292,11 @@ class Game:
         try:
             jdata = json.loads(data)
             for d in jdata:
+                print("parse pos d:", d)
                 erg.append(jdata[d]["position"])
             return erg
         except:
+            print("EXCEPTION")
             erg.clear()
             with open(config_file) as file:
                 sample = json.load(file)
@@ -327,6 +336,7 @@ class Game:
         try:
             jdata = json.loads(data)
             for d in jdata:
+                print("parse mouse d:", d)
                 erg.append(jdata[d]["mouse"])
             return erg
         except:

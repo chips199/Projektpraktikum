@@ -369,7 +369,7 @@ class MenuSetup:
         self.conn1.send("start")
         print("send start to background")
         self.root.run = False
-        self.root.destroy()
+        # self.root.destroy()
         sleep(1)
         # self.root.destroy()
         # start_new_thread(self.close_window(), tuple())
@@ -471,6 +471,7 @@ class MenuSetup:
             # self.data["game_started"] = False
             # print("data=", self.data)
         self.update_background_after_id = self.main_frame.after(10, self.update_background_process)
+
 
     def send_data(self, msg):
         data = msg
