@@ -51,18 +51,24 @@ def update_all_data(net, playerList):
 
 class Game:
 
-    def __init__(self, w, h, net, conn):
+    def __init__(self, w, h, conn):
+        self.counter = 0
+        self.conn = conn
+        time.sleep(0.5)
+        self.data = {}
+        self.timer = datetime.datetime.now()
+        self.update_background_process()
+
         # pygame.init()
         pygame.display.set_icon(pygame.image.load(wrk_dir + r"\..\stick_wars_logo.png"))
-        self.net = net
         self.width = w
         self.height = h
-        self.canvas = canvas.Canvas(self.width, self.height, str(self.net.id) + "Stick  Wars")
-        self.map = Map(self, map_names_dict[net.map_name])
+        self.canvas = canvas.Canvas(self.width, self.height, str(self.data['id']) + "Stick  Wars")
+        # self.map = Map(self, map_names_dict[self.data['map_name']])
+        self.map = Map(self, basic_map)
         self.online = [True, True, True, True]
         self.pos = [[100, 100], [200, 100], [300, 100], [400, 100]]
         self.mouse = [[0, 0], [0, 0], [0, 0], [0, 0]]
-        self.conn = conn
         # load the config for default values
         # this will later be done in the map to configure spawnpoints
         with open(config_file) as file:
@@ -91,7 +97,7 @@ class Game:
         run = True
 
         # just for comfort
-        id = int(self.net.id)
+        id = int(self.data['id'])
 
         # game loop
         while run:
@@ -173,9 +179,13 @@ class Game:
             # time = datetime.datetime.now()
 
             # Send Data about this player and get some over the others als reply
-            reply = self.send_data()
+            self.update_background_process()
+            # reply = self.send_data()
+            # for item in reply.items():
+            #     print(item)
+            # print()
             # synchronise positions
-            pos = self.parse_pos(reply)
+            pos = self.parse_pos(self.data)
             for i, position in enumerate(self.pos):
                 self.playerList[i].x, self.playerList[i].y = position
             for p in self.playerList:
@@ -183,11 +193,11 @@ class Game:
                     continue
                 p.refresh_solids()
             # synchronise Online stati
-            online = self.parse_online(reply)
+            online = self.parse_online(self.data)
             for i, on in enumerate(self.online):
                 self.playerList[i].is_connected = on
             # sync mouse
-            mouse = self.parse_mouse(reply)
+            mouse = self.parse_mouse(self.data)
             for i, on in enumerate(self.mouse):
                 self.playerList[i].mousepos = on
 
@@ -203,31 +213,43 @@ class Game:
                     pygame.draw.circle(self.canvas.get_canvas(), (255, 0, 0), p.mousepos, 20)
             # Update Canvas
             self.canvas.update()
+            time.sleep(0.01)
 
             # print("Handling redraw:", datetime.datetime.now() - time)
             # time = datetime.datetime.now()
         # self.process.kill() # muss noch übergeben werden
         pygame.quit()
 
-    def send_data(self):
-        """
-        Send position to server
-        :return: String with data of all players
-        """
-        with open(config_file) as file:
-            sample = json.load(file)
+    def update_background_process(self):
+        print("GET_background")
+        if datetime.datetime.now() - self.timer >= datetime.timedelta(seconds=1):
+            self.timer = datetime.datetime.now()
+            print("count in Menu:", self.counter)
+            self.counter = 0
+        else:
+            self.counter += 1
+        if self.conn.poll():
+            self.data = self.conn.recv()
+            # self.data["amount_player"] = int(2),
+            # self.data["game_started"] = False
+            # print("data=", self.data)
 
-        data = sample[str(self.net.id)]
-        # data['id'] = int(self.net.id)
-        # data['position'] = [int(self.playerList[int(self.net.id)].x), int(self.playerList[int(self.net.id)].y)]
-        # data['connected'] = True
-        # data['mouse'] = self.playerList[int(self.net.id)].mousepos
-        print("ein Aufruf")
-        for item in data.items():
-            print(data)
-        # reply = self.net.send(json.dumps(data))
-        # print(reply)
-        return data
+    # def send_data(self):
+    #     """
+    #     Send position to server
+    #     :return: String with data of all players
+    #     """
+    #     with open(config_file) as file:
+    #         sample = json.load(file)
+    #
+    #     data = sample[str(self.net.id)]
+    #     data['id'] = int(self.net.id)
+    #     data['position'] = [int(self.playerList[int(self.net.id)].x), int(self.playerList[int(self.net.id)].y)]
+    #     data['connected'] = True
+    #     data['mouse'] = self.playerList[int(self.net.id)].mousepos
+    #     reply = self.net.send(json.dumps(data))
+    #     print(reply)
+    #     return reply
         # return reply
 
     # def update_all_data(self):

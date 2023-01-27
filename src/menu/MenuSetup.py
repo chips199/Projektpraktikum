@@ -366,17 +366,19 @@ class MenuSetup:
                                func3=lambda: self.main_frame.after(4300, lambda: self.update_player())))
 
     def start_game(self):
+        self.conn1.send("start")
+        print("send start to background")
         self.root.run = False
         self.root.destroy()
         sleep(1)
         # self.root.destroy()
         # start_new_thread(self.close_window(), tuple())
-        net = self.data["net"]
-        print(net.session_id)
+        # net = self.data["net"]
+        # print(net.session_id)
         # net.start_game()  # type:ignore[union-attr]
         # self.data["net"].start_game()
         # # sleep(1)
-        g = game.Game(w=1600, h=900, net=net, conn=self.conn1)
+        g = game.Game(w=1600, h=900, conn=self.conn1)
         # self.root.quit()
         # self.root.destroy()
         # sleep(1)
