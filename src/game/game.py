@@ -31,45 +31,39 @@ class Game:
     def __init__(self, w, h, conn):
         self.counter = 0
         self.conn = conn
-        # time.sleep(0.2)
-        self.data = {
-            "1": {
-                "id": 0,
-                "position": [50, 50],
-                "mouse": [50, 50],
-                "connected": True,
-                "health": 100
-            },
-            "2": {
-                "id": 0,
-                "position": [50, 50],
-                "mouse": [50, 50],
-                "connected": True,
-                "health": 100
-            },
-            "3": {
-                "id": 0,
-                "position": [50, 50],
-                "mouse": [50, 50],
-                "connected": True,
-                "health": 100
-            },
-            "4": {
-                "id": 0,
-                "position": [50, 50],
-                "mouse": [50, 50],
-                "connected": True,
-                "health": 100
-            },
-            "id": 0
-        }
+        # self.data = {
+        #     "1": {
+        #         "id": 0,
+        #         "position": [50, 50],
+        #         "mouse": [50, 50],
+        #         "connected": False,
+        #         "health": 100
+        #     },
+        #     "2": {
+        #         "id": 0,
+        #         "position": [50, 50],
+        #         "mouse": [50, 50],
+        #         "connected": False,
+        #         "health": 100
+        #     },
+        #     "3": {
+        #         "id": 0,
+        #         "position": [50, 50],
+        #         "mouse": [50, 50],
+        #         "connected": False,
+        #         "health": 100
+        #     },
+        #     "4": {
+        #         "id": 0,
+        #         "position": [50, 50],
+        #         "mouse": [50, 50],
+        #         "connected": False,
+        #         "health": 100
+        #     },
+        #     "id": 0
+        # }
         self.timer = datetime.datetime.now()
-        # self.update_background_process()
-        # print(self.data['id'])
-        time.sleep(1)
         self.update_background_process()
-        time.sleep(1)
-        # print(self.data['id'])
         self.id = int(self.data['id'])
 
         # pygame.init()
@@ -79,7 +73,7 @@ class Game:
         self.canvas = canvas.Canvas(self.width, self.height, str(self.id) + "Stick  Wars")
         # self.map = Map(self, map_names_dict[self.data['map_name']])
         self.map = Map(self, basic_map)
-        self.online = [True, True, True, True]
+        self.online = [False, False, False, False]
         self.this_player_pos = [700, 50]
         self.pos = [[100, 100], [200, 100], [300, 100], [400, 100]]
         self.mouse = [[0, 0], [0, 0], [0, 0], [0, 0]]
@@ -173,9 +167,6 @@ class Game:
                         self.playerList[id].set_animation_direction(2)
                     self.playerList[id].move(1, self.nextToSolid(self.playerList[id], 1, self.playerList[id].velocity))
 
-                # else:
-                #     self.playerList[id].do_animation_left = self.playerList[id].do_animation_left = False
-
                 # Jump
                 if keys[pygame.K_SPACE] or self.playerList[id].is_jumping:
                     self.playerList[id].stop_animation()
@@ -199,8 +190,7 @@ class Game:
             self.update_background_process()
             # print("Handling update:", datetime.datetime.now() - timer)
             # timer = datetime.datetime.now()
-            #     print(item)
-            # print()
+
             # synchronise positions
             self.pos = self.parse_pos()
             # print("Position parsed:", self.pos)
@@ -212,7 +202,7 @@ class Game:
                     continue
                 p.refresh_solids()
             # synchronise Online stati
-            # online = self.parse_online(self.data)
+            self.online = self.parse_online()
             for i, on in enumerate(self.online):
                 self.playerList[i].is_connected = on
             # sync mouse
@@ -236,10 +226,7 @@ class Game:
             # timer = datetime.datetime.now()
 
             while datetime.datetime.now() - fps_timer < datetime.timedelta(milliseconds=20):
-                # print("wait Game")
-                # self.send_to_background_process()
                 continue
-            # print("UPDATE AGAIN")
             self.send_to_background_process()
             # while datetime.datetime.now() - fps_timer < datetime.timedelta(milliseconds=20):
             #     # print("wait Game")
@@ -247,7 +234,6 @@ class Game:
             #     continue
 
             # print("TOTAL TIME:", datetime.datetime.now() - fps_timer)
-            # time.sleep(0.001)
 
         # self.process.kill() # muss noch übergeben werden
         pygame.quit()
@@ -263,16 +249,8 @@ class Game:
         while not self.conn.poll():
             continue
         while self.conn.poll():
-            # print("GET_background")
             new_data = self.conn.recv()
-            # if "amount_player" in new_data:
-            #     # print("key not in dict")
-            #     # print(new_data)
-            #     return
-            # else:
-        # print("DATA in Game", new_data)
         if type(new_data) == str:
-            # print("UPDATE DATA")
             self.data = json.loads(new_data)
 
     def send_to_background_process(self):
@@ -281,41 +259,6 @@ class Game:
             "mouse": self.playerList[int(self.data['id'])].mousepos
         }
         self.conn.send(temp_data)
-
-    # def send_data(self):
-    #     """
-    #     Send position to server
-    #     :return: String with data of all players
-    #     """
-    #     with open(config_file) as file:
-    #         sample = json.load(file)
-    #
-    #     data = sample[str(self.net.id)]
-    #     data['id'] = int(self.net.id)
-    #     data['position'] = [int(self.playerList[int(self.net.id)].x), int(self.playerList[int(self.net.id)].y)]
-    #     data['connected'] = True
-    #     data['mouse'] = self.playerList[int(self.net.id)].mousepos
-    #     reply = self.net.send(json.dumps(data))
-    #     print(reply)
-    #     return reply
-    # return reply
-
-    # def update_all_data(self):
-    #     while True:
-    #         print("in Process")
-    #         with open(config_file) as file:
-    #             sample = json.load(file)
-    #
-    #
-    #         data = sample[str(self.net.id)]
-    #         data['id'] = int(self.net.id)
-    #         data['position'] = [int(self.playerList[int(self.net.id)].x), int(self.playerList[int(self.net.id)].y)]
-    #         data['connected'] = True
-    #         data['mouse'] = self.playerList[int(self.net.id)].mousepos
-    #         reply = self.net.send(json.dumps(data))
-    #         self.pos = self.parse_pos(reply)
-    #         self.mouse = self.parse_mouse(reply)
-    #         self.online = self.parse_online(reply)
 
     @staticmethod
     def update_fps():
@@ -331,7 +274,6 @@ class Game:
         """
         erg = []
         try:
-            # jdata = json.loads(data)
             for key, value in self.data.items():
                 if key != "id":
                     for key2, value2 in value.items():
@@ -339,7 +281,8 @@ class Game:
                             if key != str(self.id):
                                 erg.append(value2)
                             else:
-                                erg.append([int(self.playerList[int(self.data["id"])].x), int(self.playerList[int(self.data["id"])].y)])
+                                erg.append([int(self.playerList[int(self.data["id"])].x),
+                                            int(self.playerList[int(self.data["id"])].y)])
                 else:
                     continue
             return erg
@@ -353,7 +296,7 @@ class Game:
             return erg
 
     # @staticmethod
-    def parse_online(self, data):
+    def parse_online(self):
         """
         extracts online information from server data
         :param data: string from server
@@ -361,7 +304,6 @@ class Game:
         """
         erg = []
         try:
-            # jdata = json.loads(data)
             for key, value in self.data.items():
                 if key != "id":
                     for key2, value2 in value.items():
@@ -373,13 +315,6 @@ class Game:
                 else:
                     continue
             return erg
-        #
-        # erg = []
-        # try:
-        #     jdata = json.loads(data)
-        #     for d in jdata:
-        #         erg.append(jdata[d]["connected"])
-        #     return erg
         except:
             erg.clear()
             with open(config_file) as file:
@@ -389,7 +324,7 @@ class Game:
             return erg
 
     @staticmethod
-    def parse_mouse(data):
+    def parse_mouse(data):  # noch nicht an background process angepasst
         """
         extracts mouse information from server data
         :param data: string from server

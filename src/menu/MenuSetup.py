@@ -189,31 +189,32 @@ class MenuSetup:
                                         fg_color="#212121")
         self.choose_map_frame.place(anchor='n', x=self.window_width / 2, y=self.window_height * 0.3)
 
-        # load basic map
-        basic_map_structures = tk.CTkImage(
-            dark_image=Image.open(wrk_dir + r"\..\menu\maps\basic_map.png"),
-            size=(int(444 * self.sizing_width),
-                  int(250 * self.sizing_height)))
-        map1 = MyLabel(master=self.choose_map_frame,
-                       text=None,
-                       image=basic_map_structures)
-        map1.place(x=int(175 * self.sizing_width),
-                   y=int(20 * self.sizing_height))
-
-        self.root.update()
-
         # load space map
         space_map_platforms = tk.CTkImage(
             dark_image=Image.open(wrk_dir + r"\..\menu\maps\space_map.png"),
-            size=(int(map1.winfo_width() * self.sizing_width),
-                  int(map1.winfo_height() * self.sizing_height)))
+            size=(int(444 * self.sizing_width),
+                  int(250 * self.sizing_height)))
         map2 = MyLabel(master=self.choose_map_frame,
                        text=None,
                        image=space_map_platforms,
                        fg_color='#252525'
                        )
-        map2.place(x=int((map1.winfo_x() + map1.winfo_width() + 20) * self.sizing_width),
-                   y=map1.winfo_y() * self.sizing_height)
+        map2.place(relx=0.5,
+                   y=int(170 * self.sizing_height),
+                   anchor='center')
+
+        self.root.update()
+
+        # load basic map
+        basic_map_structures = tk.CTkImage(
+            dark_image=Image.open(wrk_dir + r"\..\menu\maps\basic_map.png"),
+            size=(int(map2.winfo_width() * self.sizing_width),
+                  int(map2.winfo_height() * self.sizing_height)))
+        map1 = MyLabel(master=self.choose_map_frame,
+                       text=None,
+                       image=basic_map_structures)
+        map1.place(x=int((map2.winfo_x() - map2.winfo_width() - 20) * self.sizing_width),
+                   y=map2.winfo_y() * self.sizing_height)
 
         self.root.update()
 
@@ -350,7 +351,7 @@ class MenuSetup:
                                after_time=2500,
                                func=lambda: self.load_lobby_frame(),
                                func2=lambda: self.check_if_game_started(),
-                               func3=lambda: self.main_frame.after(4800, lambda: self.update_player())))
+                               func3=lambda: self.main_frame.after(3000, lambda: self.update_player())))
 
     def join_lobby(self):
         self.start_network(argument=self.entry_session_id.get(),  # type:ignore[union-attr]
@@ -363,25 +364,17 @@ class MenuSetup:
                                after_time=2400,
                                func=lambda: self.load_lobby_frame(),
                                fun2=lambda: self.check_if_game_started(),
-                               func3=lambda: self.main_frame.after(4300, lambda: self.update_player())))
+                               func3=lambda: self.main_frame.after(3000, lambda: self.update_player())))
 
     def start_game(self):
         self.conn1.send("start")
         print("send start to background")
         self.root.run = False
         self.root.destroy()
-        sleep(1)
-        # self.root.destroy()
-        # start_new_thread(self.close_window(), tuple())
-        # net = self.data["net"]
-        # print(net.session_id)
-        # net.start_game()  # type:ignore[union-attr]
-        # self.data["net"].start_game()
-        # # sleep(1)
+        # important sleep, don't remove!!! Neccessary for the background task to realize that the game
+        # has started, to send correct data to the game
+        sleep(2)
         g = game.Game(w=1600, h=900, conn=self.conn1)
-        # self.root.quit()
-        # self.root.destroy()
-        # sleep(1)
         g.run()
 
     # __________________other Functions__________________
@@ -413,12 +406,9 @@ class MenuSetup:
             if argument != "":
                 self.conn1, self.conn2 = multiprocessing.Pipe(duplex=True)
                 process = multiprocessing.Process(target=backgroundProzess, args=(argument, self.conn2))
-                # process.daemon = True
                 process.start()
-                # sleep is needed to start the process in background properly
-                # sleep(2)
                 while not self.conn1.poll():
-                    print("wait")
+                    # waiting for the first message of background process
                     sleep(0.1)
                 self.timer = datetime.datetime.now()
                 update_func()
@@ -444,8 +434,6 @@ class MenuSetup:
                 if self.update_background_after_id is not None:
                     self.main_frame.after_cancel(self.update_background_after_id)
             else:
-                # self.s_id = self.net.session_id
-                # start_new_thread(self.update_player, tuple())
                 success_func()
 
         except ConnectionRefusedError:
@@ -467,11 +455,7 @@ class MenuSetup:
             self.counter += 1
         if self.conn1.poll():
             self.data = self.conn1.recv()
-            # self.data["amount_player"] = int(2),
-            # self.data["game_started"] = False
-            # print("data=", self.data)
-        self.update_background_after_id = self.main_frame.after(10, self.update_background_process)
-
+        self.update_background_after_id = self.main_frame.after(300, self.update_background_process)
 
     def send_data(self, msg):
         data = msg
