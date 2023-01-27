@@ -182,7 +182,7 @@ class MenuSetup:
         map1 = MyLabel(master=self.choose_map_frame,
                        text=None,
                        image=basic_map_structures)
-        map1.place(x=int(175 * self.sizing_width),
+        map1.place(x=int(114 * self.sizing_width),
                    y=int(20 * self.sizing_height))
 
         self.root.update()
