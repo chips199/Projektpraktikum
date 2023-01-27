@@ -115,14 +115,14 @@ class Game:
 
         # game loop
         while run:
-            # time = datetime.datetime.now()
+            fps_timer = datetime.datetime.now()
 
             # pygame stuff for the max fps
-            clock.tick(70)
+            clock.tick(100)
             # print()
             print("FPS:", self.update_fps())
+            timer = datetime.datetime.now()
             if self.playerList[id].is_alive():
-                # time = datetime.datetime.now()
                 # handling pygame events
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
@@ -157,8 +157,8 @@ class Game:
                                     # Draw damage from opponent
                                     player.beaten(self.playerList[id].user_weapon)
                                     break
-                # print("Handling Events:", datetime.datetime.now() - time)
-                # time = datetime.datetime.now()
+                # print("Handling Events:", datetime.datetime.now() - timer)
+                timer = datetime.datetime.now()
 
                 # get the key presses
                 keys = pygame.key.get_pressed()
@@ -184,20 +184,21 @@ class Game:
                 # gravity
                 self.playerList[id].gravity(func=self.nextToSolid)
 
-                # print("Handling Keys:", datetime.datetime.now() - time)
-                # time = datetime.datetime.now()
+                # print("Handling Keys:", datetime.datetime.now() - timer)
+                # timer = datetime.datetime.now()
 
             # Mouse Position
             self.playerList[id].mousepos = pygame.mouse.get_pos()
-            # print("Handling mouse:", datetime.datetime.now() - time)
-            timer = datetime.datetime.now()
+            # print("Handling mouse:", datetime.datetime.now() - timer)
+            # timer = datetime.datetime.now()
 
             # Send Data about this player and get some over the others als reply
             self.send_to_background_process()
-            print("Handling send:", datetime.datetime.now() - timer)
-            timer = datetime.datetime.now()
+            # print("Handling send:", datetime.datetime.now() - timer)
+            # timer = datetime.datetime.now()
             self.update_background_process()
-            print("Handling update:", datetime.datetime.now() - timer)
+            # print("Handling update:", datetime.datetime.now() - timer)
+            # timer = datetime.datetime.now()
             #     print(item)
             # print()
             # synchronise positions
@@ -219,8 +220,8 @@ class Game:
             for i, on in enumerate(self.mouse):
                 self.playerList[i].mousepos = on
 
-            # print("Handling Data:", datetime.datetime.now() - time)
-            # time = datetime.datetime.now()
+            # print("Handling pos parsing:", datetime.datetime.now() - timer)
+            # timer = datetime.datetime.now()
 
             # Draw Map
             self.map.draw(self.canvas.get_canvas())
@@ -231,21 +232,36 @@ class Game:
                     pygame.draw.circle(self.canvas.get_canvas(), (255, 0, 0), p.mousepos, 20)
             # Update Canvas
             self.canvas.update()
+            # print("Handling redraw:", datetime.datetime.now() - timer)
+            # timer = datetime.datetime.now()
+
+            while datetime.datetime.now() - fps_timer < datetime.timedelta(milliseconds=20):
+                # print("wait Game")
+                # self.send_to_background_process()
+                continue
+            # print("UPDATE AGAIN")
+            self.send_to_background_process()
+            # while datetime.datetime.now() - fps_timer < datetime.timedelta(milliseconds=20):
+            #     # print("wait Game")
+            #     # self.send_to_background_process()
+            #     continue
+
+            # print("TOTAL TIME:", datetime.datetime.now() - fps_timer)
             # time.sleep(0.001)
 
-            # print("Handling redraw:", datetime.datetime.now() - time)
-            # time = datetime.datetime.now()
         # self.process.kill() # muss noch übergeben werden
         pygame.quit()
 
     def update_background_process(self):
         # if datetime.datetime.now() - self.timer >= datetime.timedelta(seconds=1):
         #     self.timer = datetime.datetime.now()
-        #     # print("count in Menu:", self.counter)
+        #     print("count in Menu:", self.counter)
         #     self.counter = 0
         # else:
         #     self.counter += 1
         new_data = None
+        while not self.conn.poll():
+            continue
         while self.conn.poll():
             # print("GET_background")
             new_data = self.conn.recv()
@@ -254,9 +270,9 @@ class Game:
             #     # print(new_data)
             #     return
             # else:
-        print("DATA:", new_data)
+        # print("DATA in Game", new_data)
         if type(new_data) == str:
-            print("UPDATE DATA")
+            # print("UPDATE DATA")
             self.data = json.loads(new_data)
 
     def send_to_background_process(self):
