@@ -34,13 +34,13 @@ class Player(Animated):
         fist_path = map_dir + f"\\waffen\\faeuste\\animation\\fists_{self.get_color(self.directory)}_animation"
         sword_path = map_dir + f"\\waffen\\schwert\\animation\\sword_hold_animation_{self.get_color(self.directory)}"
         # print(fist_path)
-        # self.weapon = weapon.Weapon(weapon.WeaponType.Fist, self.x, self.y, fist_path)
-        self.weapon = weapon.Weapon(weapon.WeaponType.Sword, self.x, self.y, sword_path)
+        self.weapon = weapon.Weapon(weapon.WeaponType.Fist, self.x, self.y, fist_path)
+        # self.weapon = weapon.Weapon(weapon.WeaponType.Sword, self.x, self.y, sword_path)
 
     def draw(self, g):
         super(Player, self).draw(g=g)
         self.weapon.animation_direction = self.animation_direction
-        self.weapon.draw(g=g, x=self.x, width=self.frame_width)
+        self.weapon.draw(g=g, x=self.x, y=self.y, width=self.frame_width, height=self.frame_height)
 
     @staticmethod
     def shift_df(df, dirn, n):

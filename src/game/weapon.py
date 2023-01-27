@@ -22,9 +22,10 @@ class Weapon(Animated):
         self.last_hit = int(round(datetime.now().timestamp()))
 
     def draw(self, **kwargs):
+        self.y = kwargs["y"] + kwargs["height"] - self.frame_height
         if self.animation_direction == 2:
             self.x = kwargs["x"] + kwargs["width"] - self.frame_width
-            super(Weapon, self).draw(g=kwargs["g"])
+            super(Weapon, self).draw(g=kwargs["g"] )
         else:
             self.x = kwargs["x"]
             super(Weapon, self).draw(g=kwargs["g"])
