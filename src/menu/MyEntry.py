@@ -34,17 +34,29 @@ class MyEntry(tk.CTkEntry):
 
 import multiprocessing
 import time
+from multiprocessing.connection import Connection
 
-
-def printing(text):
-    while True:
-        print(text)
-        time.sleep(0.014)
+def printing(conn2: Connection):
+    print("fill pipe")
+    conn2.send("first message")
+    conn2.send("second message")
+    # while True:
+    #     print(text)
+    #     time.sleep(0.014)
 
 
 if __name__ == "__main__":
-    process = multiprocessing.Process(target=printing, args=("Process", ))
+    print("start")
+    conn1, conn2 = multiprocessing.Pipe(duplex=True)
+    process = multiprocessing.Process(target=printing, args=(conn2, ))
     process.start()
-    while True:
-        print("Main")
-        # time.sleep(0.014)
+
+    time.sleep(1)
+
+    data = ""
+    while conn1.poll():
+        data = conn1.recv()
+    print(data)
+    # while True:
+    #     print("Main")
+    #     # time.sleep(0.014)

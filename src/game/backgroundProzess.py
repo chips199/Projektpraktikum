@@ -1,6 +1,7 @@
 import datetime
 import os
 import json
+import time
 
 from src.game.network import Network
 from time import sleep
@@ -28,19 +29,12 @@ class backgroundProzess:
         # self.net.send("ready")
 
         while True:
-            # print()
-            # print("SET_background")
-            # print()
-            # if connection.poll():
-            #     msg = connection.recv()
-            #     print(msg)
-            #     self.net.send_new_session_id(msg)
-            if datetime.datetime.now() - self.timer >= datetime.timedelta(seconds=1):
-                self.timer = datetime.datetime.now()
-                print("count in Background:", self.counter)
-                self.counter = 0
-            else:
-                self.counter += 1
+            # if datetime.datetime.now() - self.timer >= datetime.timedelta(seconds=1):
+            #     self.timer = datetime.datetime.now()
+            #     # print("count in Background:", self.counter)
+            #     self.counter = 0
+            # else:
+            #     self.counter += 1
 
             if not self.game_started:
                 self.check_game_started()
@@ -49,40 +43,36 @@ class backgroundProzess:
                 else:
                     self.update_game_pos()
                     self.send_game()
+
+                    time.sleep(4.2)
             else:
                 self.update_game_pos()
                 self.send_game()
 
-            # print(id)
-            sleep(0.01)
-
-    # def get_session_id(self):
-    #     return self.net.id
+            # sleep(0.001)
 
     def check_game_started(self):
         if self.conn.poll():
             msg = self.conn.recv()
-            # print(msg)
             if msg == "start":
                 self.net.start_game()
                 print("SHOULD START GAME")
                 self.game_started = True
+                time.sleep(1)
                 return
         self.game_started = False
 
     def send_menu(self):
-        # print("send menu")
         data = {
             "id": self.net.id,
             "s_id": self.net.session_id,
             "amount_player": self.net.check_lobby(),
             "game_started": self.net.game_started(),
-            # "net": self.net
         }
         self.conn.send(data)
 
     def send_game(self):
-        print("now send game data")
+        # print("now send game data")
         with open(config_file) as file:
             sample = json.load(file)
 
@@ -92,13 +82,14 @@ class backgroundProzess:
         data['connected'] = True
         data['mouse'] = self.mouse
         self.reply = self.net.send(json.dumps(data))
-        self.conn.send(data)
+        self.reply = json.loads(self.reply)
+        self.reply["id"] = self.net.id
+        self.reply = json.dumps(self.reply)
+        self.conn.send(self.reply)
 
     def update_game_pos(self):
-        if self.conn.poll():
+        while self.conn.poll():
             data = self.conn.recv()
-            # print(msg)
             self.position = data['position']
             self.mouse = data['mouse']
-        self.game_started = False
 

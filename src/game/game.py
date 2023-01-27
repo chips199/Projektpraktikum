@@ -26,47 +26,61 @@ map_names_dict = {"basicmap": basic_map,
 clock = pygame.time.Clock()
 
 
-def printing():
-    while True:
-        print("Hi")
-        time.sleep(0.05)
-
-
-def update_all_data(net, playerList):
-    while True:
-        print("in Process")
-        with open(config_file) as file:
-            sample = json.load(file)
-
-        data = sample[str(net.id)]
-        data['id'] = int(net.id)
-        data['position'] = [int(playerList[int(net.id)].x), int(playerList[int(net.id)].y)]
-        data['connected'] = True
-        data['mouse'] = playerList[int(net.id)].mousepos
-        reply = net.send(json.dumps(data))
-        # pos = self.parse_pos(reply)
-        # mouse = self.parse_mouse(reply)
-        # online = self.parse_online(reply)
-
-
 class Game:
 
     def __init__(self, w, h, conn):
         self.counter = 0
         self.conn = conn
-        time.sleep(0.5)
-        self.data = {}
+        # time.sleep(0.2)
+        self.data = {
+            "1": {
+                "id": 0,
+                "position": [50, 50],
+                "mouse": [50, 50],
+                "connected": True,
+                "health": 100
+            },
+            "2": {
+                "id": 0,
+                "position": [50, 50],
+                "mouse": [50, 50],
+                "connected": True,
+                "health": 100
+            },
+            "3": {
+                "id": 0,
+                "position": [50, 50],
+                "mouse": [50, 50],
+                "connected": True,
+                "health": 100
+            },
+            "4": {
+                "id": 0,
+                "position": [50, 50],
+                "mouse": [50, 50],
+                "connected": True,
+                "health": 100
+            },
+            "id": 0
+        }
         self.timer = datetime.datetime.now()
+        # self.update_background_process()
+        # print(self.data['id'])
+        time.sleep(1)
         self.update_background_process()
+        time.sleep(1)
+        # print(self.data['id'])
+        self.id = int(self.data['id'])
 
         # pygame.init()
         pygame.display.set_icon(pygame.image.load(wrk_dir + r"\..\stick_wars_logo.png"))
         self.width = w
         self.height = h
-        self.canvas = canvas.Canvas(self.width, self.height, str(self.data['id']) + "Stick  Wars")
+        self.canvas = canvas.Canvas(self.width, self.height, str(self.id) + "Stick  Wars")
         # self.map = Map(self, map_names_dict[self.data['map_name']])
         self.map = Map(self, basic_map)
         self.online = [True, True, True, True]
+        self.this_player_pos = [700, 50]
         self.pos = [[100, 100], [200, 100], [300, 100], [400, 100]]
         self.mouse = [[0, 0], [0, 0], [0, 0], [0, 0]]
         # load the config for default values
@@ -97,14 +111,14 @@ class Game:
         run = True
 
         # just for comfort
-        id = int(self.data['id'])
+        id = self.id
 
         # game loop
         while run:
             # time = datetime.datetime.now()
 
             # pygame stuff for the max fps
-            clock.tick(60)
+            clock.tick(70)
             # print()
             print("FPS:", self.update_fps())
             if self.playerList[id].is_alive():
@@ -176,29 +190,32 @@ class Game:
             # Mouse Position
             self.playerList[id].mousepos = pygame.mouse.get_pos()
             # print("Handling mouse:", datetime.datetime.now() - time)
-            # time = datetime.datetime.now()
+            timer = datetime.datetime.now()
 
             # Send Data about this player and get some over the others als reply
             self.send_to_background_process()
+            print("Handling send:", datetime.datetime.now() - timer)
+            timer = datetime.datetime.now()
             self.update_background_process()
-            # reply = self.send_data()
-            # for item in reply.items():
+            print("Handling update:", datetime.datetime.now() - timer)
             #     print(item)
             # print()
             # synchronise positions
-            pos = self.parse_pos(self.data)
+            self.pos = self.parse_pos()
+            # print("Position parsed:", self.pos)
             for i, position in enumerate(self.pos):
+                # print("Type position:", type(position))
                 self.playerList[i].x, self.playerList[i].y = position
             for p in self.playerList:
                 if p == self.playerList[id]:
                     continue
                 p.refresh_solids()
             # synchronise Online stati
-            online = self.parse_online(self.data)
+            # online = self.parse_online(self.data)
             for i, on in enumerate(self.online):
                 self.playerList[i].is_connected = on
             # sync mouse
-            mouse = self.parse_mouse(self.data)
+            # mouse = self.parse_mouse(self.data)
             for i, on in enumerate(self.mouse):
                 self.playerList[i].mousepos = on
 
@@ -214,7 +231,7 @@ class Game:
                     pygame.draw.circle(self.canvas.get_canvas(), (255, 0, 0), p.mousepos, 20)
             # Update Canvas
             self.canvas.update()
-            time.sleep(0.001)
+            # time.sleep(0.001)
 
             # print("Handling redraw:", datetime.datetime.now() - time)
             # time = datetime.datetime.now()
@@ -222,24 +239,32 @@ class Game:
         pygame.quit()
 
     def update_background_process(self):
-        if datetime.datetime.now() - self.timer >= datetime.timedelta(seconds=1):
-            self.timer = datetime.datetime.now()
-            print("count in Menu:", self.counter)
-            self.counter = 0
-        else:
-            self.counter += 1
-        if self.conn.poll():
-            print("GET_background")
-            self.data = self.conn.recv()
-            print(self.data)
+        # if datetime.datetime.now() - self.timer >= datetime.timedelta(seconds=1):
+        #     self.timer = datetime.datetime.now()
+        #     # print("count in Menu:", self.counter)
+        #     self.counter = 0
+        # else:
+        #     self.counter += 1
+        new_data = None
+        while self.conn.poll():
+            # print("GET_background")
+            new_data = self.conn.recv()
+            # if "amount_player" in new_data:
+            #     # print("key not in dict")
+            #     # print(new_data)
+            #     return
+            # else:
+        print("DATA:", new_data)
+        if type(new_data) == str:
+            print("UPDATE DATA")
+            self.data = json.loads(new_data)
 
     def send_to_background_process(self):
         temp_data = {
-            "position": [int(self.playerList[int(self.data['id'])].x), int(self.playerList[int(self.data['id'])].y)],
+            "position": [int(self.playerList[int(self.data["id"])].x), int(self.playerList[int(self.data["id"])].y)],
             "mouse": self.playerList[int(self.data['id'])].mousepos
         }
         self.conn.send(temp_data)
-
 
     # def send_data(self):
     #     """
@@ -257,7 +282,7 @@ class Game:
     #     reply = self.net.send(json.dumps(data))
     #     print(reply)
     #     return reply
-        # return reply
+    # return reply
 
     # def update_all_data(self):
     #     while True:
@@ -281,8 +306,8 @@ class Game:
         fps = str(int(clock.get_fps()))
         return fps
 
-    @staticmethod
-    def parse_pos(data):
+    # @staticmethod
+    def parse_pos(self):
         """
         extracts positions from server data
         :param data: string from server
@@ -290,13 +315,20 @@ class Game:
         """
         erg = []
         try:
-            jdata = json.loads(data)
-            for d in jdata:
-                print("parse pos d:", d)
-                erg.append(jdata[d]["position"])
+            # jdata = json.loads(data)
+            for key, value in self.data.items():
+                if key != "id":
+                    for key2, value2 in value.items():
+                        if key2 == "position":
+                            if key != str(self.id):
+                                erg.append(value2)
+                            else:
+                                erg.append([int(self.playerList[int(self.data["id"])].x), int(self.playerList[int(self.data["id"])].y)])
+                else:
+                    continue
             return erg
-        except:
-            print("EXCEPTION")
+        except Exception as e:
+            print("EXCEPTION:", e)
             erg.clear()
             with open(config_file) as file:
                 sample = json.load(file)
@@ -304,8 +336,8 @@ class Game:
                 erg.append(sample[p]["position"])
             return erg
 
-    @staticmethod
-    def parse_online(data):
+    # @staticmethod
+    def parse_online(self, data):
         """
         extracts online information from server data
         :param data: string from server
@@ -313,10 +345,25 @@ class Game:
         """
         erg = []
         try:
-            jdata = json.loads(data)
-            for d in jdata:
-                erg.append(jdata[d]["connected"])
+            # jdata = json.loads(data)
+            for key, value in self.data.items():
+                if key != "id":
+                    for key2, value2 in value.items():
+                        if key2 == "connected":
+                            if key != str(self.id):
+                                erg.append(value2)
+                            else:
+                                erg.append(True)
+                else:
+                    continue
             return erg
+        #
+        # erg = []
+        # try:
+        #     jdata = json.loads(data)
+        #     for d in jdata:
+        #         erg.append(jdata[d]["connected"])
+        #     return erg
         except:
             erg.clear()
             with open(config_file) as file:

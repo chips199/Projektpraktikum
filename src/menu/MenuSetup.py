@@ -349,7 +349,7 @@ class MenuSetup:
                                stepsize=7,
                                after_time=2500,
                                func=lambda: self.load_lobby_frame(),
-                               # func2=lambda: self.check_if_game_started(),
+                               func2=lambda: self.check_if_game_started(),
                                func3=lambda: self.main_frame.after(4800, lambda: self.update_player())))
 
     def join_lobby(self):
@@ -362,14 +362,14 @@ class MenuSetup:
                                                "down"],
                                after_time=2400,
                                func=lambda: self.load_lobby_frame(),
-                               # fun2=lambda: self.check_if_game_started(),
+                               fun2=lambda: self.check_if_game_started(),
                                func3=lambda: self.main_frame.after(4300, lambda: self.update_player())))
 
     def start_game(self):
         self.conn1.send("start")
         print("send start to background")
         self.root.run = False
-        # self.root.destroy()
+        self.root.destroy()
         sleep(1)
         # self.root.destroy()
         # start_new_thread(self.close_window(), tuple())
