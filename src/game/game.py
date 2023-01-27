@@ -270,7 +270,7 @@ class Game:
         # for op in other_players:
         #     solid_pixels_df = pd.concat([solid_pixels_df, op.solid_df])
         # getting copy of the players solid dataframe
-        simulated_player = copy(player.solid_df)
+        simulated_player = copy(player.get_dataframe())
         erg = 0
 
         Player.Player.shift_df(simulated_player, dirn, distance)

@@ -13,9 +13,11 @@ class Animated:
         # self.wrk_dir = os.path.abspath(os.path.dirname(__file__))
         # self.wrk_dir = wrk_dir + r"\..\basicmap\player\animation"
         # self.image = directory + r"\0.png"
-        self.directory = directory
         self.solid_df = None
         self.relativ_solids_df = None
+        self.frame_dfs = list()  # type: List[pd.DataFrame]
+        self.relativ_frame_dfs = list()  # type: List[pd.DataFrame]
+        self.directory = directory
         self.edge_surface = None
         self.solid = []  # type: List[Tuple[int, int]]
         self.relativ_solids = []  # type: List[Tuple[int, int]]
@@ -31,6 +33,7 @@ class Animated:
         self.frame_width = self.images_left[0].get_width()  # width of each frame
         self.frame_height = self.images_left[0].get_height()  # height of each frame
         self.current_frame = 0
+        self.frame_dfs, self.relativ_frame_dfs = self.load_dfs()
 
     def draw(self, **kwargs):
         """
@@ -96,3 +99,36 @@ class Animated:
         self.relativ_solids_df = pd.DataFrame(self.relativ_solids, columns=['x', 'y'])
         self.solid_df = pd.DataFrame(self.solid, columns=['x', 'y'])
         return images_right, images_left
+
+    def get_dataframe(self, firstFrame = False):
+        if firstFrame:
+            return self.frame_dfs[self.current_frame]
+        else:
+            return self.solid_df
+
+    def get_relativ_dataframe(self, firstFrame = False):
+        if firstFrame:
+            return self.relativ_frame_dfs[self.current_frame]
+        else:
+            return self.relativ_solids_df
+
+    def load_dfs(self):
+        sprite_sheet = self.directory + ".png"
+        image = pygame.image.load(sprite_sheet).convert_alpha()
+        dfs = list()
+        rdfs = list()
+        df = list()
+        rdf = list()
+        edge_surface = pygame.transform.laplacian(image).convert_alpha()
+        alpha_array = pygame.surfarray.pixels_alpha(edge_surface)
+        alpha_array = alpha_array.swapaxes(0, 1)
+        for yi, y in enumerate(alpha_array):
+            for xi, x in enumerate(y):
+                if x > 200:
+                    df.append((xi + self.x, yi + self.y))
+                    rdf.append((xi, yi))
+
+        for i in range(image.get_width() // self.frame_width):
+            dfs.append(pd.DataFrame(df, columns=['x', 'y']))
+            rdfs.append(pd.DataFrame(rdf, columns=['x', 'y']))
+        return dfs, rdfs

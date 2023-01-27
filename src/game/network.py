@@ -12,8 +12,8 @@ class Network:
         self.client.settimeout(2)
         # use the url for connecting to an external server
         # use the third if it is just local
-        self.host, self.port = "6.tcp.eu.ngrok.io", 18577
-        # self.host, self.port = "localhost", 5556
+        # self.host, self.port = "5.tcp.eu.ngrok.io", 18258
+        self.host, self.port = "localhost", 5556
         self.addr = (self.host, self.port)
         self.id, self.session_id = self.connect_lobby(msg)
         self.map_name = self.get_map()
@@ -31,10 +31,13 @@ class Network:
             self.client.connect(self.addr)
             self.client.sendall(str.encode(p))
             rply = self.client.recv(2048).decode()
+            print(rply)
+            pid, msg = rply.split(",")
         except socket.timeout:
-            rply = "5,No connection possible"
-        print(rply)
-        pid, msg = rply.split(",")
+            pid, msg = "5,No connection possible".split(",")
+        except ValueError:
+            pid, msg = "5,Server gave nothing back".split(",")
+
         return pid, msg
 
     def connect(self):
