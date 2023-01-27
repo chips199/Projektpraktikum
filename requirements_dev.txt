@@ -3,3 +3,10 @@ tox
 pytest~=7.2.0
 pytest-cov
 mypy
+imageio~=2.22.4
+matplotlib~=3.6.2
+numpy~=1.24.1
+pygame~=2.1.2
+game~=0.0.0
+Pillow~=9.4.0
+setuptools~=60.2.0

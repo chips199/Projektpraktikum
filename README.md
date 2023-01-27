@@ -1,4 +1,4 @@
-![Tests](https://github.com/mCodingLLC/SlapThatLikeButton-TestingStarterProject/actions/workflows/tests.yml/badge.svg)
+![Tests](https://github.com/chips199/Projektpraktikum/actions/workflows/tests.yml/badge.svg)
 
 # Multiplayer PvP Spiel
 
