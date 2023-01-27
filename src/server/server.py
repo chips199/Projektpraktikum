@@ -99,6 +99,7 @@ def threaded_client(conn):
     # receiving the first message
     start_msg = conn.recv(2048).decode()
     print(start_msg)
+
     # splitting create game and join, if the code is 4 digits long, try connecting, else try creating a new game
     if len(start_msg) == 4:
         # join lobby
