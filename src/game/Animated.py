@@ -9,7 +9,7 @@ wrk_dir = wrk_dir + r"\..\basicmap\player\animation"
 
 
 class Animated:
-    def __init__(self, width, height, startx, starty, directory):
+    def __init__(self, startx, starty, directory):
         # self.wrk_dir = os.path.abspath(os.path.dirname(__file__))
         # self.wrk_dir = wrk_dir + r"\..\basicmap\player\animation"
         # self.image = directory + r"\0.png"
@@ -22,30 +22,33 @@ class Animated:
         self.current_frame = None
         self.x = startx
         self.y = starty
-        self.width = width
-        self.height = height
         self.animation_direction = 1  # 1 mean right, 2 means left
         self.animation_running = False
 
         self.images_right, self.images_left = self.load_images()
-        self.images_right = list(x for i, x in enumerate(self.images_right) if i % 2 == 0)
-        self.images_left = list(x for i, x in enumerate(self.images_left) if i % 2 == 0)
 
         self.frame_count = len(self.images_right) - 1  # amount of frames of animation, starting at index 0
+        self.frame_width = self.images_left[0].get_width()  # width of each frame
+        self.frame_height = self.images_left[0].get_height()  # height of each frame
         self.current_frame = 0
 
-    def draw(self, g):
+    def draw(self, **kwargs):
         """
         displays a player to the canvas
         :param g: pygame canvas
         """
         if self.animation_direction == 1:
-            self.animate(g, self.images_right)
+            self.animate(kwargs["g"], self.images_right)
         else:
-            self.animate(g, self.images_left)
+            self.animate(kwargs["g"], self.images_left)
+
+    def cut_frames(self, n: int):
+        self.images_right = list(x for i, x in enumerate(self.images_right) if i % int(n) == 0)
+        self.images_left = list(x for i, x in enumerate(self.images_left) if i % int(n) == 0)
+        self.frame_count = len(self.images_right) - 1  # amount of frames of animation, starting at index 0
 
     def animate(self, g, images):
-        player_rec = pygame.Rect(self.x, self.y, self.width, self.height)
+        player_rec = pygame.Rect(self.x, self.y, self.frame_width, self.frame_height)
         if self.current_frame < self.frame_count and self.animation_running:
             g.blit(images[self.current_frame + 1], player_rec)
             self.current_frame += 1
@@ -57,8 +60,8 @@ class Animated:
     def stop_animation(self):
         self.animation_running = False
 
-    def set_animation_direction(self, direction: int = 1):
-        self.animation_direction = direction
+    def set_animation_direction(self, drn):
+        self.animation_direction = drn
         self.animation_running = True
 
     def load_images(self):

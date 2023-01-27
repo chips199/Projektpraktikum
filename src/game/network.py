@@ -1,5 +1,7 @@
 import json
 import socket
+
+
 # from src.game import game
 
 
@@ -9,11 +11,8 @@ class Network:
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client.settimeout(2)
         # use the url for connecting to an external server
-        # use tht second line to connect to a local server, which is visible in a network
         # use the third if it is just local
         self.host, self.port = "6.tcp.eu.ngrok.io", 18577
-        # self.host, self.port = "10.170.48.131", 17586
-        # self.host, self.port = socket.gethostbyname(socket.gethostname()), 5556
         # self.host, self.port = "localhost", 5556
         self.addr = (self.host, self.port)
         self.id, self.session_id = self.connect_lobby(msg)

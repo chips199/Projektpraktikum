@@ -72,38 +72,39 @@ class Game:
                     if event.type == pygame.K_ESCAPE:
                         run = False
 
-                    # Hit
-                    elif event.type == pygame.MOUSEBUTTONDOWN:
-                        # Check if Player can use his weapon
-                        if self.playerList[id].weapon.can_hit():
-                            # Check if an enemy player is in range
-                            self.playerList[id].weapon.hit()
-                            self.playerList[id].weapon.set_animation_direction(self.playerList[id].animation_direction)
-                            # for player in self.playerList:
-                            #     #  Do not beat your own player
-                            #     if player == self.playerList[id]:
-                            #         continue
-                            #     # Check if the player was hit
-                            #     # First check if the opponent is in range of the weapon
-                            #     # Then check if the player's mouse is on the opponent
-                            #     if player.x < self.playerList[id].x + self.playerList[id].width + self.playerList[
-                            #         id].weapon.distance and player.x + player.width > self.playerList[id].x - \
-                            #             self.playerList[
-                            #                 id].weapon.distance and player.y < self.playerList[id].y + \
-                            #             self.playerList[id].height + self.playerList[
-                            #         id].weapon.distance and player.y + player.height > self.playerList[id].y - \
-                            #             self.playerList[
-                            #                 id].weapon.distance and player.x < self.playerList[id].mousepos[
-                            #         0] < player.x + player.width \
-                            #             and player.y < self.playerList[id].mousepos[1] < player.y + player.height:
-                            #         # Draw damage from opponent
-                            #         player.beaten(self.playerList[id].weapon)
-                            #         break
                 # print("Handling Events:", datetime.datetime.now() - time)
                 # time = datetime.datetime.now()
 
                 # get the key presses
                 keys = pygame.key.get_pressed()
+
+                # Hit
+                if keys[pygame.K_s]:
+                    # Check if Player can use his weapon
+                    if self.playerList[id].weapon.can_hit():
+                        # Check if an enemy player is in range
+                        self.playerList[id].weapon.hit()
+                        self.playerList[id].weapon.set_animation_direction(self.playerList[id].animation_direction)
+                        # for player in self.playerList:
+                        #     #  Do not beat your own player
+                        #     if player == self.playerList[id]:
+                        #         continue
+                        #     # Check if the player was hit
+                        #     # First check if the opponent is in range of the weapon
+                        #     # Then check if the player's mouse is on the opponent
+                        #     if player.x < self.playerList[id].x + self.playerList[id].width + self.playerList[
+                        #         id].weapon.distance and player.x + player.width > self.playerList[id].x - \
+                        #             self.playerList[
+                        #                 id].weapon.distance and player.y < self.playerList[id].y + \
+                        #             self.playerList[id].height + self.playerList[
+                        #         id].weapon.distance and player.y + player.height > self.playerList[id].y - \
+                        #             self.playerList[
+                        #                 id].weapon.distance and player.x < self.playerList[id].mousepos[
+                        #         0] < player.x + player.width \
+                        #             and player.y < self.playerList[id].mousepos[1] < player.y + player.height:
+                        #         # Draw damage from opponent
+                        #         player.beaten(self.playerList[id].weapon)
+                        #         break
 
                 if keys[pygame.K_d] and not self.playerList[id].block_x_axis:
                     if self.playerList[id].landed:
@@ -119,7 +120,7 @@ class Game:
                 #     self.playerList[id].do_animation_left = self.playerList[id].do_animation_left = False
 
                 # Jump
-                if keys[pygame.K_SPACE] or self.playerList[id].is_jumping:
+                if keys[pygame.K_SPACE] or self.playerList[id].is_jumping or keys[pygame.K_w]:
                     self.playerList[id].stop_animation()
                     self.playerList[id].jump(func=self.nextToSolid)
 

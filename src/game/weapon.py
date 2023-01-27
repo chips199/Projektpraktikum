@@ -5,8 +5,8 @@ from src.game.Animated import Animated
 
 
 class WeaponType(Enum):
-    Fist = {"Damage":20, "Durability":float('inf'), "Cooldown": 2, "IsShortRange":True}
-    Sword = {"Damage":40, "Durability":20, "Cooldown": 4, "IsShortRange":True}
+    Fist = {"Damage": 20, "Durability": float('inf'), "Cooldown": 2, "IsShortRange": True}
+    Sword = {"Damage": 40, "Durability": 20, "Cooldown": 4, "IsShortRange": True}
 
 
 class Weapon(Animated):
@@ -17,7 +17,17 @@ class Weapon(Animated):
         """
         super(Weapon, self).__init__(*args, **kwargs)
         self.weapon_type = waepon_type
+        if self.weapon_type == WeaponType.Fist:
+            self.cut_frames(2)
         self.last_hit = int(round(datetime.now().timestamp()))
+
+    def draw(self, **kwargs):
+        if self.animation_direction == 2:
+            self.x = kwargs["x"] + kwargs["width"] - self.frame_width
+            super(Weapon, self).draw(g=kwargs["g"])
+        else:
+            self.x = kwargs["x"]
+            super(Weapon, self).draw(g=kwargs["g"])
 
     def can_hit(self):
         """
@@ -26,7 +36,8 @@ class Weapon(Animated):
          - Shelf life not yet used up
          - Cooldown must have expired
         """
-        return self.weapon_type.value["Durability"] > 0 and self.last_hit + self.weapon_type.value["Cooldown"] <= int(round(datetime.now().timestamp()))
+        return self.weapon_type.value["Durability"] > 0 and self.last_hit + self.weapon_type.value["Cooldown"] <= int(
+            round(datetime.now().timestamp()))
 
     def hit(self):
         """

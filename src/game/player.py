@@ -6,7 +6,6 @@ from src.game.Animated import Animated
 
 
 class Player(Animated):
-    width, height = 50, 100
     last_jump = datetime.datetime.now()
     height_jump = 200
     status_jump = 0
@@ -15,7 +14,7 @@ class Player(Animated):
     health = 100
 
     def __init__(self, *args, **kwargs):
-        super(Player, self).__init__(self.width, self.height, *args, **kwargs)
+        super(Player, self).__init__(*args, **kwargs)
 
         self.falling_time = datetime.datetime.now()
         self.jumping_time = datetime.datetime.now()
@@ -29,18 +28,19 @@ class Player(Animated):
         self.is_jumping = False
         self.is_falling = True
         self.block_x_axis = False
+        self.cut_frames(2)
         # self.color = color
         map_dir = "\\".join(str(self.directory).split('\\')[:-3])
         fist_path = map_dir + f"\\waffen\\faeuste\\animation\\fists_{self.get_color(self.directory)}_animation"
         sword_path = map_dir + f"\\waffen\\schwert\\animation\\sword_hold_animation_{self.get_color(self.directory)}"
         # print(fist_path)
-        # self.weapon = weapon.Weapon(weapon.WeaponType.Fist, self.width, self.height, self.x, self.y, fist_path)
-        self.weapon = weapon.Weapon(weapon.WeaponType.Sword, self.width, self.height, self.x, self.y, sword_path)
+        self.weapon = weapon.Weapon(weapon.WeaponType.Fist, self.x, self.y, fist_path)
+        # self.weapon = weapon.Weapon(weapon.WeaponType.Sword, self.x, self.y, sword_path)
 
     def draw(self, g):
-        super(Player, self).draw(g)
+        super(Player, self).draw(g=g)
         self.weapon.animation_direction = self.animation_direction
-        self.weapon.draw(g)
+        self.weapon.draw(g=g, x=self.x, width=self.frame_width)
 
     @staticmethod
     def shift_df(df, dirn, n):
@@ -71,16 +71,20 @@ class Player(Animated):
             v = self.velocity
 
         if dirn == 0:
+            self.animation_direction = 1
             self.x += v
+            self.weapon.x += v
         elif dirn == 1:
+            self.animation_direction = 2
             self.x -= v
+            self.weapon.x -= v
         elif dirn == 2:
             self.y -= v
+            self.weapon.y -= v
         else:
             self.y += v
+            self.weapon.y += v
 
-        self.weapon.x = self.x
-        self.weapon.y = self.y
         self.solid_df = Player.shift_df(self.solid_df, dirn, v)
 
     def jump(self, func):
@@ -214,6 +218,7 @@ class Player(Animated):
                             self.block_x_axis = False
                             self.is_falling = False
                             self.velocity_gravity = 1
+
     @staticmethod
     def get_color(p):
         if p.__contains__("magenta"):
