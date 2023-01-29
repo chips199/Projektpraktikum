@@ -289,8 +289,8 @@ class Game:
         # else:
         #     self.counter += 1
         new_data = None
-        # while not self.conn.poll():
-        #     continue
+        while not self.conn.poll():
+            continue
         while self.conn.poll():
             new_data = self.conn.recv()
         if type(new_data) == str:

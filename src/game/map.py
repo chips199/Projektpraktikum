@@ -29,12 +29,12 @@ class Map():
         #     self.player_uris.append(playerimg)
 
         # load player images
-        for directory in next(os.walk(self.directory + r'/player/animation'))[1]:
+        for directory in next(os.walk(self.directory + r'\player\animation'))[1]:
             if directory[-3:] == 'png':
                 print(str(directory) + ' is no folder')
                 continue
-            self.player_uris.append(os.path.join(self.directory + r'/player/animation', directory))
-            print("directory:", os.path.join(self.directory + r'/player', directory))
+            self.player_uris.append(os.path.join(self.directory + r'\player\animation', directory))
+            print("directory:", os.path.join(self.directory + r'\player', directory))
 
         # load solid images and add solid pixels to solid list
         for filename in os.listdir(self.directory + r'/solid'):
