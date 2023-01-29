@@ -286,11 +286,11 @@ class Game:
 
             # if self.counter_reset_timer == 60:
             if datetime.datetime.now() - self.new_fps_timer > datetime.timedelta(milliseconds=990):
-                print("MIN TIME:", round(self.min_timer / 1000, 3))
-                print("MAX TIME:", round(self.max_timer / 1000, 3))
-                print("TIME TOTAL:", round(self.time_total / 1000, 3))
-                print("COUNTER:", self.counter_reset_timer)
-                print()
+                # print("MIN TIME:", round(self.min_timer / 1000, 3))
+                # print("MAX TIME:", round(self.max_timer / 1000, 3))
+                # print("TIME TOTAL:", round(self.time_total / 1000, 3))
+                # print("COUNTER:", self.counter_reset_timer)
+                # print()
                 self.counter_reset_timer = 0
                 self.new_fps_timer = datetime.datetime.now()
 

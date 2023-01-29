@@ -24,7 +24,7 @@ class Player(Animated):
         # self.y = starty
         self.velocity = 6
         self.velocity_gravity = 1
-        self.velocity_jumping = self.max_jumping_speed = 23
+        self.velocity_jumping = self.max_jumping_speed = 20
         self.velocity_time = 15
         self.landed = False
         self.is_jumping = False
