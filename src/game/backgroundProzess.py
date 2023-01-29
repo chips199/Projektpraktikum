@@ -25,6 +25,7 @@ class backgroundProzess:
 
         self.position = [int(100), int(100)]
         self.mouse = [int(100), int(100)]
+        self.frame = 0
 
         # self.net.send("ready")
 
@@ -48,6 +49,8 @@ class backgroundProzess:
 
                     # time.sleep(3.2)
             else:
+                while not self.conn.poll():
+                    continue
                 self.update_game_pos()
                 # print("Handling update:", datetime.datetime.now() - timer)
                 # timer = datetime.datetime.now()
@@ -78,7 +81,7 @@ class backgroundProzess:
             "id": self.net.id,
             "s_id": self.net.session_id,
             "amount_player": self.net.check_lobby(),
-            "game_started": self.net.game_started(),
+            "game_started": self.net.game_started()
         }
         self.conn.send(data)
 
@@ -92,10 +95,12 @@ class backgroundProzess:
         data['position'] = self.position
         data['connected'] = True
         data['mouse'] = self.mouse
+        data['frame'] = self.frame
         self.reply = self.net.send(json.dumps(data))
         self.reply = json.loads(self.reply)
         self.reply["id"] = self.net.id
         self.reply = json.dumps(self.reply)
+        print(self.reply)
         self.conn.send(self.reply)
 
     def update_game_pos(self):
@@ -104,4 +109,5 @@ class backgroundProzess:
             data = self.conn.recv()
             self.position = data['position']
             self.mouse = data['mouse']
+            self.frame = data['frame']
         # print("DATA in Background", data)

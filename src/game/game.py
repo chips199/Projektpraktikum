@@ -307,8 +307,8 @@ class Game:
         # else:
         #     self.counter += 1
         new_data = None
-        while not self.conn.poll():
-            continue
+        # while not self.conn.poll():
+        #     continue
         while self.conn.poll():
             new_data = self.conn.recv()
         if type(new_data) == str:
@@ -317,7 +317,8 @@ class Game:
     def send_to_background_process(self):
         temp_data = {
             "position": [int(self.playerList[int(self.data["id"])].x), int(self.playerList[int(self.data["id"])].y)],
-            "mouse": self.playerList[int(self.data['id'])].mousepos
+            "mouse": self.playerList[int(self.data['id'])].mousepos,
+            "frame": self.playerList[int(self.data['id'])].current_frame
         }
         self.conn.send(temp_data)
 
