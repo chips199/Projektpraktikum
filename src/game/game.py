@@ -236,7 +236,7 @@ class Game:
             self.send_to_background_process()
 
             # if self.counter_reset_timer > 0:
-            #     print(round(self.time_total / 1000, 3) / self.counter_reset_timer)
+            #     print(round(self.time_total / 1000, 3) / self.counter_reset_timer) #
 
             if self.counter_reset_timer > 0 and \
                     round(self.time_total / 1000, 3) / self.counter_reset_timer < 16:
