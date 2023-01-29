@@ -225,7 +225,7 @@ class Game:
             # print("Handling redraw:", datetime.datetime.now() - timer)
             # timer = datetime.datetime.now()
 
-            while datetime.datetime.now() - fps_timer < datetime.timedelta(milliseconds=20):
+            while datetime.datetime.now() - fps_timer < datetime.timedelta(milliseconds=16):
                 continue
             self.send_to_background_process()
             # while datetime.datetime.now() - fps_timer < datetime.timedelta(milliseconds=20):
