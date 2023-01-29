@@ -77,6 +77,8 @@ class Game:
         self.this_player_pos = [700, 50]
         self.pos = [[100, 100], [200, 100], [300, 100], [400, 100]]
         self.mouse = [[0, 0], [0, 0], [0, 0], [0, 0]]
+        self.player_frames = [[0, False, 1], [0, False, 1], [0, False, 1], [0, False, 1]]
+        self.weapon_frames = [[0, False, 1], [0, False, 1], [0, False, 1], [0, False, 1]]
         # load the config for default values
         # this will later be done in the map to configure spawnpoints
         with open(config_file) as file:
@@ -204,6 +206,16 @@ class Game:
             for i, on in enumerate(self.mouse):
                 self.playerList[i].mousepos = on
 
+            # sync animation frames
+            self.player_frames, self.weapon_frames = self.parse_frame()
+            for i, (data_player, data_weapon) in enumerate(zip(self.player_frames, self.weapon_frames)):
+                self.playerList[i].current_frame = data_player[0]
+                self.playerList[i].animation_running = data_player[1]
+                self.playerList[i].animation_direction = data_player[2]
+                self.playerList[i].weapon.current_frame = data_weapon[0]
+                self.playerList[i].weapon.animation_running = data_weapon[1]
+                self.playerList[i].weapon.animation_direction = data_weapon[2]
+
             # print("Handling pos parsing:", datetime.datetime.now() - timer)
             # timer = datetime.datetime.now()
 
@@ -250,7 +262,13 @@ class Game:
     def send_to_background_process(self):
         temp_data = {
             "position": [int(self.playerList[int(self.data["id"])].x), int(self.playerList[int(self.data["id"])].y)],
-            "mouse": self.playerList[int(self.data['id'])].mousepos
+            "mouse": self.playerList[int(self.data['id'])].mousepos,
+            "player_frame": [self.playerList[int(self.data['id'])].current_frame,
+                             self.playerList[int(self.data['id'])].animation_running,
+                             self.playerList[int(self.data['id'])].animation_direction],
+            "weapon_frame": [self.playerList[int(self.data['id'])].weapon.current_frame,
+                             self.playerList[int(self.data['id'])].weapon.animation_running,
+                             self.playerList[int(self.data['id'])].weapon.animation_direction]
         }
         self.conn.send(temp_data)
 
@@ -258,6 +276,31 @@ class Game:
     def update_fps():
         fps = str(int(clock.get_fps()))
         return fps
+
+    def parse_frame(self):
+        erg_player = []
+        erg_weapon = []
+        for key, value in self.data.items():
+            # since a fifth dictionary entry named 'id' is added for the player id, ignore this key
+            if key != "id":
+                for key2, value2 in value.items():
+                    if key2 == "player_frame":
+                        if key != str(self.id):
+                            erg_player.append(value2)
+                        else:
+                            erg_player.append([self.playerList[int(self.data["id"])].current_frame,
+                                               self.playerList[int(self.data["id"])].animation_running,
+                                               self.playerList[int(self.data["id"])].animation_direction])
+                    elif key2 == "weapon_frame":
+                        if key != str(self.id):
+                            erg_weapon.append(value2)
+                        else:
+                            erg_weapon.append([self.playerList[int(self.data["id"])].weapon.current_frame,
+                                               self.playerList[int(self.data["id"])].weapon.animation_running,
+                                               self.playerList[int(self.data["id"])].weapon.animation_direction])
+            else:
+                continue
+        return erg_player, erg_weapon
 
     # @staticmethod
     def parse_pos(self):
@@ -347,7 +390,7 @@ class Game:
         :return: integer representing the distance to the next object within the range
         """
         # first combining all solid pixels in one dataframe
-        # other_players = self.playerList[:int(self.net.id)] + self.playerList[int(self.net.id) + 1:]
+        # other_players = self.playerList[:self.id] + self.playerList[self.id + 1:]
         solid_pixels_df = copy(self.map.solid_df)
         # for op in other_players:
         #     solid_pixels_df = pd.concat([solid_pixels_df, op.solid_df])
