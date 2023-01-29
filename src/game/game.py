@@ -183,8 +183,8 @@ class Game:
 
             # sync mouse
             # mouse = self.parse_mouse(self.data)
-            for i, on in enumerate(self.mouse):
-                self.playerList[i].mousepos = on
+            # for i, on in enumerate(self.mouse):
+            #     self.playerList[i].mousepos = on
 
             # sync animation frames from player and weapon
             self.player_frames, self.weapon_frames = self.parse_frame()

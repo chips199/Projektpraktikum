@@ -80,7 +80,7 @@ class backgroundProzess:
         data['weapon_frame'] = self.weapon_frame
         self.reply = self.net.send(json.dumps(data))
         self.reply = json.loads(self.reply)
-        self.reply["id"] = self.net.id
+        self.reply["id"] = self.net.id  # type:ignore[index]
         self.reply = json.dumps(self.reply)
         self.conn.send(self.reply)
 
