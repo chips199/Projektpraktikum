@@ -22,9 +22,9 @@ class Player(Animated):
         self.jumping_time = datetime.datetime.now()
         # self.x = startx
         # self.y = starty
-        self.velocity = 8
+        self.velocity = 6
         self.velocity_gravity = 1
-        self.velocity_jumping = self.max_jumping_speed = 20
+        self.velocity_jumping = self.max_jumping_speed = 23
         self.velocity_time = 15
         self.landed = False
         self.is_jumping = False
@@ -32,6 +32,8 @@ class Player(Animated):
         self.block_x_axis = False
         # self.color = color
         self.weapon = weapon
+        self.velocity_counter = 0
+        self.velocity_counter2 = 0
 
     @staticmethod
     def shift_df(df, dirn, n):
@@ -94,10 +96,15 @@ class Player(Animated):
                     self.jumping_time = datetime.datetime.now()
 
                 # after certain time, decrease jumping speed
-                elif datetime.datetime.now() - self.jumping_time > datetime.timedelta(milliseconds=self.velocity_time):
+                # elif datetime.datetime.now() - self.jumping_time > datetime.timedelta(milliseconds=self.velocity_time):
+                elif self.velocity_counter2 >= self.velocity_counter:
                     self.velocity_jumping -= 1
                     # reset timer to current time
                     self.jumping_time = datetime.datetime.now()
+                    self.velocity_counter2 = 0
+
+                else:
+                    self.velocity_counter2 += 1
 
                 # jump with speed calculated in func()
                 self.move(2, vel)
@@ -155,14 +162,19 @@ class Player(Animated):
                     self.falling_time = datetime.datetime.now()
 
                 # after certain time increase the falling speed until it's maximum
-                elif datetime.datetime.now() - self.falling_time > datetime.timedelta(milliseconds=self.velocity_time):
+                # elif datetime.datetime.now() - self.falling_time > datetime.timedelta(milliseconds=self.velocity_time):
+                elif self.velocity_counter2 >= self.velocity_counter:
                     self.velocity_gravity += 1
                     # reset timer to current time
                     self.falling_time = datetime.datetime.now()
+                    self.velocity_counter2 = 0
 
                     # limit the falling speed to it's maximum
                     if self.velocity_gravity > self.max_jumping_speed:
                         self.velocity_gravity = self.max_jumping_speed
+
+                else:
+                    self.velocity_counter2 += 1
 
                 # move player down with speed calculated in func()
                 self.move(dirn=3, v=int(vel))

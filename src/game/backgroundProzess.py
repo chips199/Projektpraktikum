@@ -46,7 +46,7 @@ class backgroundProzess:
                     self.update_game_pos()
                     self.send_game()
 
-                    time.sleep(4.2)
+                    # time.sleep(3.2)
             else:
                 self.update_game_pos()
                 # print("Handling update:", datetime.datetime.now() - timer)
@@ -54,10 +54,10 @@ class backgroundProzess:
                 self.send_game()
                 # print("Handling send:", datetime.datetime.now() - timer)
 
-            while datetime.datetime.now() - fps_timer < datetime.timedelta(milliseconds=20):
-                # print("wait Background")
-                self.update_game_pos()
-                self.send_game()
+            # while datetime.datetime.now() - fps_timer < datetime.timedelta(milliseconds=20):
+            #     # print("wait Background")
+            #     self.update_game_pos()
+            #     self.send_game()
                 # continue
 
             # sleep(0.001)
@@ -105,4 +105,3 @@ class backgroundProzess:
             self.position = data['position']
             self.mouse = data['mouse']
         # print("DATA in Background", data)
-

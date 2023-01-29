@@ -96,6 +96,12 @@ class Game:
                 Player.Player(config['2']['position'][0], config['2']['position'][1], (0, 255, 255)),
                 Player.Player(config['3']['position'][0], config['3']['position'][1], (255, 0, 255))]
 
+        self.min_timer = 0
+        self.max_timer = 0
+        self.counter_reset_timer = 0
+        self.time_total = 0
+        self.new_fps_timer = datetime.datetime.now()
+
     def run(self):
         """
         the core method of the game containing the game loop
@@ -225,15 +231,70 @@ class Game:
             # print("Handling redraw:", datetime.datetime.now() - timer)
             # timer = datetime.datetime.now()
 
-            while datetime.datetime.now() - fps_timer < datetime.timedelta(milliseconds=20):
-                continue
+            # while datetime.datetime.now() - fps_timer < datetime.timedelta(milliseconds=20):
+            #     continue
             self.send_to_background_process()
+
+            # if self.counter_reset_timer > 0:
+            #     print(round(self.time_total / 1000, 3) / self.counter_reset_timer)
+
+            if self.counter_reset_timer > 0 and \
+                    round(self.time_total / 1000, 3) / self.counter_reset_timer < 16:
+                # print("counter reset timer:", self.counter_reset_timer)
+                # print("time total:", round(self.time_total / 1000, 3))
+                delay = self.counter_reset_timer * 16 - round(self.time_total / 1000, 3)
+                # print("should wait:", delay)
+                # print("---")
+                # print("time now:", datetime.datetime.now())
+                # print("delay:", datetime.timedelta(milliseconds=delay))
+                # print("subtraktion:", datetime.datetime.now() - datetime.timedelta(milliseconds=delay))
+                # print("in microseconds:", (datetime.datetime.now() - datetime.timedelta(milliseconds=delay)).microsecond)
+                wait_time = datetime.datetime.now()
+                while datetime.datetime.now() - wait_time < datetime.timedelta(microseconds=delay*1000):
+                    # print("in while")
+                    continue
+                # print((datetime.datetime.now() - wait_time).microseconds / 1000)
+
+
             # while datetime.datetime.now() - fps_timer < datetime.timedelta(milliseconds=20):
             #     # print("wait Game")
             #     # self.send_to_background_process()
             #     continue
 
             # print("TOTAL TIME:", datetime.datetime.now() - fps_timer)
+
+            # -----------------------------------------------
+            this_time = int((datetime.datetime.now() - fps_timer).microseconds)
+            # print("TYPE this time:", type(this_time), "VAL:", this_time)
+            # print("TYPE min timer:", type(self.min_timer), "VAL:", self.min_timer)
+            # print("TYPE max timer:", type(self.max_timer), "VAL:", self.max_timer)
+
+            if self.counter_reset_timer == 0:
+                # print("COUNTER RESET")
+                self.min_timer = this_time
+                self.max_timer = this_time
+                self.time_total = 0
+                # print(self.min_timer, type(self.min_timer))
+                # print(self.max_timer, type(self.max_timer))
+                # print(this_time < self.min_timer)
+            elif this_time < self.min_timer:
+                self.min_timer = this_time
+            elif this_time > self.max_timer:
+                self.max_timer = this_time
+            self.counter_reset_timer += 1
+            self.time_total += this_time
+
+            # if self.counter_reset_timer == 60:
+            if datetime.datetime.now() - self.new_fps_timer > datetime.timedelta(milliseconds=990):
+                print("MIN TIME:", round(self.min_timer / 1000, 3))
+                print("MAX TIME:", round(self.max_timer / 1000, 3))
+                print("TIME TOTAL:", round(self.time_total / 1000, 3))
+                print("COUNTER:", self.counter_reset_timer)
+                print()
+                self.counter_reset_timer = 0
+                self.new_fps_timer = datetime.datetime.now()
+
+            # -----------------------------------------------
 
         # self.process.kill() # muss noch übergeben werden
         pygame.quit()
