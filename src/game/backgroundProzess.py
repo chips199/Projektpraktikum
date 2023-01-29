@@ -39,21 +39,12 @@ class backgroundProzess:
 
             if not self.game_started:
                 self.check_game_started()
-                if not self.game_started:
-                    self.send_menu()
-                else:
-                    self.update_game_pos()
-                    self.send_game()
-
-                    time.sleep(4.2)
+            # check again if game started cause could have changed due to the check_game_started() func
+            if not self.game_started:
+                self.send_menu()
             else:
                 self.update_game_pos()
                 self.send_game()
-
-            # while datetime.datetime.now() - fps_timer < datetime.timedelta(milliseconds=20):
-            #     # print("wait Background")
-            #     self.update_game_pos()
-            #     self.send_game()
 
     def check_game_started(self):
         if self.conn.poll():

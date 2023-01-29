@@ -1,6 +1,8 @@
 import datetime
 from copy import copy
 
+import pandas
+
 from src.game import weapon
 from src.game.animated import Animated
 
@@ -29,6 +31,7 @@ class Player(Animated):
         self.is_falling = True
         self.block_x_axis = False
         self.cut_frames(2)
+        self.solid_df = pandas.DataFrame
         # self.color = color
         map_dir = "\\".join(str(self.directory).split('\\')[:-3])
         fist_path = map_dir + f"\\waffen\\faeuste\\animation\\fists_{self.get_color(self.directory)}_animation"

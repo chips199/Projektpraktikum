@@ -30,8 +30,8 @@ class MenuSetup:
         self.update_background_after_id = None
         self.network_started = False
         # self.id = "5"
-        self.conn1 = None
-        self.conn2 = None
+        self.conn1 = Connection
+        self.conn2 = Connection
         self.entry_session_id = None
         self.label_error = None
         self.label_game_name = None
