@@ -30,11 +30,13 @@ class Network:
             self.client.connect(self.addr)
             self.client.sendall(str.encode(p))
             rply = self.client.recv(2048).decode()
-            print("REPLY:", rply)
+            print(rply)
+            pid, msg = rply.split(",")
         except socket.timeout:
-            rply = "5,No connection possible"
-        print(rply)
-        pid, msg = rply.split(",")
+            pid, msg = "5,No connection possible".split(",")
+        except ValueError:
+            pid, msg = "5,Server gave nothing back".split(",")
+
         return pid, msg
 
     def connect(self):
