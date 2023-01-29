@@ -5,7 +5,7 @@ from src.game.Animated import Animated
 
 
 class WeaponType(Enum):
-    Fist = {"Damage": 20, "Durability": float('inf'), "Cooldown": 2, "IsShortRange": True}
+    Fist = {"Damage": 20, "Durability": float('inf'), "Cooldown": 0, "IsShortRange": True}
     Sword = {"Damage": 40, "Durability": 20, "Cooldown": 4, "IsShortRange": True}
 
 

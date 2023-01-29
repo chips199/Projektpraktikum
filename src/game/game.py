@@ -240,8 +240,8 @@ class Game:
         # else:
         #     self.counter += 1
         new_data = None
-        while not self.conn.poll():
-            continue
+        # while not self.conn.poll():
+        #     continue
         while self.conn.poll():
             new_data = self.conn.recv()
         if type(new_data) == str:
@@ -318,7 +318,7 @@ class Game:
             return erg
 
     @staticmethod
-    def parse_mouse(data):  # noch nicht an background process angepasst
+    def parse_mouse(data):
         """
         extracts mouse information from server data
         :param data: string from server
@@ -352,7 +352,7 @@ class Game:
         # for op in other_players:
         #     solid_pixels_df = pd.concat([solid_pixels_df, op.solid_df])
         # getting copy of the players solid dataframe
-        simulated_player = copy(player.get_dataframe(True))
+        simulated_player = copy(player.solid_df)
         erg = 0
 
         Player.Player.shift_df(simulated_player, dirn, distance)
