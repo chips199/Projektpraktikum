@@ -34,7 +34,7 @@ class Animated:
         self.frame_width = self.images_left[0].get_width()  # width of each frame
         self.frame_height = self.images_left[0].get_height()  # height of each frame
         self.current_frame = 0
-        self.frame_dfs, self.relativ_frame_dfs = self.load_dfs()
+        self.abs_l, self.abs_r, self.rel_l, self.rel_r = self.load_dfs()
 
     def draw(self, **kwargs):
         """
@@ -60,6 +60,7 @@ class Animated:
             g.blit(images[0], player_rec)
             self.current_frame = 0
             self.animation_running = False
+
 
     def stop_animation(self):
         self.animation_running = False
@@ -101,11 +102,30 @@ class Animated:
         self.solid_df = pd.DataFrame(self.solid, columns=['x', 'y'])
         return images_right, images_left
 
-    def get_dataframe(self, firstFrame=False):
-        if firstFrame:
-            return self.solid_df
-        else:
-            return self.frame_dfs[self.current_frame]
+    def get_dataframe(self, frame = -99):
+        try:
+            if self.animation_direction == 1:
+                erg = copy(self.rel_r[frame])
+                erg['x'] = erg['x'].map(lambda x: x + self.x)
+                erg['y'] = erg['y'].map(lambda y: y + self.y)
+                return erg
+            else:
+                erg = copy(self.rel_l[frame])
+                erg['x'] = erg['x'].map(lambda x: x + self.x)
+                erg['y'] = erg['y'].map(lambda y: y + self.y)
+                return erg
+        except IndexError:
+            if self.animation_direction == 1:
+                erg = copy(self.rel_r[self.current_frame])
+                erg['x'] = erg['x'].map(lambda x: x + self.x)
+                erg['y'] = erg['y'].map(lambda y: y + self.y)
+                return erg
+            else:
+                erg = copy(self.rel_l[self.current_frame])
+                erg['x'] = erg['x'].map(lambda x: x + self.x)
+                erg['y'] = erg['y'].map(lambda y: y + self.y)
+                return erg
+
 
     def get_relativ_dataframe(self, firstFrame=False):
         if firstFrame:
@@ -114,25 +134,32 @@ class Animated:
             return self.relativ_frame_dfs[self.current_frame]
 
     def load_dfs(self):
-        sprite_sheet = self.directory + ".png"
-        image = pygame.image.load(sprite_sheet).convert_alpha()
-        dfs = list()
-        rdfs = list()
-        # df = list()
-        # rdf = list()
-        for i in range(image.get_width() // self.frame_width):
-            this_image = pygame.transform.chop(image, (i * self.frame_width, 0, self.frame_width, self.frame_height))
-            edge_surface = pygame.transform.laplacian(this_image).convert_alpha()
-            alpha_array = pygame.surfarray.pixels_alpha(edge_surface)
-            alpha_array = alpha_array.swapaxes(0, 1)
-            erg = list()
-            erg2 = list()
-            for iy, y in enumerate(alpha_array):
+        rel_l = list()
+        rel_r = list()
+        abs_l = list()
+        abs_r = list()
+        for il in self.images_left:
+            aa = pygame.surfarray.pixels_alpha(pygame.transform.laplacian(il)).swapaxes(0, 1)
+            relativ = list()
+            absolut = list()
+            for iy, y in enumerate(aa):
                 for ix, x in enumerate(y):
                     if x > 100:
-                        erg.append((ix + self.x, iy + self.y))
-                        erg2.append((ix, iy))
-            dfs.append(pd.DataFrame(erg, columns=['x', 'y']))
-            rdfs.append(pd.DataFrame(erg2, columns=['x', 'y']))
+                        absolut.append((ix + self.x, iy + self.y))
+                        relativ.append((ix, iy))
+            abs_l.append(pd.DataFrame(absolut, columns=['x', 'y']))
+            rel_l.append(pd.DataFrame(relativ, columns=['x', 'y']))
 
-        return dfs, rdfs
+        for ir in self.images_right:
+            aa = pygame.surfarray.pixels_alpha(pygame.transform.laplacian(ir)).swapaxes(0, 1)
+            relativ = list()
+            absolut = list()
+            for iy, y in enumerate(aa):
+                for ix, x in enumerate(y):
+                    if x > 100:
+                        absolut.append((ix + self.x, iy + self.y))
+                        relativ.append((ix, iy))
+            abs_r.append(pd.DataFrame(absolut, columns=['x', 'y']))
+            rel_r.append(pd.DataFrame(relativ, columns=['x', 'y']))
+
+        return abs_l, abs_r, rel_l, rel_r
