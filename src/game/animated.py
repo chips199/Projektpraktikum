@@ -74,8 +74,8 @@ class Animated:
         Returns:
             List of images.
         """
-        images_right = []
-        images_left = []
+        images_right: List[pygame.image] = []
+        images_left: List[pygame.image] = []
 
         for filename in sorted(os.listdir(self.directory)):
             if filename[-3:] != 'png':

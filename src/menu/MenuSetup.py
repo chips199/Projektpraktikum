@@ -415,7 +415,7 @@ class MenuSetup:
             else:
                 process = None
 
-            if argument == "" or self.data["id"] == "5":
+            if argument == "" or self.data["id"] == "5":  # type:ignore[comparison-overlap]
                 if argument == "":
                     msg = "Enter Session ID"
                 else:
@@ -454,12 +454,12 @@ class MenuSetup:
         else:
             self.counter += 1
         if self.conn1.poll():  # type:ignore[attr-defined]
-            self.data = self.conn1.recv()   # type:ignore[attr-defined]
+            self.data = self.conn1.recv()  # type:ignore[attr-defined]
         self.update_background_after_id = self.main_frame.after(300, self.update_background_process)
 
     def send_data(self, msg):
         data = msg
-        self.conn1.send(data)   # type:ignore[attr-defined]
+        self.conn1.send(data)  # type:ignore[attr-defined]
 
 
 if __name__ == "__main__":

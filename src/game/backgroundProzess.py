@@ -15,7 +15,7 @@ class backgroundProzess:
         print("IN PROZESS")
         print(msg)
         self.net = Network(msg)
-        self.conn = connection
+        self.conn: Connection = connection
 
         self.counter = 0
         self.timer = datetime.datetime.now()
