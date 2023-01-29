@@ -84,7 +84,7 @@ class Player(Animated):
             self.y += v
             self.weapon.y += v
 
-        self.solid_df = Player.shift_df(self.solid_df, dirn, v)
+        self.solid_df = Player.shift_df(self.solid_df, dirn, v)  # type:ignore[has-type]
 
     def jump(self, func):
         """
