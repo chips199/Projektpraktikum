@@ -206,7 +206,7 @@ class Game:
             for i, on in enumerate(self.mouse):
                 self.playerList[i].mousepos = on
 
-            # sync animation frames
+            # sync animation frames from player and weapon
             self.player_frames, self.weapon_frames = self.parse_frame()
             for i, (data_player, data_weapon) in enumerate(zip(self.player_frames, self.weapon_frames)):
                 self.playerList[i].current_frame = data_player[0]
