@@ -16,9 +16,9 @@ from src.game import weapon as Weapon
 
 wrk_dir = os.path.abspath(os.path.dirname(__file__))
 config_file = wrk_dir + r'\configuration.json'
-basic_map = wrk_dir + r"\..\basicmap"
-platformmap = wrk_dir + r"\..\platformmap"
-schneemap = wrk_dir + r"\..\schneemap"
+basic_map = "\\".join(str(wrk_dir).split("\\")[:-1]) + r"\basicmap"
+platformmap = "\\".join(str(wrk_dir).split("\\")[:-1]) + r"\platformmap"
+schneemap = "\\".join(str(wrk_dir).split("\\")[:-1]) + r"\schneemap"
 map_names_dict = {"basicmap": basic_map,
                   "platformmap": platformmap,
                   "schneemap": schneemap}
@@ -72,29 +72,19 @@ class Game:
         self.height = h
         self.canvas = canvas.Canvas(self.width, self.height, str(self.id) + "Stick  Wars")
         # self.map = Map(self, map_names_dict[self.data['map_name']])
-        self.map = Map(self, basic_map)
+        self.map = Map(self, map_names_dict[self.data["metadata"]["map"]])
         self.online = [False, False, False, False]
         self.this_player_pos = [700, 50]
         self.pos = [[100, 100], [200, 100], [300, 100], [400, 100]]
         self.mouse = [[0, 0], [0, 0], [0, 0], [0, 0]]
-        # load the config for default values
-        # this will later be done in the map to configure spawnpoints
-        with open(config_file) as file:
-            config = json.load(file)
+        self.player_frames = [[0, False, 1], [0, False, 1], [0, False, 1], [0, False, 1]]
+        self.weapon_frames = [[0, False, 1], [0, False, 1], [0, False, 1], [0, False, 1]]
 
-        # if a map has player images generate use them if not don't
-        if len(self.map.player_uris) == 4:
-            self.playerList = [
-                Player.Player(config['0']['position'][0], config['0']['position'][1], self.map.player_uris[0]),
-                Player.Player(config['1']['position'][0], config['1']['position'][1], self.map.player_uris[1]),
-                Player.Player(config['2']['position'][0], config['2']['position'][1], self.map.player_uris[2]),
-                Player.Player(config['3']['position'][0], config['3']['position'][1], self.map.player_uris[3])]
-        else:
-            self.playerList = [
-                Player.Player(config['0']['position'][0], config['0']['position'][1], (0, 255, 0)),
-                Player.Player(config['1']['position'][0], config['1']['position'][1], (255, 255, 0)),
-                Player.Player(config['2']['position'][0], config['2']['position'][1], (0, 255, 255)),
-                Player.Player(config['3']['position'][0], config['3']['position'][1], (255, 0, 255))]
+        self.playerList = [
+            Player.Player(self.data["metadata"]["spawnpoints"]["0"], directory=self.map.player_uris[0]),
+            Player.Player(self.data["metadata"]["spawnpoints"]["1"], directory=self.map.player_uris[1]),
+            Player.Player(self.data["metadata"]["spawnpoints"]["2"], directory=self.map.player_uris[2]),
+            Player.Player(self.data["metadata"]["spawnpoints"]["3"], directory=self.map.player_uris[3])]
 
         self.min_timer = 0
         self.max_timer = 0
@@ -121,7 +111,7 @@ class Game:
             clock.tick(100)
             # print()
             print("FPS:", self.update_fps())
-            timer = datetime.datetime.now()
+            # timer = datetime.datetime.now()
             if self.playerList[id].is_alive():
                 # handling pygame events
                 for event in pygame.event.get():
@@ -131,37 +121,19 @@ class Game:
                     if event.type == pygame.K_ESCAPE:
                         run = False
 
-                    # Hit
-                    elif event.type == pygame.MOUSEBUTTONDOWN:
-                        # Check if Player can use his weapon
-                        if self.playerList[id].user_weapon.can_hit():
-                            # Check if an enemy player is in range
-                            self.playerList[id].user_weapon.hit()
-                            for player in self.playerList:
-                                #  Do not beat your own player
-                                if player == self.playerList[id]:
-                                    continue
-                                # Check if the player was hit
-                                # First check if the opponent is in range of the weapon
-                                # Then check if the player's mouse is on the opponent
-                                if player.x < self.playerList[id].x + self.playerList[id].width + self.playerList[
-                                    id].user_weapon.distance and player.x + player.width > self.playerList[id].x - \
-                                        self.playerList[
-                                            id].user_weapon.distance and player.y < self.playerList[id].y + \
-                                        self.playerList[id].height + self.playerList[
-                                    id].user_weapon.distance and player.y + player.height > self.playerList[id].y - \
-                                        self.playerList[
-                                            id].user_weapon.distance and player.x < self.playerList[id].mousepos[
-                                    0] < player.x + player.width \
-                                        and player.y < self.playerList[id].mousepos[1] < player.y + player.height:
-                                    # Draw damage from opponent
-                                    player.beaten(self.playerList[id].user_weapon)
-                                    break
-                # print("Handling Events:", datetime.datetime.now() - timer)
-                timer = datetime.datetime.now()
+                # print("Handling Events:", datetime.datetime.now() - time)
+                # time = datetime.datetime.now()
 
                 # get the key presses
                 keys = pygame.key.get_pressed()
+
+                # Hit
+                if keys[pygame.K_s]:
+                    # Check if Player can use his weapon
+                    if self.playerList[id].weapon.can_hit():
+                        # Check if an enemy player is in range
+                        self.playerList[id].weapon.hit()
+                        self.playerList[id].weapon.set_animation_direction(self.playerList[id].animation_direction)
 
                 if keys[pygame.K_d] and not self.playerList[id].block_x_axis:
                     if self.playerList[id].landed:
@@ -174,7 +146,7 @@ class Game:
                     self.playerList[id].move(1, self.nextToSolid(self.playerList[id], 1, self.playerList[id].velocity))
 
                 # Jump
-                if keys[pygame.K_SPACE] or self.playerList[id].is_jumping:
+                if keys[pygame.K_SPACE] or self.playerList[id].is_jumping or keys[pygame.K_w]:
                     self.playerList[id].stop_animation()
                     self.playerList[id].jump(func=self.nextToSolid)
 
@@ -199,22 +171,32 @@ class Game:
 
             # synchronise positions
             self.pos = self.parse_pos()
-            # print("Position parsed:", self.pos)
             for i, position in enumerate(self.pos):
-                # print("Type position:", type(position))
                 self.playerList[i].x, self.playerList[i].y = position
             for p in self.playerList:
                 if p == self.playerList[id]:
                     continue
                 p.refresh_solids()
+
             # synchronise Online stati
             self.online = self.parse_online()
             for i, on in enumerate(self.online):
                 self.playerList[i].is_connected = on
+
             # sync mouse
             # mouse = self.parse_mouse(self.data)
-            for i, on in enumerate(self.mouse):
-                self.playerList[i].mousepos = on
+            # for i, on in enumerate(self.mouse):
+            #     self.playerList[i].mousepos = on
+
+            # sync animation frames from player and weapon
+            self.player_frames, self.weapon_frames = self.parse_frame()
+            for i, (data_player, data_weapon) in enumerate(zip(self.player_frames, self.weapon_frames)):
+                self.playerList[i].current_frame = data_player[0]
+                self.playerList[i].animation_running = data_player[1]
+                self.playerList[i].animation_direction = data_player[2]
+                self.playerList[i].weapon.current_frame = data_weapon[0]
+                self.playerList[i].weapon.animation_running = data_weapon[1]
+                self.playerList[i].weapon.animation_direction = data_weapon[2]
 
             # print("Handling pos parsing:", datetime.datetime.now() - timer)
             # timer = datetime.datetime.now()
@@ -250,11 +232,10 @@ class Game:
                 # print("subtraktion:", datetime.datetime.now() - datetime.timedelta(milliseconds=delay))
                 # print("in microseconds:", (datetime.datetime.now() - datetime.timedelta(milliseconds=delay)).microsecond)
                 wait_time = datetime.datetime.now()
-                while datetime.datetime.now() - wait_time < datetime.timedelta(microseconds=delay*1000):
+                while datetime.datetime.now() - wait_time < datetime.timedelta(microseconds=delay * 1000):
                     # print("in while")
                     continue
                 # print((datetime.datetime.now() - wait_time).microseconds / 1000)
-
 
             # while datetime.datetime.now() - fps_timer < datetime.timedelta(milliseconds=20):
             #     # print("wait Game")
@@ -263,6 +244,7 @@ class Game:
 
             # print("TOTAL TIME:", datetime.datetime.now() - fps_timer)
 
+            # self.process.kill() # process muss noch aus MenuSetup übergeben werden
             # -----------------------------------------------
             this_time = int((datetime.datetime.now() - fps_timer).microseconds)
             # print("TYPE this time:", type(this_time), "VAL:", this_time)
@@ -318,7 +300,12 @@ class Game:
         temp_data = {
             "position": [int(self.playerList[int(self.data["id"])].x), int(self.playerList[int(self.data["id"])].y)],
             "mouse": self.playerList[int(self.data['id'])].mousepos,
-            "frame": self.playerList[int(self.data['id'])].current_frame
+            "player_frame": [self.playerList[int(self.data['id'])].current_frame,
+                             self.playerList[int(self.data['id'])].animation_running,
+                             self.playerList[int(self.data['id'])].animation_direction],
+            "weapon_frame": [self.playerList[int(self.data['id'])].weapon.current_frame,
+                             self.playerList[int(self.data['id'])].weapon.animation_running,
+                             self.playerList[int(self.data['id'])].weapon.animation_direction]
         }
         self.conn.send(temp_data)
 
@@ -326,6 +313,36 @@ class Game:
     def update_fps():
         fps = str(int(clock.get_fps()))
         return fps
+
+    def parse_frame(self):
+        """
+        extracts positions from server data
+        :return: list of player frames [current_frame, animation_running, animation_direction],
+                 list of weapon frames[current_frame, animation_running, animation_direction]
+        """
+        erg_player = []
+        erg_weapon = []
+        for key, value in self.data.items():
+            # since a fifth dictionary entry named 'id' is added for the player id, ignore this key/entry
+            if key != "id":
+                for key2, value2 in value.items():
+                    if key2 == "player_frame":
+                        if key != str(self.id):
+                            erg_player.append(value2)
+                        else:
+                            erg_player.append([self.playerList[int(self.data["id"])].current_frame,
+                                               self.playerList[int(self.data["id"])].animation_running,
+                                               self.playerList[int(self.data["id"])].animation_direction])
+                    elif key2 == "weapon_frame":
+                        if key != str(self.id):
+                            erg_weapon.append(value2)
+                        else:
+                            erg_weapon.append([self.playerList[int(self.data["id"])].weapon.current_frame,
+                                               self.playerList[int(self.data["id"])].weapon.animation_running,
+                                               self.playerList[int(self.data["id"])].weapon.animation_direction])
+            else:
+                continue
+        return erg_player, erg_weapon
 
     # @staticmethod
     def parse_pos(self):
@@ -335,27 +352,18 @@ class Game:
         :return: list of player positions
         """
         erg = []
-        try:
-            for key, value in self.data.items():
-                if key != "id":
-                    for key2, value2 in value.items():
-                        if key2 == "position":
-                            if key != str(self.id):
-                                erg.append(value2)
-                            else:
-                                erg.append([int(self.playerList[int(self.data["id"])].x),
-                                            int(self.playerList[int(self.data["id"])].y)])
-                else:
-                    continue
-            return erg
-        except Exception as e:
-            print("EXCEPTION:", e)
-            erg.clear()
-            with open(config_file) as file:
-                sample = json.load(file)
-            for p in sample:
-                erg.append(sample[p]["position"])
-            return erg
+        for key, value in self.data.items():
+            if key != "id":
+                for key2, value2 in value.items():
+                    if key2 == "position":
+                        if key != str(self.id):
+                            erg.append(value2)
+                        else:
+                            erg.append([int(self.playerList[int(self.data["id"])].x),
+                                        int(self.playerList[int(self.data["id"])].y)])
+            else:
+                continue
+        return erg
 
     # @staticmethod
     def parse_online(self):
@@ -365,25 +373,17 @@ class Game:
         :return: list of online stati
         """
         erg = []
-        try:
-            for key, value in self.data.items():
-                if key != "id":
-                    for key2, value2 in value.items():
-                        if key2 == "connected":
-                            if key != str(self.id):
-                                erg.append(value2)
-                            else:
-                                erg.append(True)
-                else:
-                    continue
-            return erg
-        except:
-            erg.clear()
-            with open(config_file) as file:
-                sample = json.load(file)
-            for p in sample:
-                erg.append(sample[p]["connected"])
-            return erg
+        for key, value in self.data.items():
+            if key != "id":
+                for key2, value2 in value.items():
+                    if key2 == "connected":
+                        if key != str(self.id):
+                            erg.append(value2)
+                        else:
+                            erg.append(True)
+            else:
+                continue
+        return erg
 
     @staticmethod
     def parse_mouse(data):  # noch nicht an background process angepasst
@@ -396,7 +396,6 @@ class Game:
         try:
             jdata = json.loads(data)
             for d in jdata:
-                print("parse mouse d:", d)
                 erg.append(jdata[d]["mouse"])
             return erg
         except:
@@ -416,7 +415,7 @@ class Game:
         :return: integer representing the distance to the next object within the range
         """
         # first combining all solid pixels in one dataframe
-        # other_players = self.playerList[:int(self.net.id)] + self.playerList[int(self.net.id) + 1:]
+        # other_players = self.playerList[:self.id] + self.playerList[self.id + 1:]
         solid_pixels_df = copy(self.map.solid_df)
         # for op in other_players:
         #     solid_pixels_df = pd.concat([solid_pixels_df, op.solid_df])

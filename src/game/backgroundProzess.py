@@ -4,7 +4,6 @@ import json
 import time
 
 from src.game.network import Network
-from time import sleep
 from multiprocessing.connection import Connection
 
 wrk_dir = os.path.abspath(os.path.dirname(__file__))
@@ -16,7 +15,7 @@ class backgroundProzess:
         print("IN PROZESS")
         print(msg)
         self.net = Network(msg)
-        self.conn = connection
+        self.conn: Connection = connection
 
         self.counter = 0
         self.timer = datetime.datetime.now()
@@ -25,45 +24,29 @@ class backgroundProzess:
 
         self.position = [int(100), int(100)]
         self.mouse = [int(100), int(100)]
-        self.frame = 0
+        self.player_frame = [0, False, 1]
+        self.weapon_frame = [0, False, 1]
 
         # self.net.send("ready")
 
         while True:
-            fps_timer = datetime.datetime.now()
+            # fps_timer = datetime.datetime.now()
             # if datetime.datetime.now() - self.timer >= datetime.timedelta(seconds=1):
             #     self.timer = datetime.datetime.now()
             #     print("count in Background:", self.counter)
             #     self.counter = 0
             # else:
             #     self.counter += 1
-            timer = datetime.datetime.now()
+            # timer = datetime.datetime.now()
 
             if not self.game_started:
                 self.check_game_started()
-                if not self.game_started:
-                    self.send_menu()
-                else:
-                    self.update_game_pos()
-                    self.send_game()
-
-                    # time.sleep(3.2)
+            # check again if game started cause could have changed due to the check_game_started() func
+            if not self.game_started:
+                self.send_menu()
             else:
-                while not self.conn.poll():
-                    continue
                 self.update_game_pos()
-                # print("Handling update:", datetime.datetime.now() - timer)
-                # timer = datetime.datetime.now()
                 self.send_game()
-                # print("Handling send:", datetime.datetime.now() - timer)
-
-            # while datetime.datetime.now() - fps_timer < datetime.timedelta(milliseconds=20):
-            #     # print("wait Background")
-            #     self.update_game_pos()
-            #     self.send_game()
-                # continue
-
-            # sleep(0.001)
 
     def check_game_started(self):
         if self.conn.poll():
@@ -81,7 +64,7 @@ class backgroundProzess:
             "id": self.net.id,
             "s_id": self.net.session_id,
             "amount_player": self.net.check_lobby(),
-            "game_started": self.net.game_started()
+            "game_started": self.net.game_started(),
         }
         self.conn.send(data)
 
@@ -95,19 +78,18 @@ class backgroundProzess:
         data['position'] = self.position
         data['connected'] = True
         data['mouse'] = self.mouse
-        data['frame'] = self.frame
+        data['player_frame'] = self.player_frame
+        data['weapon_frame'] = self.weapon_frame
         self.reply = self.net.send(json.dumps(data))
         self.reply = json.loads(self.reply)
-        self.reply["id"] = self.net.id
+        self.reply["id"] = self.net.id  # type:ignore[index]
         self.reply = json.dumps(self.reply)
-        print(self.reply)
         self.conn.send(self.reply)
 
     def update_game_pos(self):
-        data = None
         while self.conn.poll():
             data = self.conn.recv()
             self.position = data['position']
             self.mouse = data['mouse']
-            self.frame = data['frame']
-        # print("DATA in Background", data)
+            self.player_frame = data['player_frame']
+            self.weapon_frame = data['weapon_frame']

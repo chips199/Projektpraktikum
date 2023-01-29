@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+import platform
 import socket
 from _thread import start_new_thread
 import random
@@ -52,7 +53,10 @@ except socket.error as e:
 s.listen(number_of_games_at_a_time * number_of_players_per_game)
 print("Waiting for a connection")
 # load the config file as basis for a fresh game
-config_file = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', r'game\\configuration.json'))
+seperator = "\\" if platform.system() == 'Windows' else "/"
+config_file = seperator.join(
+    list(os.path.abspath(os.path.dirname(__file__)).split(seperator)[:-1])) + f"{seperator}game{seperator}configuration.json"
+# print("\\".join(list(os.path.abspath(os.path.dirname(__file__)).split("\\")[:-1])) + "\\game\\configuration.json")
 with open(config_file) as file:
     game_data = json.load(file)
 # load spawn points
@@ -97,6 +101,7 @@ def threaded_client(conn):
     # receiving the first message
     start_msg = conn.recv(2048).decode()
     print(start_msg)
+
     # splitting create game and join, if the code is 4 digits long, try connecting, else try creating a new game
     if len(start_msg) == 4:
         # join lobby
@@ -163,6 +168,8 @@ def threaded_client(conn):
             exit(1)
         # get real game_id
         game_id = list(game_data_dict.keys())[this_gid]
+        game_data_dict[game_id]["metadata"]["map"] = start_msg
+        game_data_dict[game_id]["metadata"]["spawnpoints"] = this_spawn_points
         maps_dict[game_id] = start_msg
         conn.send(str.encode(f"{this_pid},{game_id}"))
         # finished creating game and booking player
@@ -217,12 +224,12 @@ def threaded_client(conn):
             reset_games()
             conn.close()
             exit(0)
-        elif msg == "":
-            print("connection lost")
-            players_connected[this_gid][this_pid] = 0
-            reset_games()
-            conn.close()
-            exit(0)
+        # elif msg == "":
+        #     print("connection lost")
+        #     players_connected[this_gid][this_pid] = 0
+        #     reset_games()
+        #     conn.close()
+        #     exit(0)
 
         sleep(0.2)
 

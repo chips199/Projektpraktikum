@@ -2,7 +2,7 @@ import datetime
 import inspect
 import os
 from time import sleep
-from typing import Optional, Callable, Union
+from typing import Optional, Callable, Union, Type
 
 import customtkinter as tk
 from PIL import Image
@@ -26,12 +26,12 @@ class MenuSetup:
     def __init__(self):
         # -------------------------------------------  Parameters  -------------------------------------------
         self.counter = 0
-        self.timer = None
+        self.timer = datetime.datetime.now()
         self.update_background_after_id = None
         self.network_started = False
         # self.id = "5"
-        self.conn1 = None
-        self.conn2 = None
+        self.conn1 = Type[Connection]
+        self.conn2 = Type[Connection]
         self.entry_session_id = None
         self.label_error = None
         self.label_game_name = None
@@ -367,7 +367,7 @@ class MenuSetup:
                                func3=lambda: self.main_frame.after(3000, lambda: self.update_player())))
 
     def start_game(self):
-        self.conn1.send("start")
+        self.conn1.send("start")  # type:ignore[attr-defined]
         print("send start to background")
         self.root.run = False
         self.root.destroy()
@@ -401,7 +401,7 @@ class MenuSetup:
             if inspect.isfunction(value):
                 value()
 
-    def start_network(self, argument, update_func, success_func):
+    def start_network(self, argument: str, update_func, success_func):
         try:
             if argument != "":
                 self.conn1, self.conn2 = multiprocessing.Pipe(duplex=True)
@@ -415,11 +415,11 @@ class MenuSetup:
             else:
                 process = None
 
-            if argument == "" or self.data["id"] == "5":
+            if argument == "" or self.data["id"] == "5":  # type:ignore[comparison-overlap]
                 if argument == "":
                     msg = "Enter Session ID"
                 else:
-                    msg = self.data["s_id"]
+                    msg = str(self.data["s_id"])
                 self.label_error.label_hide_show(  # type:ignore[union-attr]
                     x=int(self.window_width / 2),
                     y=int(self.label_game_name.winfo_y() +  # type:ignore[union-attr]
@@ -453,13 +453,13 @@ class MenuSetup:
             self.counter = 0
         else:
             self.counter += 1
-        if self.conn1.poll():
-            self.data = self.conn1.recv()
+        if self.conn1.poll():  # type:ignore[attr-defined]
+            self.data = self.conn1.recv()  # type:ignore[attr-defined]
         self.update_background_after_id = self.main_frame.after(300, self.update_background_process)
 
     def send_data(self, msg):
         data = msg
-        self.conn1.send(data)
+        self.conn1.send(data)  # type:ignore[attr-defined]
 
 
 if __name__ == "__main__":
