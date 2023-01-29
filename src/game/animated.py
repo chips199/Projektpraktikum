@@ -10,7 +10,7 @@ wrk_dir = wrk_dir + r"\..\basicmap\player\animation"
 
 
 class Animated:
-    def __init__(self, startx, starty, directory):
+    def __init__(self, start, directory):
         # self.wrk_dir = os.path.abspath(os.path.dirname(__file__))
         # self.wrk_dir = wrk_dir + r"\..\basicmap\player\animation"
         # self.image = directory + r"\0.png"
@@ -23,8 +23,8 @@ class Animated:
         self.solid = []  # type: List[Tuple[int, int]]
         self.relativ_solids = []  # type: List[Tuple[int, int]]
         # self.current_frame = None
-        self.x = startx
-        self.y = starty
+        self.x = start[0]
+        self.y = start[1]
         self.animation_direction = 1  # 1 mean right, 2 means left
         self.animation_running = False
 

@@ -168,6 +168,8 @@ def threaded_client(conn):
             exit(1)
         # get real game_id
         game_id = list(game_data_dict.keys())[this_gid]
+        game_data_dict[game_id]["metadata"]["map"] = start_msg
+        game_data_dict[game_id]["metadata"]["spawnpoints"] = this_spawn_points
         maps_dict[game_id] = start_msg
         conn.send(str.encode(f"{this_pid},{game_id}"))
         # finished creating game and booking player

@@ -65,6 +65,8 @@ class Game:
         self.timer = datetime.datetime.now()
         self.update_background_process()
         self.id = int(self.data['id'])
+        print(self.data)
+
 
         # pygame.init()
         pygame.display.set_icon(pygame.image.load(wrk_dir + r"\..\stick_wars_logo.png"))
@@ -72,7 +74,7 @@ class Game:
         self.height = h
         self.canvas = canvas.Canvas(self.width, self.height, str(self.id) + "Stick  Wars")
         # self.map = Map(self, map_names_dict[self.data['map_name']])
-        self.map = Map(self, basic_map)
+        self.map = Map(self, map_names_dict[self.data["metadata"]["map"]])
         self.online = [False, False, False, False]
         self.this_player_pos = [700, 50]
         self.pos = [[100, 100], [200, 100], [300, 100], [400, 100]]
@@ -85,10 +87,10 @@ class Game:
             config = json.load(file)
 
         self.playerList = [
-            Player.Player(config['0']['position'][0], config['0']['position'][1], directory=self.map.player_uris[0]),
-            Player.Player(config['1']['position'][0], config['1']['position'][1], directory=self.map.player_uris[1]),
-            Player.Player(config['2']['position'][0], config['2']['position'][1], directory=self.map.player_uris[2]),
-            Player.Player(config['3']['position'][0], config['3']['position'][1], directory=self.map.player_uris[3])]
+            Player.Player(self.data["metadata"]["spawnpoints"]["0"], directory=self.map.player_uris[0]),
+            Player.Player(self.data["metadata"]["spawnpoints"]["1"], directory=self.map.player_uris[1]),
+            Player.Player(self.data["metadata"]["spawnpoints"]["2"], directory=self.map.player_uris[2]),
+            Player.Player(self.data["metadata"]["spawnpoints"]["3"], directory=self.map.player_uris[3])]
 
     def run(self):
         """

@@ -33,8 +33,8 @@ class Player(Animated):
         map_dir = "\\".join(str(self.directory).split('\\')[:-3])
         fist_path = map_dir + f"\\waffen\\faeuste\\animation\\fists_{self.get_color(self.directory)}_animation"
         # sword_path = map_dir + f"\\waffen\\schwert\\animation\\sword_hold_animation_{self.get_color(self.directory)}"
-        self.weapon = weapon.Weapon(weapon.WeaponType.Fist, self.x, self.y, fist_path)
-        # self.weapon = weapon.Weapon(weapon.WeaponType.Sword, self.x, self.y, sword_path)
+        self.weapon = weapon.Weapon(weapon.WeaponType.Fist, [self.x, self.y], fist_path)
+        # self.weapon = weapon.Weapon(weapon.WeaponType.Sword, [self.x, self.y], sword_path)
 
     def draw(self, g):
         super(Player, self).draw(g=g)
