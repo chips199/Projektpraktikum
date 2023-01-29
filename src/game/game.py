@@ -67,7 +67,6 @@ class Game:
         self.id = int(self.data['id'])
         print(self.data)
 
-
         # pygame.init()
         pygame.display.set_icon(pygame.image.load(wrk_dir + r"\..\stick_wars_logo.png"))
         self.width = w
@@ -81,10 +80,6 @@ class Game:
         self.mouse = [[0, 0], [0, 0], [0, 0], [0, 0]]
         self.player_frames = [[0, False, 1], [0, False, 1], [0, False, 1], [0, False, 1]]
         self.weapon_frames = [[0, False, 1], [0, False, 1], [0, False, 1], [0, False, 1]]
-        # load the config for default values
-        # this will later be done in the map to configure spawnpoints
-        with open(config_file) as file:
-            config = json.load(file)
 
         self.playerList = [
             Player.Player(self.data["metadata"]["spawnpoints"]["0"], directory=self.map.player_uris[0]),
