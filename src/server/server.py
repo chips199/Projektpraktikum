@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+import platform
 import socket
 from _thread import start_new_thread
 import random
@@ -52,8 +53,9 @@ except socket.error as e:
 s.listen(number_of_games_at_a_time * number_of_players_per_game)
 print("Waiting for a connection")
 # load the config file as basis for a fresh game
-config_file = "/".join(
-    list(os.path.abspath(os.path.dirname(__file__)).split("/")[:-1])) + "/game/configuration.json"
+seperator = "\\" if platform.system() == 'Windows' else "/"
+config_file = seperator.join(
+    list(os.path.abspath(os.path.dirname(__file__)).split(seperator)[:-1])) + f"{seperator}game{seperator}configuration.json"
 # print("\\".join(list(os.path.abspath(os.path.dirname(__file__)).split("\\")[:-1])) + "\\game\\configuration.json")
 with open(config_file) as file:
     game_data = json.load(file)
