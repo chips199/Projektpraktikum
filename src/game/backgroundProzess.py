@@ -4,7 +4,6 @@ import json
 import time
 
 from src.game.network import Network
-from time import sleep
 from multiprocessing.connection import Connection
 
 wrk_dir = os.path.abspath(os.path.dirname(__file__))
@@ -28,17 +27,15 @@ class backgroundProzess:
         self.player_frame = [0, False, 1]
         self.weapon_frame = [0, False, 1]
 
-        # self.net.send("ready")
-
         while True:
-            fps_timer = datetime.datetime.now()
+            # fps_timer = datetime.datetime.now()
             # if datetime.datetime.now() - self.timer >= datetime.timedelta(seconds=1):
             #     self.timer = datetime.datetime.now()
             #     print("count in Background:", self.counter)
             #     self.counter = 0
             # else:
             #     self.counter += 1
-            timer = datetime.datetime.now()
+            # timer = datetime.datetime.now()
 
             if not self.game_started:
                 self.check_game_started()
@@ -51,18 +48,12 @@ class backgroundProzess:
                     time.sleep(4.2)
             else:
                 self.update_game_pos()
-                # print("Handling update:", datetime.datetime.now() - timer)
-                # timer = datetime.datetime.now()
                 self.send_game()
-                # print("Handling send:", datetime.datetime.now() - timer)
 
-            while datetime.datetime.now() - fps_timer < datetime.timedelta(milliseconds=20):
-                # print("wait Background")
-                self.update_game_pos()
-                self.send_game()
-                # continue
-
-            # sleep(0.001)
+            # while datetime.datetime.now() - fps_timer < datetime.timedelta(milliseconds=20):
+            #     # print("wait Background")
+            #     self.update_game_pos()
+            #     self.send_game()
 
     def check_game_started(self):
         if self.conn.poll():
@@ -103,12 +94,9 @@ class backgroundProzess:
         self.conn.send(self.reply)
 
     def update_game_pos(self):
-        data = None
         while self.conn.poll():
             data = self.conn.recv()
             self.position = data['position']
             self.mouse = data['mouse']
             self.player_frame = data['player_frame']
             self.weapon_frame = data['weapon_frame']
-        # print("DATA in Background", data)
-

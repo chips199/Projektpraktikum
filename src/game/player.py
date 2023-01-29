@@ -2,7 +2,7 @@ import datetime
 from copy import copy
 
 from src.game import weapon
-from src.game.Animated import Animated
+from src.game.animated import Animated
 
 
 class Player(Animated):
@@ -32,8 +32,7 @@ class Player(Animated):
         # self.color = color
         map_dir = "\\".join(str(self.directory).split('\\')[:-3])
         fist_path = map_dir + f"\\waffen\\faeuste\\animation\\fists_{self.get_color(self.directory)}_animation"
-        sword_path = map_dir + f"\\waffen\\schwert\\animation\\sword_hold_animation_{self.get_color(self.directory)}"
-        # print(fist_path)
+        # sword_path = map_dir + f"\\waffen\\schwert\\animation\\sword_hold_animation_{self.get_color(self.directory)}"
         self.weapon = weapon.Weapon(weapon.WeaponType.Fist, self.x, self.y, fist_path)
         # self.weapon = weapon.Weapon(weapon.WeaponType.Sword, self.x, self.y, sword_path)
 

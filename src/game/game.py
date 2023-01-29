@@ -109,7 +109,7 @@ class Game:
             clock.tick(100)
             # print()
             print("FPS:", self.update_fps())
-            timer = datetime.datetime.now()
+            # timer = datetime.datetime.now()
             if self.playerList[id].is_alive():
                 # handling pygame events
                 for event in pygame.event.get():
@@ -132,26 +132,6 @@ class Game:
                         # Check if an enemy player is in range
                         self.playerList[id].weapon.hit()
                         self.playerList[id].weapon.set_animation_direction(self.playerList[id].animation_direction)
-                        # for player in self.playerList:
-                        #     #  Do not beat your own player
-                        #     if player == self.playerList[id]:
-                        #         continue
-                        #     # Check if the player was hit
-                        #     # First check if the opponent is in range of the weapon
-                        #     # Then check if the player's mouse is on the opponent
-                        #     if player.x < self.playerList[id].x + self.playerList[id].width + self.playerList[
-                        #         id].weapon.distance and player.x + player.width > self.playerList[id].x - \
-                        #             self.playerList[
-                        #                 id].weapon.distance and player.y < self.playerList[id].y + \
-                        #             self.playerList[id].height + self.playerList[
-                        #         id].weapon.distance and player.y + player.height > self.playerList[id].y - \
-                        #             self.playerList[
-                        #                 id].weapon.distance and player.x < self.playerList[id].mousepos[
-                        #         0] < player.x + player.width \
-                        #             and player.y < self.playerList[id].mousepos[1] < player.y + player.height:
-                        #         # Draw damage from opponent
-                        #         player.beaten(self.playerList[id].weapon)
-                        #         break
 
                 if keys[pygame.K_d] and not self.playerList[id].block_x_axis:
                     if self.playerList[id].landed:
@@ -189,18 +169,18 @@ class Game:
 
             # synchronise positions
             self.pos = self.parse_pos()
-            # print("Position parsed:", self.pos)
             for i, position in enumerate(self.pos):
-                # print("Type position:", type(position))
                 self.playerList[i].x, self.playerList[i].y = position
             for p in self.playerList:
                 if p == self.playerList[id]:
                     continue
                 p.refresh_solids()
+
             # synchronise Online stati
             self.online = self.parse_online()
             for i, on in enumerate(self.online):
                 self.playerList[i].is_connected = on
+
             # sync mouse
             # mouse = self.parse_mouse(self.data)
             for i, on in enumerate(self.mouse):
@@ -234,14 +214,10 @@ class Game:
             while datetime.datetime.now() - fps_timer < datetime.timedelta(milliseconds=16):
                 continue
             self.send_to_background_process()
-            # while datetime.datetime.now() - fps_timer < datetime.timedelta(milliseconds=20):
-            #     # print("wait Game")
-            #     # self.send_to_background_process()
-            #     continue
 
             # print("TOTAL TIME:", datetime.datetime.now() - fps_timer)
 
-        # self.process.kill() # muss noch übergeben werden
+        # self.process.kill() # process muss noch aus MenuSetup übergeben werden
         pygame.quit()
 
     def update_background_process(self):
@@ -278,10 +254,15 @@ class Game:
         return fps
 
     def parse_frame(self):
+        """
+        extracts positions from server data
+        :return: list of player frames [current_frame, animation_running, animation_direction],
+                 list of weapon frames[current_frame, animation_running, animation_direction]
+        """
         erg_player = []
         erg_weapon = []
         for key, value in self.data.items():
-            # since a fifth dictionary entry named 'id' is added for the player id, ignore this key
+            # since a fifth dictionary entry named 'id' is added for the player id, ignore this key/entry
             if key != "id":
                 for key2, value2 in value.items():
                     if key2 == "player_frame":
@@ -306,59 +287,40 @@ class Game:
     def parse_pos(self):
         """
         extracts positions from server data
-        :param data: string from server
         :return: list of player positions
         """
         erg = []
-        try:
-            for key, value in self.data.items():
-                if key != "id":
-                    for key2, value2 in value.items():
-                        if key2 == "position":
-                            if key != str(self.id):
-                                erg.append(value2)
-                            else:
-                                erg.append([int(self.playerList[int(self.data["id"])].x),
-                                            int(self.playerList[int(self.data["id"])].y)])
-                else:
-                    continue
-            return erg
-        except Exception as e:
-            print("EXCEPTION:", e)
-            erg.clear()
-            with open(config_file) as file:
-                sample = json.load(file)
-            for p in sample:
-                erg.append(sample[p]["position"])
-            return erg
+        for key, value in self.data.items():
+            if key != "id":
+                for key2, value2 in value.items():
+                    if key2 == "position":
+                        if key != str(self.id):
+                            erg.append(value2)
+                        else:
+                            erg.append([int(self.playerList[int(self.data["id"])].x),
+                                        int(self.playerList[int(self.data["id"])].y)])
+            else:
+                continue
+        return erg
 
     # @staticmethod
     def parse_online(self):
         """
         extracts online information from server data
-        :param data: string from server
         :return: list of online stati
         """
         erg = []
-        try:
-            for key, value in self.data.items():
-                if key != "id":
-                    for key2, value2 in value.items():
-                        if key2 == "connected":
-                            if key != str(self.id):
-                                erg.append(value2)
-                            else:
-                                erg.append(True)
-                else:
-                    continue
-            return erg
-        except:
-            erg.clear()
-            with open(config_file) as file:
-                sample = json.load(file)
-            for p in sample:
-                erg.append(sample[p]["connected"])
-            return erg
+        for key, value in self.data.items():
+            if key != "id":
+                for key2, value2 in value.items():
+                    if key2 == "connected":
+                        if key != str(self.id):
+                            erg.append(value2)
+                        else:
+                            erg.append(True)
+            else:
+                continue
+        return erg
 
     @staticmethod
     def parse_mouse(data):

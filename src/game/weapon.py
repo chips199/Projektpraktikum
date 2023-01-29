@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 
-from src.game.Animated import Animated
+from src.game.animated import Animated
 
 
 class WeaponType(Enum):

@@ -118,10 +118,10 @@ class Animated:
         image = pygame.image.load(sprite_sheet).convert_alpha()
         dfs = list()
         rdfs = list()
-        df = list()
-        rdf = list()
+        # df = list()
+        # rdf = list()
         for i in range(image.get_width() // self.frame_width):
-            this_image = pygame.transform.chop(image, (i*self.frame_width, 0, self.frame_width, self.frame_height))
+            this_image = pygame.transform.chop(image, (i * self.frame_width, 0, self.frame_width, self.frame_height))
             edge_surface = pygame.transform.laplacian(this_image).convert_alpha()
             alpha_array = pygame.surfarray.pixels_alpha(edge_surface)
             alpha_array = alpha_array.swapaxes(0, 1)
@@ -134,6 +134,5 @@ class Animated:
                         erg2.append((ix, iy))
             dfs.append(pd.DataFrame(erg, columns=['x', 'y']))
             rdfs.append(pd.DataFrame(erg2, columns=['x', 'y']))
-
 
         return dfs, rdfs
