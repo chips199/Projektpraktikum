@@ -24,6 +24,7 @@ map_names_dict = {"basicmap": basic_map,
                   "schneemap": schneemap}
 
 clock = pygame.time.Clock()
+pygame.font.init()
 
 
 class Game:
@@ -205,14 +206,15 @@ class Game:
             self.map.draw(self.canvas.get_canvas())
             # Draw Players
             for p in self.playerList:
-                if p.is_connected:
+                if p.is_connected and p.health > 0:
                     p.draw(self.canvas.get_canvas())
-                    pygame.draw.circle(self.canvas.get_canvas(), (255, 0, 0), p.mousepos, 20)
+                    # pygame.draw.circle(self.canvas.get_canvas(), (255, 0, 0), p.mousepos, 20)
+            if not self.playerList[id].is_alive():
+                self.canvas.get_canvas().blit(pygame.image.load(wrk_dir + '\\wasted.png').convert_alpha(), (0, 0))
             # Update Canvas
             self.canvas.update()
             print(self.playerList[id].x, self.playerList[id].y)
             # print("Handling redraw:", datetime.datetime.now() - timer)
-
 
             # timer = datetime.datetime.now()
 
