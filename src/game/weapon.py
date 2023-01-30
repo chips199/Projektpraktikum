@@ -8,8 +8,8 @@ from src.game.animated import Animated
 
 
 class WeaponType(Enum):
-    Fist = {"Damage": 20, "Durability": float('inf'), "Cooldown": 0, "IsShortRange": True}
-    Sword = {"Damage": 40, "Durability": 20, "Cooldown": 4, "IsShortRange": True}
+    Fist = {"Damage": 20, "damage_to_weapon_per_hit": 0, "Cooldown": 1, "IsShortRange": True}
+    Sword = {"Damage": 40, "damage_to_weapon_per_hit": 50, "Cooldown": 2, "IsShortRange": True}
 
 
 class Weapon(Animated):
@@ -19,10 +19,13 @@ class Weapon(Animated):
         Initialize the class weapon
         """
         super(Weapon, self).__init__(*args, **kwargs)
+        self.destroyed = False
         self.weapon_type = waepon_type
         if self.weapon_type == WeaponType.Fist:
             self.cut_frames(2)
         self.last_hit = int(round(datetime.now().timestamp()))
+        self.hitted = list()
+        self.durebility = 100
         self.abs_l, self.abs_r, self.rel_l, self.rel_r = self.load_dfs()
 
     def get_dataframe(self, frame=-99):
@@ -69,19 +72,30 @@ class Weapon(Animated):
          - Shelf life not yet used up
          - Cooldown must have expired
         """
-        return self.weapon_type.value["Durability"] > 0 and self.last_hit + self.weapon_type.value["Cooldown"] <= int(
+        return self.durebility > 0 and self.last_hit + self.weapon_type.value["Cooldown"] <= int(
             round(datetime.now().timestamp()))
 
-    def hit(self, players):
+    def hit(self):
         """
         Weapon has hit another Player:
          - reduces durability
          - saves the current time for dhe cooldown
         :return: None
         """
-        self.weapon_type.value["Durability"] -= 1
+        self.durebility -= self.weapon_type.value["damage_to_weapon_per_hit"]
         self.last_hit = int(round(datetime.now().timestamp()))
-        wdf = self.get_dataframe()
-        for p in players:
-            if pd.merge(wdf, p.solid_df, how='inner', on=['x', 'y']).empty:
-                p.health -= self.weapon_type.value["Damage"]
+
+    def check_hit(self, pl, players, map_df):
+        pl_hitted = self.hitted.__contains__(-99)
+        wdf = self.get_dataframe(self.current_frame)
+        for ip, p in enumerate(players):
+            if not pd.merge(wdf, p.solid_df, how='inner', on=['x', 'y']).empty:
+                if not self.hitted.__contains__(ip):
+                    self.hitted.append(ip)
+                    p.health -= self.weapon_type.value["Damage"]
+        if not pd.merge(wdf, map_df, how='inner', on=['x', 'y']).empty and not pl_hitted:
+            self.hitted.append(-99)
+            pl.health -= self.weapon_type.value["Damage"]
+        if self.current_frame == self.frame_count:
+            self.hitted = list()
+            self.destroyed = self.durebility <= 0

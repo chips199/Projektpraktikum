@@ -37,10 +37,10 @@ class Player(Animated):
         self.velocity_counter2 = 0
         # self.health = 0
         map_dir = "\\".join(str(self.directory).split('\\')[:-3])
-        fist_path = map_dir + f"\\waffen\\faeuste\\animation\\fists_{self.get_color(self.directory)}_animation"
-        # sword_path = map_dir + f"\\waffen\\schwert\\animation\\sword_hold_animation_{self.get_color(self.directory)}"
-        self.weapon = weapon.Weapon(weapon.WeaponType.Fist, [self.x, self.y], fist_path)
-        # self.weapon = weapon.Weapon(weapon.WeaponType.Sword, [self.x, self.y], sword_path)
+        self.fist_path = map_dir + f"\\waffen\\faeuste\\animation\\fists_{self.get_color(self.directory)}_animation"
+        self.sword_path = map_dir + f"\\waffen\\schwert\\animation\\sword_hold_animation_{self.get_color(self.directory)}"
+        # self.weapon = weapon.Weapon(weapon.WeaponType.Fist, [self.x, self.y], self.fist_path)
+        self.weapon = weapon.Weapon(weapon.WeaponType.Sword, [self.x, self.y], self.sword_path)
 
     def draw(self, g):
         super(Player, self).draw(g=g)
@@ -48,6 +48,11 @@ class Player(Animated):
         if self.health > 0:
             pygame.draw.line(g, pygame.Color(45, 175, 20), (self.x, self.y - 5),
                              (self.x + (self.frame_width * (self.health / 100)), self.y - 5), 3)
+        pygame.draw.line(g, pygame.Color(20, 20, 20), (self.x, self.y - 10), (self.x + self.frame_width, self.y - 10), 3)
+        if self.weapon.durebility > 0:
+            pygame.draw.line(g, pygame.Color(25, 25, 200), (self.x, self.y - 10),
+                             (self.x + (self.frame_width * (self.weapon.durebility / 100)), self.y - 10),
+                             3)
         self.weapon.animation_direction = self.animation_direction
         self.weapon.draw(g=g, x=self.x, y=self.y, width=self.frame_width, height=self.frame_height)
 
