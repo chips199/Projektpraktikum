@@ -1,6 +1,8 @@
 import datetime
 from copy import copy
 
+import pygame.draw
+
 from src.game import weapon
 from src.game.animated import Animated
 
@@ -33,6 +35,7 @@ class Player(Animated):
         self.weapon = weapon
         self.velocity_counter = 0
         self.velocity_counter2 = 0
+        self.health = 50
         map_dir = "\\".join(str(self.directory).split('\\')[:-3])
         fist_path = map_dir + f"\\waffen\\faeuste\\animation\\fists_{self.get_color(self.directory)}_animation"
         # sword_path = map_dir + f"\\waffen\\schwert\\animation\\sword_hold_animation_{self.get_color(self.directory)}"
@@ -41,6 +44,10 @@ class Player(Animated):
 
     def draw(self, g):
         super(Player, self).draw(g=g)
+        pygame.draw.line(g, pygame.Color(231, 24, 55), (self.x, self.y - 5), (self.x + self.frame_width, self.y - 5), 3)
+        if self.health > 0:
+            pygame.draw.line(g, pygame.Color(45, 175, 20), (self.x, self.y - 5),
+                             (self.x + (self.frame_width * (self.health / 100)), self.y - 5), 3)
         self.weapon.animation_direction = self.animation_direction
         self.weapon.draw(g=g, x=self.x, y=self.y, width=self.frame_width, height=self.frame_height)
 
