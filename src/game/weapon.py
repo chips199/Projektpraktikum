@@ -1,5 +1,8 @@
+from copy import copy
 from datetime import datetime
 from enum import Enum
+
+import pandas as pd
 
 from src.game.animated import Animated
 
@@ -20,8 +23,37 @@ class Weapon(Animated):
         if self.weapon_type == WeaponType.Fist:
             self.cut_frames(2)
         self.last_hit = int(round(datetime.now().timestamp()))
+        self.abs_l, self.abs_r, self.rel_l, self.rel_r = self.load_dfs()
+
+    def get_dataframe(self, frame=-99):
+        try:
+            if self.animation_direction == 1:
+                erg = copy(self.rel_r[frame])
+                erg['x'] = erg['x'].map(lambda x: x + self.x)
+                erg['y'] = erg['y'].map(lambda y: y + self.y)
+                return erg
+            else:
+                erg = copy(self.rel_l[frame])
+                erg['x'] = erg['x'].map(lambda x: x + self.x)
+                erg['y'] = erg['y'].map(lambda y: y + self.y)
+                return erg
+        except IndexError:
+            if self.animation_direction == 1:
+                erg = copy(self.rel_r[self.current_frame])
+                erg['x'] = erg['x'].map(lambda x: x + self.x)
+                erg['y'] = erg['y'].map(lambda y: y + self.y)
+                return erg
+            else:
+                erg = copy(self.rel_l[self.current_frame])
+                erg['x'] = erg['x'].map(lambda x: x + self.x)
+                erg['y'] = erg['y'].map(lambda y: y + self.y)
+                return erg
 
     def draw(self, **kwargs):
+        """
+
+        :param kwargs:
+        """
         self.y = kwargs["y"] + kwargs["height"] - self.frame_height
         if self.animation_direction == 2:
             self.x = kwargs["x"] + kwargs["width"] - self.frame_width
@@ -40,7 +72,7 @@ class Weapon(Animated):
         return self.weapon_type.value["Durability"] > 0 and self.last_hit + self.weapon_type.value["Cooldown"] <= int(
             round(datetime.now().timestamp()))
 
-    def hit(self):
+    def hit(self, players):
         """
         Weapon has hit another Player:
          - reduces durability
@@ -49,3 +81,7 @@ class Weapon(Animated):
         """
         self.weapon_type.value["Durability"] -= 1
         self.last_hit = int(round(datetime.now().timestamp()))
+        wdf = self.get_dataframe()
+        for p in players:
+            if pd.merge(wdf, p.solid_df, how='inner', on=['x', 'y']).empty:
+                p.health -= self.weapon_type.value["Damage"]

@@ -34,7 +34,7 @@ class Animated:
         self.frame_width = self.images_left[0].get_width()  # width of each frame
         self.frame_height = self.images_left[0].get_height()  # height of each frame
         self.current_frame = 0
-        self.abs_l, self.abs_r, self.rel_l, self.rel_r = self.load_dfs()
+
 
     def draw(self, **kwargs):
         """
@@ -101,30 +101,6 @@ class Animated:
         self.relativ_solids_df = pd.DataFrame(self.relativ_solids, columns=['x', 'y'])
         self.solid_df = pd.DataFrame(self.solid, columns=['x', 'y'])
         return images_right, images_left
-
-    def get_dataframe(self, frame = -99):
-        try:
-            if self.animation_direction == 1:
-                erg = copy(self.rel_r[frame])
-                erg['x'] = erg['x'].map(lambda x: x + self.x)
-                erg['y'] = erg['y'].map(lambda y: y + self.y)
-                return erg
-            else:
-                erg = copy(self.rel_l[frame])
-                erg['x'] = erg['x'].map(lambda x: x + self.x)
-                erg['y'] = erg['y'].map(lambda y: y + self.y)
-                return erg
-        except IndexError:
-            if self.animation_direction == 1:
-                erg = copy(self.rel_r[self.current_frame])
-                erg['x'] = erg['x'].map(lambda x: x + self.x)
-                erg['y'] = erg['y'].map(lambda y: y + self.y)
-                return erg
-            else:
-                erg = copy(self.rel_l[self.current_frame])
-                erg['x'] = erg['x'].map(lambda x: x + self.x)
-                erg['y'] = erg['y'].map(lambda y: y + self.y)
-                return erg
 
 
     def get_relativ_dataframe(self, firstFrame=False):

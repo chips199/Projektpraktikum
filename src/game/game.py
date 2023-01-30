@@ -110,7 +110,7 @@ class Game:
             # pygame stuff for the max fps
             clock.tick(100)
             # print()
-            print("FPS:", self.update_fps())
+            # print("FPS:", self.update_fps())
             # timer = datetime.datetime.now()
             if self.playerList[id].is_alive():
                 # handling pygame events
@@ -132,7 +132,7 @@ class Game:
                     # Check if Player can use his weapon
                     if self.playerList[id].weapon.can_hit():
                         # Check if an enemy player is in range
-                        self.playerList[id].weapon.hit()
+                        self.playerList[id].weapon.hit(self.playerList[:self.id] + self.playerList[self.id + 1:])
                         self.playerList[id].weapon.set_animation_direction(self.playerList[id].animation_direction)
 
                 if keys[pygame.K_d] and not self.playerList[id].block_x_axis:
@@ -210,7 +210,10 @@ class Game:
                     pygame.draw.circle(self.canvas.get_canvas(), (255, 0, 0), p.mousepos, 20)
             # Update Canvas
             self.canvas.update()
+            print(self.playerList[id].x, self.playerList[id].y)
             # print("Handling redraw:", datetime.datetime.now() - timer)
+
+
             # timer = datetime.datetime.now()
 
             # while datetime.datetime.now() - fps_timer < datetime.timedelta(milliseconds=20):
