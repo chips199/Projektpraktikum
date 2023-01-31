@@ -8,8 +8,8 @@ from src.game.animated import Animated
 
 
 class WeaponType(Enum):
-    Fist = {"Damage": 20, "damage_to_weapon_per_hit": 0, "Cooldown": 1, "IsShortRange": True}
-    Sword = {"Damage": 40, "damage_to_weapon_per_hit": 50, "Cooldown": 2, "IsShortRange": True}
+    Fist = {"Damage": 10, "damage_to_weapon_per_hit": 0, "Cooldown": 1, "IsShortRange": True}
+    Sword = {"Damage": 20, "damage_to_weapon_per_hit": 10, "Cooldown": 2, "IsShortRange": True}
 
 
 class Weapon(Animated):
@@ -25,6 +25,7 @@ class Weapon(Animated):
             self.cut_frames(2)
         self.last_hit = int(round(datetime.now().timestamp()))
         self.hitted = list()
+        self.hitted_me = False
         self.durebility = 100
         self.abs_l, self.abs_r, self.rel_l, self.rel_r = self.load_dfs()
 
@@ -84,8 +85,9 @@ class Weapon(Animated):
         """
         self.durebility -= self.weapon_type.value["damage_to_weapon_per_hit"]
         self.last_hit = int(round(datetime.now().timestamp()))
+        self.destroyed = self.durebility <= 0
 
-    def check_hit(self, pl, players, map_df):
+    def check_hit1(self, pl, players, map_df):
         pl_hitted = self.hitted.__contains__(-99)
         wdf = self.get_dataframe(self.current_frame)
         for ip, p in enumerate(players):
@@ -99,3 +101,20 @@ class Weapon(Animated):
         if self.current_frame == self.frame_count:
             self.hitted = list()
             self.destroyed = self.durebility <= 0
+
+    @staticmethod
+    def check_hit(pl, players, map_df):
+        pldf = pl.solid_df
+        for p in players:
+            if p.weapon.animation_running:
+                if not p.weapon.hitted_me and not pd.merge(p.weapon.get_dataframe(), pldf, how='inner', on=['x', 'y']).empty:
+                    pl.health -= p.weapon.weapon_type.value["Damage"]
+                    p.weapon.hitted_me = True
+            else:
+                p.weapon.hitted_me = False
+        if pl.weapon.animation_running:
+            if not pl.weapon.hitted_me and not pd.merge(pl.weapon.get_dataframe(), map_df, how='inner', on=['x', 'y']).empty:
+                pl.health -= pl.weapon.weapon_type.value["Damage"]
+                pl.weapon.hitted_me = True
+        else:
+            pl.weapon.hitted_me = False
