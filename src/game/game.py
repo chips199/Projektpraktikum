@@ -9,6 +9,8 @@ import pygame
 
 import multiprocessing
 
+from src.game.canvas import Canvas
+
 from src.game import canvas, weapon
 from src.game.map import Map
 from src.game import player as Player
@@ -128,8 +130,8 @@ class Game:
                     self.playerList[id].weapon = weapon.Weapon(weapon.WeaponType.Fist,
                                                                [self.playerList[id].x, self.playerList[id].y],
                                                                self.playerList[id].fist_path)
-                Weapon.Weapon.check_hit(self.playerList[id],self.playerList[:self.id] + self.playerList[self.id + 1:],
-                                                         self.map.solid_df)
+                Weapon.Weapon.check_hit(self.playerList[id], self.playerList[:self.id] + self.playerList[self.id + 1:],
+                                        self.map.solid_df)
                 # handling pygame events
 
                 # print("Handling Events:", datetime.datetime.now() - time)
@@ -218,8 +220,6 @@ class Game:
                 self.playerList[i].weapon.animation_direction = data_weapon[2]
                 self.playerList[i].health = health
 
-
-
             # print("Handling pos parsing:", datetime.datetime.now() - timer)
             # timer = datetime.datetime.now()
 
@@ -234,17 +234,20 @@ class Game:
                 self.canvas.get_canvas().blit(pygame.image.load(wrk_dir + '\\wasted.png').convert_alpha(), (0, 0))
             if self.show_scoreboard:
                 can = self.canvas.get_canvas()
-                print("scoreboard")
-                print("ID   |Kills|Deaths")
-                starty = 100
-                pygame.draw.line(can, (50, 50, 50), (100, starty), (200, starty))
-                for p in self.playerList:
-                    if p.is_connected:
-                        starty += 50
-                        kd = self.data['metadata']['scoreboard'][str(p.id)]
-                        print(f"  {p.id}  |  {kd[0]}  |  {kd[1]}  ")
-                        pygame.draw.line(can, (50, 50, 50), (100, starty), (200, starty))
-                pygame.draw.line(can, (50, 50, 50), (100, 100), (200, 100))
+                scoreboard = pygame.image.load(wrk_dir + '\\Scoreboard.png').convert_alpha()
+                Canvas.draw_text(scoreboard, "0", 20, (255,255,255), 60, 57)
+                Canvas.draw_text(scoreboard, "1", 20, (255,255,255), 60, 93)
+                Canvas.draw_text(scoreboard, "2", 20, (255,255,255), 60, 128)
+                Canvas.draw_text(scoreboard, "3", 20, (255,255,255), 60, 165)
+                Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["0"][0]), 20, (255,255,255), 178, 57)
+                Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["1"][0]), 20, (255,255,255), 178, 93)
+                Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["2"][0]), 20, (255,255,255), 178, 128)
+                Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["3"][0]), 20, (255,255,255), 178, 165)
+                Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["0"][1]), 20, (255,255,255), 310, 57)
+                Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["1"][1]), 20, (255,255,255), 310, 93)
+                Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["2"][1]), 20, (255,255,255), 310, 128)
+                Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["3"][1]), 20, (255,255,255), 310, 165)
+                can.blit(scoreboard, (100, 100))
             # Update Canvas
             self.canvas.update()
             # print(self.playerList[id].x, self.playerList[id].y)
@@ -317,7 +320,7 @@ class Game:
 
             # -----------------------------------------------
 
-        self.process.kill() # muss noch übergeben werden
+        self.process.kill()  # muss noch übergeben werden
         pygame.quit()
 
     def update_background_process(self):
