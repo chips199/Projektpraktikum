@@ -112,7 +112,7 @@ class Game:
             # pygame stuff for the max fps
             clock.tick(100)
             # print()
-            print("FPS:", self.update_fps())
+            # print("FPS:", self.update_fps())
             # timer = datetime.datetime.now()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -127,8 +127,8 @@ class Game:
                     self.playerList[id].weapon = weapon.Weapon(weapon.WeaponType.Fist,
                                                                [self.playerList[id].x, self.playerList[id].y],
                                                                self.playerList[id].fist_path)
-                Weapon.Weapon.check_hit(self.playerList[id],self.playerList[:self.id] + self.playerList[self.id + 1:],
-                                                         self.map.solid_df)
+                Weapon.Weapon.check_hit(self.playerList[id], self.playerList[:self.id] + self.playerList[self.id + 1:],
+                                        self.map.solid_df)
                 # handling pygame events
 
                 # print("Handling Events:", datetime.datetime.now() - time)
@@ -209,8 +209,6 @@ class Game:
                 self.playerList[i].weapon.animation_direction = data_weapon[2]
                 self.playerList[i].health = health
 
-
-
             # print("Handling pos parsing:", datetime.datetime.now() - timer)
             # timer = datetime.datetime.now()
 
@@ -218,7 +216,7 @@ class Game:
             self.map.draw(self.canvas.get_canvas())
             # Draw Players
             for p in self.playerList:
-                if p.is_connected and p.health > 0:
+                if p.is_connected:
                     p.draw(self.canvas.get_canvas())
                     # pygame.draw.circle(self.canvas.get_canvas(), (255, 0, 0), p.mousepos, 20)
             if not self.playerList[id].is_alive():
@@ -295,7 +293,7 @@ class Game:
 
             # -----------------------------------------------
 
-        self.process.kill() # muss noch übergeben werden
+        self.process.kill()  # muss noch übergeben werden
         pygame.quit()
 
     def update_background_process(self):

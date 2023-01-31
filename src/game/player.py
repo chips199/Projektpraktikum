@@ -32,7 +32,7 @@ class Player(Animated):
         self.block_x_axis = False
         self.cut_frames(2)
         # self.color = color
-        self.weapon = weapon
+        # self.weapon = weapon
         self.velocity_counter = 0
         self.velocity_counter2 = 0
         # self.health = 0
@@ -41,20 +41,33 @@ class Player(Animated):
         self.sword_path = map_dir + f"\\waffen\\schwert\\animation\\sword_hold_animation_{self.get_color(self.directory)}"
         # self.weapon = weapon.Weapon(weapon.WeaponType.Fist, [self.x, self.y], self.fist_path)
         self.weapon = weapon.Weapon(weapon.WeaponType.Sword, [self.x, self.y], self.sword_path)
+        self.death_animation = Animated(start=[self.x, self.y], directory=map_dir + f"\\player\\death_animation\\death_animation_{self.get_color(self.directory)}")
+        self.blood_animation = Animated(start=[self.x+5, self.y-20], directory=map_dir + f"\\player\\blood_animation")
+        self.blood_animation.set_animation_direction(drn=2)
+        self.blood_animation.double_frames(factor=2)
 
     def draw(self, g):
-        super(Player, self).draw(g=g)
-        pygame.draw.line(g, pygame.Color(231, 24, 55), (self.x, self.y - 5), (self.x + self.frame_width, self.y - 5), 3)
         if self.health > 0:
-            pygame.draw.line(g, pygame.Color(45, 175, 20), (self.x, self.y - 5),
-                             (self.x + (self.frame_width * (self.health / 100)), self.y - 5), 3)
-        pygame.draw.line(g, pygame.Color(20, 20, 20), (self.x, self.y - 10), (self.x + self.frame_width, self.y - 10), 3)
-        if self.weapon.durebility > 0:
-            pygame.draw.line(g, pygame.Color(25, 25, 200), (self.x, self.y - 10),
-                             (self.x + (self.frame_width * (self.weapon.durebility / 100)), self.y - 10),
+            super(Player, self).draw(g=g)
+            pygame.draw.line(g, pygame.Color(231, 24, 55), (self.x, self.y - 5), (self.x + self.frame_width, self.y - 5), 3)
+            if self.health > 0:
+                pygame.draw.line(g, pygame.Color(45, 175, 20), (self.x, self.y - 5),
+                                 (self.x + (self.frame_width * (self.health / 100)), self.y - 5), 3)
+            pygame.draw.line(g, pygame.Color(20, 20, 20), (self.x, self.y - 10), (self.x + self.frame_width, self.y - 10),
                              3)
-        self.weapon.animation_direction = self.animation_direction
-        self.weapon.draw(g=g, x=self.x, y=self.y, width=self.frame_width, height=self.frame_height)
+            if self.weapon.durebility > 0:
+                pygame.draw.line(g, pygame.Color(25, 25, 200), (self.x, self.y - 10),
+                                 (self.x + (self.frame_width * (self.weapon.durebility / 100)), self.y - 10),
+                                 3)
+            self.weapon.animation_direction = self.animation_direction
+            self.weapon.draw(g=g, x=self.x, y=self.y, width=self.frame_width, height=self.frame_height)
+            self.weapon.draw(g=g, x=self.x, y=self.y, width=self.frame_width, height=self.frame_height)
+            if self.weapon.hitted_me or self.blood_animation.current_frame > 0:
+                self.blood_animation.set_pos(self.x-47, self.y+15)
+                self.blood_animation.draw_animation_once(g=g, reset=True)
+        else:
+            self.death_animation.set_pos(self.x, self.y)
+            self.death_animation.draw_animation_once(g=g)
 
     @staticmethod
     def shift_df(df, dirn, n):

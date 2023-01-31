@@ -407,13 +407,12 @@ class MenuSetup:
                 self.conn1, self.conn2 = multiprocessing.Pipe(duplex=True)
                 self.process = multiprocessing.Process(target=backgroundProzess, args=(argument, self.conn2))
                 self.process.start()
+                self.root.set_process(self.process)
                 while not self.conn1.poll():
                     # waiting for the first message of background process
                     sleep(0.1)
                 self.timer = datetime.datetime.now()
                 update_func()
-            # else:
-            #     process = None
 
             if argument == "" or self.data["id"] == "5":  # type:ignore[comparison-overlap]
                 if argument == "":
