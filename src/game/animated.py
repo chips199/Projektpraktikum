@@ -25,6 +25,7 @@ class Animated:
         # self.current_frame = None
         self.x = start[0]
         self.y = start[1]
+        self.scale = 0.8
         self.animation_direction = 1  # 1 mean right, 2 means left
         self.animation_running = False
 
@@ -34,7 +35,6 @@ class Animated:
         self.frame_width = self.images_left[0].get_width()  # width of each frame
         self.frame_height = self.images_left[0].get_height()  # height of each frame
         self.current_frame = 0
-
 
     def draw(self, **kwargs):
         """
@@ -61,7 +61,6 @@ class Animated:
             self.current_frame = 0
             self.animation_running = False
 
-
     def stop_animation(self):
         self.animation_running = False
 
@@ -85,6 +84,7 @@ class Animated:
             image_path = self.directory + r"/" + filename
             try:
                 image = pygame.image.load(image_path).convert_alpha()
+                image = pygame.transform.scale(image, (image.get_width() * self.scale, image.get_height() * self.scale))
                 if len(images_right) == 0:
                     self.edge_surface = pygame.transform.laplacian(image).convert_alpha()
                     alpha_array = pygame.surfarray.pixels_alpha(self.edge_surface)
@@ -101,7 +101,6 @@ class Animated:
         self.relativ_solids_df = pd.DataFrame(self.relativ_solids, columns=['x', 'y'])
         self.solid_df = pd.DataFrame(self.solid, columns=['x', 'y'])
         return images_right, images_left
-
 
     def get_relativ_dataframe(self, firstFrame=False):
         if firstFrame:
