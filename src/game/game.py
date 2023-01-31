@@ -28,9 +28,10 @@ clock = pygame.time.Clock()
 
 class Game:
 
-    def __init__(self, w, h, conn):
+    def __init__(self, w, h, conn, process):
         self.counter = 0
         self.conn = conn
+        self.process = process
         # self.data = {
         #     "1": {
         #         "id": 0,
@@ -281,7 +282,7 @@ class Game:
 
             # -----------------------------------------------
 
-        # self.process.kill() # muss noch übergeben werden
+        self.process.kill() # muss noch übergeben werden
         pygame.quit()
 
     def update_background_process(self):
