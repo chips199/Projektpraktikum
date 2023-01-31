@@ -70,8 +70,8 @@ class Map():
                         solid.append((xi, yi))
         # Add surface borders
         # horizontal edges
-        for x in range(self.game.width):
-            solid.append((x, 0))
+        # for x in range(self.game.width):
+        #     solid.append((x, 0))
             # solid.append((x, self.game.height))
         # vertical edges
         for y in range(self.game.height):
