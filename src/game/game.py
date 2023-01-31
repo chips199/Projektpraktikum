@@ -83,16 +83,17 @@ class Game:
         self.weapon_frames = [[0, False, 1], [0, False, 1], [0, False, 1], [0, False, 1]]
 
         self.playerList = [
-            Player.Player(self.data["metadata"]["spawnpoints"]["0"], directory=self.map.player_uris[0]),
-            Player.Player(self.data["metadata"]["spawnpoints"]["1"], directory=self.map.player_uris[1]),
-            Player.Player(self.data["metadata"]["spawnpoints"]["2"], directory=self.map.player_uris[2]),
-            Player.Player(self.data["metadata"]["spawnpoints"]["3"], directory=self.map.player_uris[3])]
+            Player.Player(0, self.data["metadata"]["spawnpoints"]["0"], directory=self.map.player_uris[0]),
+            Player.Player(1, self.data["metadata"]["spawnpoints"]["1"], directory=self.map.player_uris[1]),
+            Player.Player(2, self.data["metadata"]["spawnpoints"]["2"], directory=self.map.player_uris[2]),
+            Player.Player(3, self.data["metadata"]["spawnpoints"]["3"], directory=self.map.player_uris[3])]
 
         self.min_timer = 0
         self.max_timer = 0
         self.counter_reset_timer = 0
         self.time_total = 0
         self.new_fps_timer = datetime.datetime.now()
+        self.show_scoreboard = False
 
     def run(self):
         """
@@ -137,6 +138,11 @@ class Game:
                 # get the key presses
                 keys = pygame.key.get_pressed()
 
+                # scoreboard
+                if keys[pygame.K_TAB]:
+                    self.show_scoreboard = True
+                else:
+                    self.show_scoreboard = False
                 # Hit
                 if keys[pygame.K_s]:
                     # Check if Player can use his weapon
@@ -165,6 +171,9 @@ class Game:
 
                 # print("Handling Keys:", datetime.datetime.now() - timer)
                 # timer = datetime.datetime.now()
+            else:
+                # if player is dead, set health to -99 to enable respawn
+                self.playerList[id].health = -99
 
             # Mouse Position
             self.playerList[id].mousepos = pygame.mouse.get_pos()
@@ -223,6 +232,19 @@ class Game:
                     # pygame.draw.circle(self.canvas.get_canvas(), (255, 0, 0), p.mousepos, 20)
             if not self.playerList[id].is_alive():
                 self.canvas.get_canvas().blit(pygame.image.load(wrk_dir + '\\wasted.png').convert_alpha(), (0, 0))
+            if self.show_scoreboard:
+                can = self.canvas.get_canvas()
+                print("scoreboard")
+                print("ID   |Kills|Deaths")
+                starty = 100
+                pygame.draw.line(can, (50, 50, 50), (100, starty), (200, starty))
+                for p in self.playerList:
+                    if p.is_connected:
+                        starty += 50
+                        kd = self.data['metadata']['scoreboard'][str(p.id)]
+                        print(f"  {p.id}  |  {kd[0]}  |  {kd[1]}  ")
+                        pygame.draw.line(can, (50, 50, 50), (100, starty), (200, starty))
+                pygame.draw.line(can, (50, 50, 50), (100, 100), (200, 100))
             # Update Canvas
             self.canvas.update()
             # print(self.playerList[id].x, self.playerList[id].y)
@@ -323,7 +345,8 @@ class Game:
             "weapon_frame": [self.playerList[int(self.data['id'])].weapon.current_frame,
                              self.playerList[int(self.data['id'])].weapon.animation_running,
                              self.playerList[int(self.data['id'])].weapon.animation_direction],
-            "health": self.playerList[int(self.data['id'])].health
+            "health": self.playerList[int(self.data['id'])].health,
+            "killed_by": self.playerList[int(self.data['id'])].killed_by
         }
         self.conn.send(temp_data)
 

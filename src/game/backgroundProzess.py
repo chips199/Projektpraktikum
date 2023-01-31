@@ -27,6 +27,7 @@ class backgroundProzess:
         self.player_frame = [0, False, 1]
         self.weapon_frame = [0, False, 1]
         self.health = 100
+        self.killed_by = None
 
         # self.net.send("ready")
 
@@ -82,6 +83,7 @@ class backgroundProzess:
         data['player_frame'] = self.player_frame
         data['weapon_frame'] = self.weapon_frame
         data['health'] = self.health
+        data['killed_by'] = self.killed_by
         self.reply = self.net.send(json.dumps(data))
         self.reply = json.loads(self.reply)
         self.reply["id"] = self.net.id  # type:ignore[index]
@@ -96,3 +98,4 @@ class backgroundProzess:
             self.player_frame = data['player_frame']
             self.weapon_frame = data['weapon_frame']
             self.health = data['health']
+            self.killed_by = data['killed_by']

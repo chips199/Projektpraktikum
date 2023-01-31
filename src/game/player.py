@@ -15,13 +15,14 @@ class Player(Animated):
     mousepos = (0, 0)
     health = 100
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, pid, *args, **kwargs):
         super(Player, self).__init__(*args, **kwargs)
 
         self.falling_time = datetime.datetime.now()
         self.jumping_time = datetime.datetime.now()
         # self.x = startx
         # self.y = starty
+        self.id = pid
         self.velocity = 7
         self.velocity_gravity = 1
         self.velocity_jumping = self.max_jumping_speed = 20
@@ -31,6 +32,7 @@ class Player(Animated):
         self.is_falling = True
         self.block_x_axis = False
         self.cut_frames(2)
+        self.killed_by = None
         # self.color = color
         self.weapon = weapon
         self.velocity_counter = 0
@@ -47,7 +49,8 @@ class Player(Animated):
         if self.health > 0:
             pygame.draw.line(g, pygame.Color(45, 175, 20), (self.x, self.y - 5),
                              (self.x + (self.frame_width * (self.health / 100)), self.y - 5), 3)
-        pygame.draw.line(g, pygame.Color(20, 20, 20), (self.x, self.y - 10), (self.x + self.frame_width, self.y - 10), 3)
+        pygame.draw.line(g, pygame.Color(20, 20, 20), (self.x, self.y - 10), (self.x + self.frame_width, self.y - 10),
+                         3)
         if self.weapon.durebility > 0:
             pygame.draw.line(g, pygame.Color(25, 25, 200), (self.x, self.y - 10),
                              (self.x + (self.frame_width * (self.weapon.durebility / 100)), self.y - 10),
@@ -140,19 +143,6 @@ class Player(Animated):
             if vel <= 0:
                 self.is_jumping = False
                 self.velocity_jumping = self.max_jumping_speed
-
-    def beaten(self, weapon_enemy):
-        """
-        player was beaten
-        player is subtracted the damage of the weapon and it is checked if the player died during the attack
-        :param weapon_enemy The weapon with which the player was hit
-        :return None
-        """
-        self.health -= weapon_enemy.damage
-        if self.health <= 0:
-            print("Player died")
-            # TODO: Anzeige auf Screen und Spieler ausblenden?
-            self.health = 0
 
     def is_alive(self):
         """

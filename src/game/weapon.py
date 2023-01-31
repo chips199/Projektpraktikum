@@ -105,13 +105,17 @@ class Weapon(Animated):
     @staticmethod
     def check_hit(pl, players, map_df):
         pldf = pl.solid_df
+        # check if player is hitting me
         for p in players:
             if p.weapon.animation_running:
                 if not p.weapon.hitted_me and not pd.merge(p.weapon.get_dataframe(), pldf, how='inner', on=['x', 'y']).empty:
                     pl.health -= p.weapon.weapon_type.value["Damage"]
                     p.weapon.hitted_me = True
+                    if not pl.is_alive():
+                        pl.killed_by = p.pid
             else:
                 p.weapon.hitted_me = False
+        # hitting wall
         if pl.weapon.animation_running:
             if not pl.weapon.hitted_me and not pd.merge(pl.weapon.get_dataframe(), map_df, how='inner', on=['x', 'y']).empty:
                 pl.health -= pl.weapon.weapon_type.value["Damage"]

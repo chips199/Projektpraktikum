@@ -246,6 +246,14 @@ def threaded_client(conn):
             if data:
                 # parse the client data into the game_data Dictionary, and send the result back to the client
                 game_data_dict[game_id][this_pid] = json.loads(reply)
+                if game_data_dict[game_id][this_pid]["killed_by"] is not None:
+                    game_data_dict[game_id]["metadata"]["scoreboard"][str(game_data_dict[game_id][this_pid]["killed_by"])][0] += 1
+                    game_data_dict[game_id]["metadata"]["scoreboard"][str(this_pid)][1] += 1
+                    game_data_dict[game_id][this_pid]["killed_by"] = None
+                    game_data_dict[game_id][this_pid]["position"] = this_spawn_points[this_pid]
+                    game_data_dict[game_id][this_pid]["health"] = game_data[this_pid]["health"]
+                    game_data_dict[game_id][this_pid]["player_frame"] = game_data[this_pid]["player_frame"]
+                    game_data_dict[game_id][this_pid]["weapon_frame"] = game_data[this_pid]["weapon_frame"]
                 conn.sendall(str.encode(json.dumps(game_data_dict[game_id])))
                 # to track how often the client sends a message track the time
                 last_msg = datetime.datetime.now()
