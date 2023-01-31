@@ -9,7 +9,7 @@ import pygame
 
 import multiprocessing
 
-from src.game import canvas
+from src.game import canvas, weapon
 from src.game.map import Map
 from src.game import player as Player
 from src.game import weapon as Weapon
@@ -24,6 +24,7 @@ map_names_dict = {"basicmap": basic_map,
                   "schneemap": schneemap}
 
 clock = pygame.time.Clock()
+pygame.font.init()
 
 
 class Game:
@@ -111,16 +112,22 @@ class Game:
             # pygame stuff for the max fps
             clock.tick(100)
             # print()
-            # print("FPS:", self.update_fps())
+            print("FPS:", self.update_fps())
             # timer = datetime.datetime.now()
-            if self.playerList[id].is_alive():
-                # handling pygame events
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        run = False
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    run = False
 
-                    if event.type == pygame.K_ESCAPE:
-                        run = False
+                if event.type == pygame.K_ESCAPE:
+                    run = False
+
+            if self.playerList[id].is_alive():
+                # check if weapon is destroyed and give player fists if true
+                if self.playerList[id].weapon.destroyed:
+                    self.playerList[id].weapon = weapon.Weapon(weapon.WeaponType.Fist,
+                                                               [self.playerList[id].x, self.playerList[id].y],
+                                                               self.playerList[id].fist_path)
+                # handling pygame events
 
                 # print("Handling Events:", datetime.datetime.now() - time)
                 # time = datetime.datetime.now()
@@ -133,8 +140,12 @@ class Game:
                     # Check if Player can use his weapon
                     if self.playerList[id].weapon.can_hit():
                         # Check if an enemy player is in range
-                        self.playerList[id].weapon.hit(self.playerList[:self.id] + self.playerList[self.id + 1:])
+                        self.playerList[id].weapon.hit()
                         self.playerList[id].weapon.set_animation_direction(self.playerList[id].animation_direction)
+                if self.playerList[id].weapon.animation_running:
+                    self.playerList[id].weapon.check_hit(self.playerList[id],
+                                                         self.playerList[:self.id] + self.playerList[self.id + 1:],
+                                                         self.map.solid_df)
 
                 if keys[pygame.K_d] and not self.playerList[id].block_x_axis:
                     if self.playerList[id].landed:
@@ -206,14 +217,15 @@ class Game:
             self.map.draw(self.canvas.get_canvas())
             # Draw Players
             for p in self.playerList:
-                if p.is_connected:
+                if p.is_connected and p.health > 0:
                     p.draw(self.canvas.get_canvas())
-                    pygame.draw.circle(self.canvas.get_canvas(), (255, 0, 0), p.mousepos, 20)
+                    # pygame.draw.circle(self.canvas.get_canvas(), (255, 0, 0), p.mousepos, 20)
+            if not self.playerList[id].is_alive():
+                self.canvas.get_canvas().blit(pygame.image.load(wrk_dir + '\\wasted.png').convert_alpha(), (0, 0))
             # Update Canvas
             self.canvas.update()
-            print(self.playerList[id].x, self.playerList[id].y)
+            # print(self.playerList[id].x, self.playerList[id].y)
             # print("Handling redraw:", datetime.datetime.now() - timer)
-
 
             # timer = datetime.datetime.now()
 
@@ -293,8 +305,8 @@ class Game:
         # else:
         #     self.counter += 1
         new_data = None
-        while not self.conn.poll():
-            continue
+        # while not self.conn.poll():
+        #     continue
         while self.conn.poll():
             new_data = self.conn.recv()
         if type(new_data) == str:
