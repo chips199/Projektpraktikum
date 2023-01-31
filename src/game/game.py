@@ -322,7 +322,8 @@ class Game:
                              self.playerList[int(self.data['id'])].animation_direction],
             "weapon_frame": [self.playerList[int(self.data['id'])].weapon.current_frame,
                              self.playerList[int(self.data['id'])].weapon.animation_running,
-                             self.playerList[int(self.data['id'])].weapon.animation_direction]
+                             self.playerList[int(self.data['id'])].weapon.animation_direction],
+            "health": self.playerList[int(self.data['id'])].health
         }
         self.conn.send(temp_data)
 
