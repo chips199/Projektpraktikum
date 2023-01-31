@@ -126,6 +126,8 @@ class Game:
                     self.playerList[id].weapon = weapon.Weapon(weapon.WeaponType.Fist,
                                                                [self.playerList[id].x, self.playerList[id].y],
                                                                self.playerList[id].fist_path)
+                Weapon.Weapon.check_hit(self.playerList[id],self.playerList[:self.id] + self.playerList[self.id + 1:],
+                                                         self.map.solid_df)
                 # handling pygame events
 
                 # print("Handling Events:", datetime.datetime.now() - time)
@@ -141,10 +143,6 @@ class Game:
                         # Check if an enemy player is in range
                         self.playerList[id].weapon.hit()
                         self.playerList[id].weapon.set_animation_direction(self.playerList[id].animation_direction)
-                if self.playerList[id].weapon.animation_running:
-                    self.playerList[id].weapon.check_hit(self.playerList[id],
-                                                         self.playerList[:self.id] + self.playerList[self.id + 1:],
-                                                         self.map.solid_df)
 
                 if keys[pygame.K_d] and not self.playerList[id].block_x_axis:
                     if self.playerList[id].landed:
@@ -200,14 +198,17 @@ class Game:
             #     self.playerList[i].mousepos = on
 
             # sync animation frames from player and weapon
-            self.player_frames, self.weapon_frames = self.parse_frame()
-            for i, (data_player, data_weapon) in enumerate(zip(self.player_frames, self.weapon_frames)):
+            self.player_frames, self.weapon_frames, health = self.parse_frame()
+            for i, (data_player, data_weapon, health) in enumerate(zip(self.player_frames, self.weapon_frames, health)):
                 self.playerList[i].current_frame = data_player[0]
                 self.playerList[i].animation_running = data_player[1]
                 self.playerList[i].animation_direction = data_player[2]
                 self.playerList[i].weapon.current_frame = data_weapon[0]
                 self.playerList[i].weapon.animation_running = data_weapon[1]
                 self.playerList[i].weapon.animation_direction = data_weapon[2]
+                self.playerList[i].health = health
+
+
 
             # print("Handling pos parsing:", datetime.datetime.now() - timer)
             # timer = datetime.datetime.now()
@@ -337,9 +338,10 @@ class Game:
         """
         erg_player = []
         erg_weapon = []
+        erg_health = []
         for key, value in self.data.items():
             # since a fifth dictionary entry named 'id' is added for the player id, ignore this key/entry
-            if key != "id":
+            if key != "id" and key != "metadata":
                 for key2, value2 in value.items():
                     if key2 == "player_frame":
                         if key != str(self.id):
@@ -355,9 +357,14 @@ class Game:
                             erg_weapon.append([self.playerList[int(self.data["id"])].weapon.current_frame,
                                                self.playerList[int(self.data["id"])].weapon.animation_running,
                                                self.playerList[int(self.data["id"])].weapon.animation_direction])
+                    elif key2 == "health":
+                        if key != str(self.id):
+                            erg_health.append(value2)
+                        else:
+                            erg_health.append(self.playerList[int(self.data["id"])].health)
             else:
                 continue
-        return erg_player, erg_weapon
+        return erg_player, erg_weapon, erg_health
 
     # @staticmethod
     def parse_pos(self):
