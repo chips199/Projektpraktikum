@@ -6,7 +6,8 @@
 	"connected": false,
 	"health": 100,
     "player_frame": [0, false, 1],
-    "weapon_frame": [0, false, 1]
+    "weapon_frame": [0, false, 1],
+    "killed_by": null
   },
   "1": {
     "id": 1,
@@ -15,7 +16,8 @@
 	"connected": false,
 	"health": 100,
     "player_frame": [0, false, 1],
-    "weapon_frame": [0, false, 1]
+    "weapon_frame": [0, false, 1],
+    "killed_by": null
   },
   "2": {
     "id": 2,
@@ -24,7 +26,8 @@
 	"connected": false,
 	"health": 100,
     "player_frame": [0, false, 1],
-    "weapon_frame": [0, false, 1]
+    "weapon_frame": [0, false, 1],
+    "killed_by": null
   },
   "3": {
     "id": 3,
@@ -33,7 +36,8 @@
 	"connected": false,
 	"health": 100,
     "player_frame": [0, false, 1],
-    "weapon_frame": [0, false, 1]
+    "weapon_frame": [0, false, 1],
+    "killed_by": null
   },
   "metadata": {
     "map": "basicmap",
@@ -42,6 +46,12 @@
     "1" : [0,0],
     "2" : [0,0],
     "3" : [0,0]
-  }
+  },
+    "scoreboard": {
+    "0" : [0,0],
+    "1" : [0,0],
+    "2" : [0,0],
+    "3" : [0,0]
+    }
   }
 }
