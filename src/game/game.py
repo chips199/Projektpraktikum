@@ -235,18 +235,26 @@ class Game:
             if self.show_scoreboard:
                 can = self.canvas.get_canvas()
                 scoreboard = pygame.image.load(wrk_dir + '\\Scoreboard.png').convert_alpha()
-                Canvas.draw_text(scoreboard, "0", 20, (255,255,255), 60, 57)
-                Canvas.draw_text(scoreboard, "1", 20, (255,255,255), 60, 93)
-                Canvas.draw_text(scoreboard, "2", 20, (255,255,255), 60, 128)
-                Canvas.draw_text(scoreboard, "3", 20, (255,255,255), 60, 165)
-                Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["0"][0]), 20, (255,255,255), 178, 57)
-                Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["1"][0]), 20, (255,255,255), 178, 93)
-                Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["2"][0]), 20, (255,255,255), 178, 128)
-                Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["3"][0]), 20, (255,255,255), 178, 165)
-                Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["0"][1]), 20, (255,255,255), 310, 57)
-                Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["1"][1]), 20, (255,255,255), 310, 93)
-                Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["2"][1]), 20, (255,255,255), 310, 128)
-                Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["3"][1]), 20, (255,255,255), 310, 165)
+                Canvas.draw_text(scoreboard, "0", 20, (255, 255, 255), 60, 57)
+                Canvas.draw_text(scoreboard, "1", 20, (255, 255, 255), 60, 93)
+                Canvas.draw_text(scoreboard, "2", 20, (255, 255, 255), 60, 128)
+                Canvas.draw_text(scoreboard, "3", 20, (255, 255, 255), 60, 165)
+                Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["0"][0]), 20, (255, 255, 255), 178,
+                                 57)
+                Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["1"][0]), 20, (255, 255, 255), 178,
+                                 93)
+                Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["2"][0]), 20, (255, 255, 255), 178,
+                                 128)
+                Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["3"][0]), 20, (255, 255, 255), 178,
+                                 165)
+                Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["0"][1]), 20, (255, 255, 255), 310,
+                                 57)
+                Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["1"][1]), 20, (255, 255, 255), 310,
+                                 93)
+                Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["2"][1]), 20, (255, 255, 255), 310,
+                                 128)
+                Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["3"][1]), 20, (255, 255, 255), 310,
+                                 165)
                 can.blit(scoreboard, (100, 100))
             # Update Canvas
             self.canvas.update()
