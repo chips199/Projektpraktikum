@@ -26,12 +26,12 @@ class Weapon(Animated):
         self.last_hit = int(round(datetime.now().timestamp()))
         self.hitted = list()
         self.hitted_me = False
-        self.durebility = 100
+        self.durability = 100
         self.abs_l, self.abs_r, self.rel_l, self.rel_r = self.load_dfs()
 
     def get_dataframe(self, frame=-99):
         try:
-            if self.animation_direction == 1:
+            if self.animation_direction == 0:
                 erg = copy(self.rel_r[frame])
                 erg['x'] = erg['x'].map(lambda x: x + self.x)
                 erg['y'] = erg['y'].map(lambda y: y + self.y)
@@ -42,7 +42,7 @@ class Weapon(Animated):
                 erg['y'] = erg['y'].map(lambda y: y + self.y)
                 return erg
         except IndexError:
-            if self.animation_direction == 1:
+            if self.animation_direction == 0:
                 erg = copy(self.rel_r[self.current_frame])
                 erg['x'] = erg['x'].map(lambda x: x + self.x)
                 erg['y'] = erg['y'].map(lambda y: y + self.y)
@@ -59,7 +59,7 @@ class Weapon(Animated):
         :param kwargs:
         """
         self.y = kwargs["y"] + kwargs["height"] - self.frame_height
-        if self.animation_direction == 2:
+        if self.animation_direction == 1:
             self.x = kwargs["x"] + kwargs["width"] - self.frame_width
             super(Weapon, self).draw(g=kwargs["g"])
         else:
@@ -73,7 +73,7 @@ class Weapon(Animated):
          - Shelf life not yet used up
          - Cooldown must have expired
         """
-        return self.durebility > 0 and self.last_hit + self.weapon_type.value["Cooldown"] <= int(
+        return self.durability > 0 and self.last_hit + self.weapon_type.value["Cooldown"] <= int(
             round(datetime.now().timestamp()))
 
     def hit(self):
@@ -83,9 +83,9 @@ class Weapon(Animated):
          - saves the current time for dhe cooldown
         :return: None
         """
-        self.durebility -= self.weapon_type.value["damage_to_weapon_per_hit"]
+        self.durability -= self.weapon_type.value["damage_to_weapon_per_hit"]
         self.last_hit = int(round(datetime.now().timestamp()))
-        self.destroyed = self.durebility <= 0
+        self.destroyed = self.durability <= 0
 
     def check_hit1(self, pl, players, map_df):
         pl_hitted = self.hitted.__contains__(-99)
@@ -100,7 +100,7 @@ class Weapon(Animated):
             pl.health -= self.weapon_type.value["Damage"]
         if self.current_frame == self.frame_count:
             self.hitted = list()
-            self.destroyed = self.durebility <= 0
+            self.destroyed = self.durability <= 0
 
     @staticmethod
     def check_hit(pl, players, map_df):

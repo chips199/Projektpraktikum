@@ -1,4 +1,5 @@
 import datetime
+import math
 from copy import copy
 
 import pygame.draw
@@ -20,8 +21,6 @@ class Player(Animated):
 
         self.falling_time = datetime.datetime.now()
         self.jumping_time = datetime.datetime.now()
-        # self.x = startx
-        # self.y = starty
         self.current_moving_velocity = 7
         self.moving_velocity_on_ground = self.moving_velocity_in_air = 7
         self.velocity_gravity = 1
@@ -32,11 +31,10 @@ class Player(Animated):
         self.is_falling = True
         self.block_x_axis = False
         self.cut_frames(2)
-        # self.color = color
         self.weapon = weapon
         self.velocity_counter = 0
         self.velocity_counter2 = 0
-        # self.health = 0
+        self.sliding_counter = self.max_sliding_time = 50
         map_dir = "\\".join(str(self.directory).split('\\')[:-3])
         self.fist_path = map_dir + f"\\waffen\\faeuste\\animation\\fists_{self.get_color(self.directory)}_animation"
         self.sword_path = map_dir + f"\\waffen\\schwert\\animation\\sword_hold_animation_{self.get_color(self.directory)}"
@@ -49,6 +47,25 @@ class Player(Animated):
         self.velocity_jumping = self.max_jumping_speed = data[2]
         self.velocity_counter = data[3]
 
+    def keep_sliding(self, func):
+        if self.landed and not self.is_jumping and self.sliding_counter > 1:
+            if self.animation_direction == 0:
+                self.move(dirn=0,
+                          v=int(func(player=self, dirn=0, distance=int(self.current_moving_velocity)) *
+                                math.sqrt(self.sliding_counter / self.max_sliding_time)))
+                self.sliding_counter -= 1
+            if self.animation_direction == 1:
+                self.move(dirn=1,
+                          v=int(func(player=self, dirn=1, distance=int(self.current_moving_velocity)) *
+                                math.sqrt(self.sliding_counter / self.max_sliding_time)))
+                self.sliding_counter -= 1
+
+    def reset_sliding_counter(self):
+        self.sliding_counter = self.max_sliding_time
+
+    def stop_sliding(self):
+        self.sliding_counter = 1
+
     def draw(self, g):
         super(Player, self).draw(g=g)
         pygame.draw.line(g, pygame.Color(231, 24, 55), (self.x, self.y - 5), (self.x + self.frame_width, self.y - 5), 3)
@@ -57,9 +74,9 @@ class Player(Animated):
                              (self.x + (self.frame_width * (self.health / 100)), self.y - 5), 3)
         pygame.draw.line(g, pygame.Color(20, 20, 20), (self.x, self.y - 10), (self.x + self.frame_width, self.y - 10),
                          3)
-        if self.weapon.durebility > 0:
+        if self.weapon.durability > 0:
             pygame.draw.line(g, pygame.Color(25, 25, 200), (self.x, self.y - 10),
-                             (self.x + (self.frame_width * (self.weapon.durebility / 100)), self.y - 10),
+                             (self.x + (self.frame_width * (self.weapon.durability / 100)), self.y - 10),
                              3)
         self.weapon.animation_direction = self.animation_direction
         self.weapon.draw(g=g, x=self.x, y=self.y, width=self.frame_width, height=self.frame_height)
@@ -93,11 +110,11 @@ class Player(Animated):
             v = self.current_moving_velocity
 
         if dirn == 0:
-            self.animation_direction = 1
+            self.animation_direction = 0
             self.x += v
             self.weapon.x += v
         elif dirn == 1:
-            self.animation_direction = 2
+            self.animation_direction = 1
             self.x -= v
             self.weapon.x -= v
         elif dirn == 2:
@@ -191,7 +208,7 @@ class Player(Animated):
 
             # if able to fall
             if vel > 0:
-                print("able to fall")
+                self.stop_sliding()
                 self.current_moving_velocity = self.moving_velocity_in_air
 
                 # initialize falling when the player is currently not falling

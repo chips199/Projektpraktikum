@@ -33,9 +33,9 @@ class MyWindow(tk.CTk):
         self.sizing_height = sizing_height
 
     def on_closing(self):
-        if messagebox.askokcancel("Quit", "Do you want to quit?"):
-            self.run = False
-            self.destroy()
+        # if messagebox.askokcancel("Quit", "Do you want to quit?"):
+        self.run = False
+        self.destroy()
 
     def move_out_of_window(self,
                            widget_list: list['MyFrame|MyLabel'],

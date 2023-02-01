@@ -118,7 +118,6 @@ class Game:
             # print()
             # print("FPS:", self.update_fps())
             # timer = datetime.datetime.now()
-            print(self.playerList[self.id].current_moving_velocity)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
@@ -148,20 +147,26 @@ class Game:
                     if self.playerList[id].weapon.can_hit():
                         # Check if an enemy player is in range
                         self.playerList[id].weapon.hit()
-                        self.playerList[id].weapon.set_animation_direction(self.playerList[id].animation_direction)
+                        self.playerList[id].weapon.start_animation_in_direction(self.playerList[id].animation_direction)
 
                 if keys[pygame.K_d] and not self.playerList[id].block_x_axis:
                     if self.playerList[id].landed:
-                        self.playerList[id].set_animation_direction(1)
+                        self.playerList[id].start_animation_in_direction(0)
                     self.playerList[id].move(0, self.nextToSolid(self.playerList[id], 0, self.playerList[id].current_moving_velocity))
+                    self.playerList[id].reset_sliding_counter()
 
                 elif keys[pygame.K_a] and not self.playerList[id].block_x_axis:
                     if self.playerList[id].landed:
-                        self.playerList[id].set_animation_direction(2)
+                        self.playerList[id].start_animation_in_direction(1)
                     self.playerList[id].move(1, self.nextToSolid(self.playerList[id], 1, self.playerList[id].current_moving_velocity))
+                    self.playerList[id].reset_sliding_counter()
+
+                elif self.data["metadata"]["map"] == "schneemap":
+                    self.playerList[id].keep_sliding(func=self.nextToSolid)
 
                 # Jump
                 if keys[pygame.K_SPACE] or self.playerList[id].is_jumping or keys[pygame.K_w]:
+                    self.playerList[id].stop_sliding()
                     self.playerList[id].stop_animation()
                     self.playerList[id].jump(func=self.nextToSolid)
 

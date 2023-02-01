@@ -26,7 +26,7 @@ class Animated:
         self.x = start[0]
         self.y = start[1]
         self.scale = 0.8
-        self.animation_direction = 1  # 1 mean right, 2 means left
+        self.animation_direction = 0  # 0 mean right, 1 means left
         self.animation_running = False
 
         self.images_right, self.images_left = self.load_images()
@@ -41,7 +41,7 @@ class Animated:
         displays a player to the canvas
         :param g: pygame canvas
         """
-        if self.animation_direction == 1:
+        if self.animation_direction == 0:
             self.animate(kwargs["g"], self.images_right)
         else:
             self.animate(kwargs["g"], self.images_left)
@@ -64,8 +64,8 @@ class Animated:
     def stop_animation(self):
         self.animation_running = False
 
-    def set_animation_direction(self, drn):
-        self.animation_direction = drn
+    def start_animation_in_direction(self, direction):
+        self.animation_direction = direction
         self.animation_running = True
 
     def load_images(self):
