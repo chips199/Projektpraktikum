@@ -116,8 +116,9 @@ class Game:
             # pygame stuff for the max fps
             clock.tick(100)
             # print()
-            print("FPS:", self.update_fps())
+            # print("FPS:", self.update_fps())
             # timer = datetime.datetime.now()
+            print(self.playerList[self.id].current_moving_velocity)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
@@ -152,12 +153,12 @@ class Game:
                 if keys[pygame.K_d] and not self.playerList[id].block_x_axis:
                     if self.playerList[id].landed:
                         self.playerList[id].set_animation_direction(1)
-                    self.playerList[id].move(0, self.nextToSolid(self.playerList[id], 0, self.playerList[id].velocity))
+                    self.playerList[id].move(0, self.nextToSolid(self.playerList[id], 0, self.playerList[id].current_moving_velocity))
 
                 elif keys[pygame.K_a] and not self.playerList[id].block_x_axis:
                     if self.playerList[id].landed:
                         self.playerList[id].set_animation_direction(2)
-                    self.playerList[id].move(1, self.nextToSolid(self.playerList[id], 1, self.playerList[id].velocity))
+                    self.playerList[id].move(1, self.nextToSolid(self.playerList[id], 1, self.playerList[id].current_moving_velocity))
 
                 # Jump
                 if keys[pygame.K_SPACE] or self.playerList[id].is_jumping or keys[pygame.K_w]:
