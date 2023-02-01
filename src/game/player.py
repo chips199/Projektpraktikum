@@ -22,7 +22,8 @@ class Player(Animated):
         self.jumping_time = datetime.datetime.now()
         # self.x = startx
         # self.y = starty
-        self.velocity = 7
+        self.current_moving_velocity = 7
+        self.moving_velocity_on_ground = self.moving_velocity_in_air = 7
         self.velocity_gravity = 1
         self.velocity_jumping = self.max_jumping_speed = 20
         self.velocity_time = 15
@@ -42,13 +43,20 @@ class Player(Animated):
         # self.weapon = weapon.Weapon(weapon.WeaponType.Fist, [self.x, self.y], self.fist_path)
         self.weapon = weapon.Weapon(weapon.WeaponType.Sword, [self.x, self.y], self.sword_path)
 
+    def set_velocity(self, data=(1, 1, 0)):
+        self.moving_velocity_on_ground = data[0]
+        self.moving_velocity_in_air = data[1]
+        self.velocity_jumping = self.max_jumping_speed = data[2]
+        self.velocity_counter = data[3]
+
     def draw(self, g):
         super(Player, self).draw(g=g)
         pygame.draw.line(g, pygame.Color(231, 24, 55), (self.x, self.y - 5), (self.x + self.frame_width, self.y - 5), 3)
         if self.health > 0:
             pygame.draw.line(g, pygame.Color(45, 175, 20), (self.x, self.y - 5),
                              (self.x + (self.frame_width * (self.health / 100)), self.y - 5), 3)
-        pygame.draw.line(g, pygame.Color(20, 20, 20), (self.x, self.y - 10), (self.x + self.frame_width, self.y - 10), 3)
+        pygame.draw.line(g, pygame.Color(20, 20, 20), (self.x, self.y - 10), (self.x + self.frame_width, self.y - 10),
+                         3)
         if self.weapon.durebility > 0:
             pygame.draw.line(g, pygame.Color(25, 25, 200), (self.x, self.y - 10),
                              (self.x + (self.frame_width * (self.weapon.durebility / 100)), self.y - 10),
@@ -82,7 +90,7 @@ class Player(Animated):
         :return: None
         """
         if v == -99:
-            v = self.velocity
+            v = self.current_moving_velocity
 
         if dirn == 0:
             self.animation_direction = 1
@@ -109,6 +117,7 @@ class Player(Animated):
 
         # when player is not falling
         if not self.is_falling:
+            self.current_moving_velocity = self.moving_velocity_in_air
 
             # check is moving upwards is possible
             vel = func(player=self, dirn=2, distance=int(self.velocity_jumping))
@@ -173,6 +182,7 @@ class Player(Animated):
         moves player downwards when possible
         :param func: function to check if there is no collision while falling
         """
+        moving_factor = int(self.current_moving_velocity * 2)
         # when player is not jumping
         if not self.is_jumping:
 
@@ -181,6 +191,8 @@ class Player(Animated):
 
             # if able to fall
             if vel > 0:
+                print("able to fall")
+                self.current_moving_velocity = self.moving_velocity_in_air
 
                 # initialize falling when the player is currently not falling
                 if not self.is_falling:
@@ -215,33 +227,34 @@ class Player(Animated):
                     # shift players df to the right and check if falling would then be possible
                     # in addition block the movement on x-axis for the player (for the keyboard)
                     self.block_x_axis = True
-                    self.shift_df(df=self.solid_df, dirn=0, n=self.velocity * 2)
-                    vel = func(player=self, dirn=3, distance=int(self.velocity_gravity * 2))
+                    self.shift_df(df=self.solid_df, dirn=0, n=moving_factor)
+                    vel = func(player=self, dirn=3, distance=int(self.velocity_gravity))
 
                     # if falling is then possible
                     if vel > 0:
                         # shift back the df and move to the right so in next cycle the player will continue to fall
-                        self.shift_df(df=self.solid_df, dirn=1, n=self.velocity * 2)
-                        self.move(dirn=0, v=int(self.velocity * 2))
+                        self.shift_df(df=self.solid_df, dirn=1, n=moving_factor)
+                        self.move(dirn=0, v=int(moving_factor))
 
                     else:
                         # try the same for direction left
-                        self.shift_df(df=self.solid_df, dirn=1, n=self.velocity * 4)
+                        self.shift_df(df=self.solid_df, dirn=1, n=moving_factor * 2)
                         vel = func(player=self, dirn=3, distance=int(self.velocity_gravity))
 
                         # if falling is possible after shifting to left, shift df back to original position and move left
                         if vel > 0:
-                            self.shift_df(df=self.solid_df, dirn=0, n=self.velocity * 2)
-                            self.move(dirn=1, v=int(self.velocity * 2))
+                            self.shift_df(df=self.solid_df, dirn=0, n=moving_factor)
+                            self.move(dirn=1, v=int(moving_factor))
 
                         # otherwise it means that the player is standing on its feet, so he is landed correctly
                         # so stop falling and reset the parameters
                         else:
-                            self.shift_df(df=self.solid_df, dirn=0, n=self.velocity * 2)
+                            self.shift_df(df=self.solid_df, dirn=0, n=moving_factor)
                             self.landed = True
                             self.block_x_axis = False
                             self.is_falling = False
                             self.velocity_gravity = 1
+                            self.current_moving_velocity = self.moving_velocity_on_ground
 
     @staticmethod
     def get_color(p):
