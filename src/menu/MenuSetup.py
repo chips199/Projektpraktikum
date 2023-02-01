@@ -458,8 +458,7 @@ class MenuSetup:
         self.update_background_after_id = self.main_frame.after(300, self.update_background_process)
 
     def send_data(self, msg):
-        data = msg
-        self.conn1.send(data)  # type:ignore[attr-defined]
+        self.conn1.send(msg)  # type:ignore[attr-defined]
 
 
 if __name__ == "__main__":

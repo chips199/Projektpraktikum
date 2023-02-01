@@ -75,6 +75,8 @@ class Game:
         self.canvas = canvas.Canvas(self.width, self.height, str(self.id) + "Stick  Wars")
         # self.map = Map(self, map_names_dict[self.data['map_name']])
         self.map = Map(self, map_names_dict[self.data["metadata"]["map"]])
+        print("MAP:", self.data["metadata"]["map"])
+        print("SPAWNPOINTS:", self.data["metadata"]["spawnpoints"])
         self.online = [False, False, False, False]
         self.this_player_pos = [700, 50]
         self.pos = [[100, 100], [200, 100], [300, 100], [400, 100]]
@@ -87,6 +89,8 @@ class Game:
             Player.Player(self.data["metadata"]["spawnpoints"]["1"], directory=self.map.player_uris[1]),
             Player.Player(self.data["metadata"]["spawnpoints"]["2"], directory=self.map.player_uris[2]),
             Player.Player(self.data["metadata"]["spawnpoints"]["3"], directory=self.map.player_uris[3])]
+
+        self.playerList[self.id].set_velocity(self.data["metadata"]["spawnpoints"]["velocity"])
 
         self.min_timer = 0
         self.max_timer = 0
@@ -127,8 +131,8 @@ class Game:
                     self.playerList[id].weapon = weapon.Weapon(weapon.WeaponType.Fist,
                                                                [self.playerList[id].x, self.playerList[id].y],
                                                                self.playerList[id].fist_path)
-                Weapon.Weapon.check_hit(self.playerList[id],self.playerList[:self.id] + self.playerList[self.id + 1:],
-                                                         self.map.solid_df)
+                Weapon.Weapon.check_hit(self.playerList[id], self.playerList[:self.id] + self.playerList[self.id + 1:],
+                                        self.map.solid_df)
                 # handling pygame events
 
                 # print("Handling Events:", datetime.datetime.now() - time)
@@ -208,8 +212,6 @@ class Game:
                 self.playerList[i].weapon.animation_running = data_weapon[1]
                 self.playerList[i].weapon.animation_direction = data_weapon[2]
                 self.playerList[i].health = health
-
-
 
             # print("Handling pos parsing:", datetime.datetime.now() - timer)
             # timer = datetime.datetime.now()
@@ -295,7 +297,7 @@ class Game:
 
             # -----------------------------------------------
 
-        self.process.kill() # muss noch übergeben werden
+        self.process.kill()  # muss noch übergeben werden
         pygame.quit()
 
     def update_background_process(self):
