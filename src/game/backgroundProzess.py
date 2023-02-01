@@ -26,6 +26,9 @@ class backgroundProzess:
         self.mouse = [int(100), int(100)]
         self.player_frame = [0, False, 1]
         self.weapon_frame = [0, False, 1]
+        self.health = 100
+
+        # self.net.send("ready")
 
         while True:
             # fps_timer = datetime.datetime.now()
@@ -78,6 +81,7 @@ class backgroundProzess:
         data['mouse'] = self.mouse
         data['player_frame'] = self.player_frame
         data['weapon_frame'] = self.weapon_frame
+        data['health'] = self.health
         self.reply = self.net.send(json.dumps(data))
         self.reply = json.loads(self.reply)
         self.reply["id"] = self.net.id  # type:ignore[index]
@@ -91,3 +95,4 @@ class backgroundProzess:
             self.mouse = data['mouse']
             self.player_frame = data['player_frame']
             self.weapon_frame = data['weapon_frame']
+            self.health = data['health']

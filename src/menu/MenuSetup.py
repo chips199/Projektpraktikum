@@ -25,6 +25,7 @@ wrk_dir = os.path.abspath(os.path.dirname(__file__))
 class MenuSetup:
     def __init__(self):
         # -------------------------------------------  Parameters  -------------------------------------------
+        self.process = None
         self.counter = 0
         self.timer = datetime.datetime.now()
         self.update_background_after_id = None
@@ -43,7 +44,6 @@ class MenuSetup:
         self.sizing = round(self.window_width_planned / 1920, 5)
         self.sizing_width = 1
         self.sizing_height = 1
-        # self.s_id = "1"
         self.amount_player = 0
         self.game_started = False
         self.player = []
@@ -374,7 +374,7 @@ class MenuSetup:
         # important sleep, don't remove!!! Neccessary for the background task to realize that the game
         # has started, to send correct data to the game
         sleep(2)
-        g = game.Game(w=1600, h=900, conn=self.conn1)
+        g = game.Game(w=1600, h=900, conn=self.conn1, process = self.process)
         g.run()
 
     # __________________other Functions__________________
@@ -405,15 +405,15 @@ class MenuSetup:
         try:
             if argument != "":
                 self.conn1, self.conn2 = multiprocessing.Pipe(duplex=True)
-                process = multiprocessing.Process(target=backgroundProzess, args=(argument, self.conn2))
-                process.start()
+                self.process = multiprocessing.Process(target=backgroundProzess, args=(argument, self.conn2))
+                self.process.start()
                 while not self.conn1.poll():
                     # waiting for the first message of background process
                     sleep(0.1)
                 self.timer = datetime.datetime.now()
                 update_func()
-            else:
-                process = None
+            # else:
+            #     process = None
 
             if argument == "" or self.data["id"] == "5":  # type:ignore[comparison-overlap]
                 if argument == "":
@@ -428,8 +428,8 @@ class MenuSetup:
                     time=3000,
                     message=msg)
                 # kill process (network) if session_id is invalid, in future we should be able to update the network
-                if process is not None:
-                    process.kill()
+                if self.process is not None:
+                    self.process.kill()
                 # stop the after call from update_background_process
                 if self.update_background_after_id is not None:
                     self.main_frame.after_cancel(self.update_background_after_id)
@@ -458,8 +458,7 @@ class MenuSetup:
         self.update_background_after_id = self.main_frame.after(300, self.update_background_process)
 
     def send_data(self, msg):
-        data = msg
-        self.conn1.send(data)  # type:ignore[attr-defined]
+        self.conn1.send(msg)  # type:ignore[attr-defined]
 
 
 if __name__ == "__main__":
