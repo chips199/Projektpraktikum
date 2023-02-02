@@ -143,9 +143,11 @@ class Player(Animated):
             if vel <= 0:
                 self.is_jumping = False
                 self.velocity_jumping = self.max_jumping_speed
+
     def respawn(self, data):
         self.health = data['health']
-        self.x, self.y = data['pos']
+        self.x, self.y = data['position']
+
     def is_alive(self):
         """
         Returns whether the player is still alive

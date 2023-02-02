@@ -176,6 +176,7 @@ class Game:
             else:
                 # if player is dead, set health to -99 to enable respawn
                 self.playerList[id].health = -99
+                self.playerList[id].respawn(self.data[str(id)])
 
             # Mouse Position
             self.playerList[id].mousepos = pygame.mouse.get_pos()
