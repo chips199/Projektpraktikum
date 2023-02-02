@@ -46,7 +46,7 @@ class MyWindow(tk.CTk):
     def move_out_of_window(self,
                            widget_list: list['MyFrame|MyLabel'],
                            direction_list: list[str],
-                           delay: int = 20,
+                           delay: int = 17,
                            stepsize: int = 1,
                            anchor: str = tk.NW) -> None:
         """
@@ -107,4 +107,4 @@ class MyWindow(tk.CTk):
                                                                         delay,
                                                                         stepsize,
                                                                         anchor))
-        # self.update()
+        self.update()
