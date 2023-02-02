@@ -69,7 +69,6 @@ class Player(Animated):
                           v=int(func(player=self, dirn=1, distance=int(self.current_moving_velocity)) *
                                 math.sqrt(self.sliding_frame_counter / self.max_sliding_frames)))
                 self.sliding_frame_counter -= 1
-                print("move left")
 
     def reset_sliding_counter(self):
         self.sliding_frame_counter = self.max_sliding_frames
