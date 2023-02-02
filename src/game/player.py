@@ -19,28 +19,27 @@ class Player(Animated):
     def __init__(self, *args, **kwargs):
         super(Player, self).__init__(*args, **kwargs)
 
-        self.falling_time = datetime.datetime.now()
-        self.jumping_time = datetime.datetime.now()
         self.current_moving_velocity = 7
         self.moving_velocity_on_ground = self.moving_velocity_in_air = 7
         self.velocity_gravity = 1
         self.velocity_jumping = self.max_jumping_speed = 20
-        self.velocity_time = 15
         self.landed = False
         self.is_jumping = False
         self.is_falling = True
         self.block_x_axis = False
+        self.moving_on_edge = False
         self.cut_frames(2)
         self.weapon = weapon
         self.velocity_counter = 0
         self.velocity_counter2 = 0
-        self.sliding_counter = self.max_sliding_time = 50
+        self.sliding_frame_counter = self.max_sliding_frames = 50
         map_dir = "\\".join(str(self.directory).split('\\')[:-3])
         self.fist_path = map_dir + f"\\waffen\\faeuste\\animation\\fists_{self.get_color(self.directory)}_animation"
         self.sword_path = map_dir + f"\\waffen\\schwert\\animation\\sword_hold_animation_{self.get_color(self.directory)}"
         # self.weapon = weapon.Weapon(weapon.WeaponType.Fist, [self.x, self.y], self.fist_path)
         self.weapon = weapon.Weapon(weapon.WeaponType.Sword, [self.x, self.y], self.sword_path)
-        self.death_animation = Animated(start=[0, 0], directory=map_dir + f"\\player\\death_animation\\death_animation_{self.get_color(self.directory)}")
+        self.death_animation = Animated(start=[0, 0],
+                                        directory=map_dir + f"\\player\\death_animation\\death_animation_{self.get_color(self.directory)}")
         self.blood_animation = Animated(start=[0, 0], directory=map_dir + r"\\player\\blood_animation")
         self.blood_animation.start_animation_in_direction(direction=1)
         self.blood_animation.double_frames(factor=2)
@@ -52,43 +51,72 @@ class Player(Animated):
         self.velocity_counter = data[3]
 
     def keep_sliding(self, func):
-        if self.landed and not self.is_jumping and self.sliding_counter > 1:
+        # if (self.landed or self.moving_on_edge) and \
+        #         not self.is_jumping and \
+        #         not self.is_falling and \
+        #         self.sliding_frame_counter > 1:
+        # landed for when landed and moving_on_edge for when player s sliding down hill on snowmap
+        if (self.landed or self.moving_on_edge) and \
+                not self.is_falling and \
+                self.sliding_frame_counter > 1:
             if self.animation_direction == 0:
                 self.move(dirn=0,
                           v=int(func(player=self, dirn=0, distance=int(self.current_moving_velocity)) *
-                                math.sqrt(self.sliding_counter / self.max_sliding_time)))
-                self.sliding_counter -= 1
+                                math.sqrt(self.sliding_frame_counter / self.max_sliding_frames)))
+                self.sliding_frame_counter -= 1
             if self.animation_direction == 1:
                 self.move(dirn=1,
                           v=int(func(player=self, dirn=1, distance=int(self.current_moving_velocity)) *
-                                math.sqrt(self.sliding_counter / self.max_sliding_time)))
-                self.sliding_counter -= 1
+                                math.sqrt(self.sliding_frame_counter / self.max_sliding_frames)))
+                self.sliding_frame_counter -= 1
+                print("move left")
 
     def reset_sliding_counter(self):
-        self.sliding_counter = self.max_sliding_time
+        self.sliding_frame_counter = self.max_sliding_frames
 
     def stop_sliding(self):
-        self.sliding_counter = 1
+        self.sliding_frame_counter = 1
 
     def draw(self, g):
         if self.health > 0:
             super(Player, self).draw(g=g)
-            pygame.draw.line(g, pygame.Color(231, 24, 55), (self.x, self.y - 5), (self.x + self.frame_width, self.y - 5), 3)
+
+            # health bar
+            pygame.draw.line(surface=g,
+                             color=pygame.Color(231, 24, 55),
+                             start_pos=(self.x, self.y - 5),
+                             end_pos=(self.x + self.frame_width, self.y - 5),
+                             width=3)
             if self.health > 0:
-                pygame.draw.line(g, pygame.Color(45, 175, 20), (self.x, self.y - 5),
-                                 (self.x + (self.frame_width * (self.health / 100)), self.y - 5), 3)
-            pygame.draw.line(g, pygame.Color(20, 20, 20), (self.x, self.y - 10), (self.x + self.frame_width, self.y - 10),
-                             3)
+                pygame.draw.line(surface=g,
+                                 color=pygame.Color(45, 175, 20),
+                                 start_pos=(self.x, self.y - 5),
+                                 end_pos=(self.x + (self.frame_width * (self.health / 100)), self.y - 5),
+                                 width=3)
+
+            # durability bar
+            pygame.draw.line(surface=g,
+                             color=pygame.Color(20, 20, 20),
+                             start_pos=(self.x, self.y - 10),
+                             end_pos=(self.x + self.frame_width, self.y - 10),
+                             width=3)
             if self.weapon.durability > 0:
-                pygame.draw.line(g, pygame.Color(25, 25, 200), (self.x, self.y - 10),
-                                 (self.x + (self.frame_width * (self.weapon.durability / 100)), self.y - 10),
-                                 3)
+                pygame.draw.line(surface=g,
+                                 color=pygame.Color(25, 25, 200),
+                                 start_pos=(self.x, self.y - 10),
+                                 end_pos=(self.x + (self.frame_width * (self.weapon.durability / 100)), self.y - 10),
+                                 width=3)
+
             self.weapon.animation_direction = self.animation_direction
             self.weapon.draw(g=g, x=self.x, y=self.y, width=self.frame_width, height=self.frame_height)
             self.weapon.draw(g=g, x=self.x, y=self.y, width=self.frame_width, height=self.frame_height)
+
+            # bloodsplash animation
             if self.weapon.hitted_me or self.blood_animation.current_frame > 0:
-                self.blood_animation.set_pos(self.x-47, self.y+15)
+                self.blood_animation.set_pos(self.x - 47, self.y + 15)
                 self.blood_animation.draw_animation_once(g=g, reset=True)
+
+        # death animation
         else:
             self.death_animation.set_pos(self.x, self.y)
             self.death_animation.draw_animation_once(g=g)
@@ -158,17 +186,15 @@ class Player(Animated):
                 # is currently not jumping
                 if not self.is_jumping:
                     self.is_jumping = True
-                    # reset timer to current time
-                    self.jumping_time = datetime.datetime.now()
+                    self.landed = False
 
-                # after certain time, decrease jumping speed
-                # elif datetime.datetime.now() - self.jumping_time > datetime.timedelta(milliseconds=self.velocity_time):
-                elif self.velocity_counter2 >= self.velocity_counter:
+                # after certain amount of frames, decrease jumping speed
+                if self.velocity_counter2 >= self.velocity_counter:
                     self.velocity_jumping -= 1
-                    # reset timer to current time
-                    self.jumping_time = datetime.datetime.now()
+                    # reset frame counter to 0
                     self.velocity_counter2 = 0
 
+                # otherwise just increase frame counter
                 else:
                     self.velocity_counter2 += 1
 
@@ -227,15 +253,10 @@ class Player(Animated):
                 if not self.is_falling:
                     self.is_falling = True
                     self.landed = False
-                    # reset timer to current time
-                    self.falling_time = datetime.datetime.now()
 
-                # after certain time increase the falling speed until it's maximum
-                # elif datetime.datetime.now() - self.falling_time > datetime.timedelta(milliseconds=self.velocity_time):
+                # after certain amount of frames, decrease jumping speed
                 elif self.velocity_counter2 >= self.velocity_counter:
                     self.velocity_gravity += 1
-                    # reset timer to current time
-                    self.falling_time = datetime.datetime.now()
                     self.velocity_counter2 = 0
 
                     # limit the falling speed to it's maximum
@@ -247,7 +268,8 @@ class Player(Animated):
 
                 # move player down with speed calculated in func()
                 self.move(dirn=3, v=int(vel))
-                self.block_x_axis = False
+                if vel > 5:
+                    self.block_x_axis = False
 
             # otherwise check if the player is really landed or may standing/hanging on an edge
             elif vel <= 0:
@@ -264,6 +286,10 @@ class Player(Animated):
                         # shift back the df and move to the right so in next cycle the player will continue to fall
                         self.shift_df(df=self.solid_df, dirn=1, n=moving_factor)
                         self.move(dirn=0, v=int(moving_factor))
+                        self.move(dirn=3, v=int(vel))
+                        # to be able to slide on snowmap after ending the hill
+                        self.moving_on_edge = True
+                        self.reset_sliding_counter()
 
                     else:
                         # try the same for direction left
@@ -274,6 +300,10 @@ class Player(Animated):
                         if vel > 0:
                             self.shift_df(df=self.solid_df, dirn=0, n=moving_factor)
                             self.move(dirn=1, v=int(moving_factor))
+                            self.move(dirn=3, v=int(vel))
+                            # to be able to slide on snowmap after ending the hill
+                            self.moving_on_edge = True
+                            self.reset_sliding_counter()
 
                         # otherwise it means that the player is standing on its feet, so he is landed correctly
                         # so stop falling and reset the parameters
@@ -282,6 +312,7 @@ class Player(Animated):
                             self.landed = True
                             self.block_x_axis = False
                             self.is_falling = False
+                            self.moving_on_edge = False
                             self.velocity_gravity = 1
                             self.current_moving_velocity = self.moving_velocity_on_ground
 
