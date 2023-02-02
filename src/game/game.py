@@ -228,7 +228,7 @@ class Game:
             self.map.draw(self.canvas.get_canvas())
             # Draw Players
             for p in self.playerList:
-                if p.is_connected and p.health > 0:
+                if p.is_connected:
                     p.draw(self.canvas.get_canvas())
                     # pygame.draw.circle(self.canvas.get_canvas(), (255, 0, 0), p.mousepos, 20)
             if not self.playerList[id].is_alive():

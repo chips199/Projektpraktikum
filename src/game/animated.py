@@ -36,6 +36,10 @@ class Animated:
         self.frame_height = self.images_left[0].get_height()  # height of each frame
         self.current_frame = 0
 
+    def set_pos(self, x, y):
+        self.x = x
+        self.y = y
+
     def draw(self, **kwargs):
         """
         displays a player to the canvas
@@ -51,6 +55,15 @@ class Animated:
         self.images_left = list(x for i, x in enumerate(self.images_left) if i % int(n) == 0)
         self.frame_count = len(self.images_right) - 1  # amount of frames of animation, starting at index 0
 
+    def double_frames(self, factor: int):
+        copy_right = self.images_right[:]
+        copy_left = self.images_left[:]
+        for index, (image_right, image_left) in reversed(list(enumerate(zip(copy_right, copy_left)))):
+            for _ in range(factor):
+                self.images_right.insert(index, image_right)
+                self.images_left.insert(index, image_left)
+        self.frame_count = len(self.images_right) - 1
+
     def animate(self, g, images):
         player_rec = pygame.Rect(self.x, self.y, self.frame_width, self.frame_height)
         if self.current_frame < self.frame_count and self.animation_running:
@@ -60,6 +73,16 @@ class Animated:
             g.blit(images[0], player_rec)
             self.current_frame = 0
             self.animation_running = False
+
+    def draw_animation_once(self, g, reset=False):
+        if self.current_frame < self.frame_count:
+            self.animation_running = True
+            self.draw(g=g)
+            print(self.current_frame)
+        else:
+            self.animation_running = False
+            if reset:
+                self.current_frame = 0
 
     def stop_animation(self):
         self.animation_running = False
