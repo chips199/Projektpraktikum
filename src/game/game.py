@@ -116,8 +116,8 @@ class Game:
 
             # pygame stuff for the max fps
             clock.tick(100)
-            print()
-            print("FPS:", self.update_fps())
+            # print()
+            # print("FPS:", self.update_fps())
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
@@ -135,8 +135,8 @@ class Game:
                                         self.map.solid_df)
                 # handling pygame events
 
-                print("Handling Events:", datetime.datetime.now() - timer)
-                timer = datetime.datetime.now()
+                # print("Handling Events:", datetime.datetime.now() - timer)
+                # timer = datetime.datetime.now()
 
                 # get the key presses
                 keys = pygame.key.get_pressed()
@@ -175,21 +175,21 @@ class Game:
                 # gravity
                 self.playerList[id].gravity(func=self.nextToSolid)
 
-                print("Handling Keys:", datetime.datetime.now() - timer)
-                timer = datetime.datetime.now()
+                # print("Handling Keys:", datetime.datetime.now() - timer)
+                # timer = datetime.datetime.now()
 
             # Mouse Position
             self.playerList[id].mousepos = pygame.mouse.get_pos()
-            print("Handling mouse:", datetime.datetime.now() - timer)
-            timer = datetime.datetime.now()
+            # print("Handling mouse:", datetime.datetime.now() - timer)
+            # timer = datetime.datetime.now()
 
             # Send Data about this player and get some over the others als reply
             self.send_to_background_process()
-            print("Handling send:", datetime.datetime.now() - timer)
-            timer = datetime.datetime.now()
+            # print("Handling send:", datetime.datetime.now() - timer)
+            # timer = datetime.datetime.now()
             self.update_background_process()
-            print("Handling update:", datetime.datetime.now() - timer)
-            timer = datetime.datetime.now()
+            # print("Handling update:", datetime.datetime.now() - timer)
+            # timer = datetime.datetime.now()
 
             # synchronise positions
             self.pos = self.parse_pos()
@@ -221,8 +221,8 @@ class Game:
                 self.playerList[i].weapon.animation_direction = data_weapon[2]
                 self.playerList[i].health = health
 
-            print("Handling pos parsing:", datetime.datetime.now() - timer)
-            timer = datetime.datetime.now()
+            # print("Handling pos parsing:", datetime.datetime.now() - timer)
+            # timer = datetime.datetime.now()
 
             # Draw Map
             self.map.draw(self.canvas.get_canvas())
@@ -236,8 +236,8 @@ class Game:
             # Update Canvas
             self.canvas.update()
             # print(self.playerList[id].x, self.playerList[id].y)
-            print("Handling redraw:", datetime.datetime.now() - timer)
-            timer = datetime.datetime.now()
+            # print("Handling redraw:", datetime.datetime.now() - timer)
+            # timer = datetime.datetime.now()
 
             # while datetime.datetime.now() - fps_timer < datetime.timedelta(milliseconds=20):
             #     continue
@@ -253,9 +253,9 @@ class Game:
                 # print("time total:", round(self.time_total / 1000, 3))
                 # print("this time:", this_time)a
                 delay = (self.counter_reset_timer + 1) * 16 - round((self.time_total + this_time) / 1000, 3)
-                print("calculate delay:", datetime.datetime.now() - timer)
-                timer = datetime.datetime.now()
-                print("should wait:", delay)
+                # print("calculate delay:", datetime.datetime.now() - timer)
+                # timer = datetime.datetime.now()
+                # print("should wait:", delay)
                 # print("---")
                 # print("time now:", datetime.datetime.now())
                 # print("delay:", datetime.timedelta(milliseconds=delay))
@@ -275,10 +275,10 @@ class Game:
             #     # print("wait Game")
             #     # self.send_to_background_process()
             #     continue
-            print("Handling wait:", datetime.datetime.now() - timer)
+            # print("Handling wait:", datetime.datetime.now() - timer)
             timer = datetime.datetime.now()
 
-            print("TOTAL TIME:", datetime.datetime.now() - fps_timer)
+            # print("TOTAL TIME:", datetime.datetime.now() - fps_timer)
 
             # self.process.kill() # process muss noch aus MenuSetup übergeben werden
             # -----------------------------------------------
@@ -317,9 +317,9 @@ class Game:
             #     self.new_fps_timer = datetime.datetime.now()
             #     print("reset")
 
-            print("TOTAL TIME REAL:", datetime.datetime.now() - fps_timer)
-            if self.counter_reset_timer > 0:
-                print("AVG time per frame:", self.time_total / self.counter_reset_timer)
+            # print("TOTAL TIME REAL:", datetime.datetime.now() - fps_timer)
+            # if self.counter_reset_timer > 0:
+            #     print("AVG time per frame:", self.time_total / self.counter_reset_timer)
 
             # -----------------------------------------------
 
