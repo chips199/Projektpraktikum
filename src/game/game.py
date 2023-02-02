@@ -108,7 +108,6 @@ class Game:
 
         # just for comfort
         id = self.id
-        self.playerList[self.id].set_velocity([7, 7, 20, 0])
 
         # game loop
         while run:
