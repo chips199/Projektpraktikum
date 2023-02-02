@@ -78,7 +78,6 @@ class Animated:
         if self.current_frame < self.frame_count:
             self.animation_running = True
             self.draw(g=g)
-            print(self.current_frame)
         else:
             self.animation_running = False
             if reset:

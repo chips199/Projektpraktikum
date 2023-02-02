@@ -42,7 +42,7 @@ class Player(Animated):
         self.weapon = weapon.Weapon(weapon.WeaponType.Sword, [self.x, self.y], self.sword_path)
         self.death_animation = Animated(start=[self.x, self.y], directory=map_dir + f"\\player\\death_animation\\death_animation_{self.get_color(self.directory)}")
         self.blood_animation = Animated(start=[self.x+5, self.y-20], directory=map_dir + f"\\player\\blood_animation")
-        self.blood_animation.start_animation_in_direction(drn=1)
+        self.blood_animation.start_animation_in_direction(direction=1)
         self.blood_animation.double_frames(factor=2)
 
     def set_velocity(self, data=(1, 1, 0)):
