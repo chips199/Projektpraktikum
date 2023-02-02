@@ -374,7 +374,7 @@ class MenuSetup:
         # important sleep, don't remove!!! Neccessary for the background task to realize that the game
         # has started, to send correct data to the game
         sleep(2)
-        g = game.Game(w=1600, h=900, conn=self.conn1, process = self.process)
+        g = game.Game(w=1600, h=900, conn=self.conn1, process=self.process)
         g.run()
 
     # __________________other Functions__________________

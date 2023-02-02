@@ -36,7 +36,7 @@ class MyWindow(tk.CTk):
     def on_closing(self):
         # if messagebox.askokcancel("Quit", "Do you want to quit?"):
         if self.process is not None:
-            self.process.kill()
+            self.process.kill()  # type:ignore[unreachable]
         self.run = False
         self.destroy()
 

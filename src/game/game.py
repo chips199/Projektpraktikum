@@ -112,7 +112,7 @@ class Game:
         # game loop
         while run:
             fps_timer = datetime.datetime.now()
-            timer = datetime.datetime.now()
+            # timer = datetime.datetime.now()
 
             # pygame stuff for the max fps
             clock.tick(100)
@@ -242,7 +242,7 @@ class Game:
             self.send_to_background_process()
 
             this_time = int((datetime.datetime.now() - fps_timer).microseconds)
-            delay = 0
+            delay = 0.0
 
             if self.counter_reset_timer > 0 and \
                     round((self.time_total + this_time) / 1000, 3) / (self.counter_reset_timer + 1) < 16:
