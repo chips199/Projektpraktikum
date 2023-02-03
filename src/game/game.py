@@ -136,6 +136,10 @@ class Game:
                                                                self.playerList[id].fist_path)
                 Weapon.Weapon.check_hit(self.playerList[id], self.playerList[:self.id] + self.playerList[self.id + 1:],
                                         self.map.solid_df)
+                if self.playerList[id].y > self.height:
+                    self.playerList[id].health = 0
+                    self.playerList[id].death_time = datetime.datetime.now()
+                    self.playerList[id].killed_by[id] += 1
                 # handling pygame events
 
                 # print("Handling Events:", datetime.datetime.now() - timer)
