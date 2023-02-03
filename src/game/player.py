@@ -32,7 +32,7 @@ class Player(Animated):
         self.is_falling = True
         self.block_x_axis = False
         self.cut_frames(2)
-        self.killed_by = None
+        self.killed_by = {"0": 0, "1": 0, "2": 0, "3": 0}
         # self.color = color
         self.weapon = weapon
         self.velocity_counter = 0

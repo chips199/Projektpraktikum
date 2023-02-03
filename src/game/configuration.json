@@ -7,7 +7,7 @@
 	"health": 100,
     "player_frame": [0, false, 1],
     "weapon_frame": [0, false, 1],
-    "killed_by": null
+    "killed_by": {"0": 0, "1": 0, "2": 0, "3": 0}
   },
   "1": {
     "id": 1,
@@ -17,7 +17,7 @@
 	"health": 100,
     "player_frame": [0, false, 1],
     "weapon_frame": [0, false, 1],
-    "killed_by": null
+    "killed_by": {"0": 0, "1": 0, "2": 0, "3": 0}
   },
   "2": {
     "id": 2,
@@ -27,7 +27,7 @@
 	"health": 100,
     "player_frame": [0, false, 1],
     "weapon_frame": [0, false, 1],
-    "killed_by": null
+    "killed_by": {"0": 0, "1": 0, "2": 0, "3": 0}
   },
   "3": {
     "id": 3,
@@ -37,7 +37,7 @@
 	"health": 100,
     "player_frame": [0, false, 1],
     "weapon_frame": [0, false, 1],
-    "killed_by": null
+    "killed_by": {"0": 0, "1": 0, "2": 0, "3": 0}
   },
   "metadata": {
     "map": "basicmap",

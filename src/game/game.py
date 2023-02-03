@@ -174,9 +174,9 @@ class Game:
                 # print("Handling Keys:", datetime.datetime.now() - timer)
                 # timer = datetime.datetime.now()
             else:
-                # if player is dead, set health to -99 to enable respawn
-                self.playerList[id].health = -99
-                self.playerList[id].respawn(self.data[str(id)])
+                # if player is dead, respawn
+                self.playerList[id] = Player.Player(int(id), self.data["metadata"]["spawnpoints"][str(id)],
+                                                    directory=self.map.player_uris[int(id)])
 
             # Mouse Position
             self.playerList[id].mousepos = pygame.mouse.get_pos()
@@ -211,8 +211,8 @@ class Game:
             #     self.playerList[i].mousepos = on
 
             # sync animation frames from player and weapon
-            self.player_frames, self.weapon_frames, health = self.parse_frame()
-            for i, (data_player, data_weapon, health) in enumerate(zip(self.player_frames, self.weapon_frames, health)):
+            self.player_frames, self.weapon_frames, health, killed = self.parse_frame()
+            for i, (data_player, data_weapon, health, killed) in enumerate(zip(self.player_frames, self.weapon_frames, health, killed)):
                 self.playerList[i].current_frame = data_player[0]
                 self.playerList[i].animation_running = data_player[1]
                 self.playerList[i].animation_direction = data_player[2]
@@ -220,6 +220,8 @@ class Game:
                 self.playerList[i].weapon.animation_running = data_weapon[1]
                 self.playerList[i].weapon.animation_direction = data_weapon[2]
                 self.playerList[i].health = health
+                self.playerList[i].killed_by = killed
+
 
             # print("Handling pos parsing:", datetime.datetime.now() - timer)
             # timer = datetime.datetime.now()
@@ -376,6 +378,7 @@ class Game:
         erg_player = []
         erg_weapon = []
         erg_health = []
+        erg_killed_by = []
         for key, value in self.data.items():
             # since a fifth dictionary entry named 'id' is added for the player id, ignore this key/entry
             if key != "id" and key != "metadata":
@@ -399,9 +402,11 @@ class Game:
                             erg_health.append(value2)
                         else:
                             erg_health.append(self.playerList[int(self.data["id"])].health)
+                    elif key2 == "killed_by":
+                        erg_killed_by.append(value2)
             else:
                 continue
-        return erg_player, erg_weapon, erg_health
+        return erg_player, erg_weapon, erg_health, erg_killed_by
 
     # @staticmethod
     def parse_pos(self):
