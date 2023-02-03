@@ -23,9 +23,8 @@ class backgroundProzess:
         self.game_started = False
 
         self.position = [int(100), int(100)]
-        self.mouse = [int(100), int(100)]
         self.player_frame = [0, False, 1]
-        self.weapon_frame = [0, False, 1]
+        self.weapon_frame = [0, False, 1, "Fist", 100]
         self.health = 100
         self.killed_by = [0, 0, 0, 0]
 
@@ -79,7 +78,6 @@ class backgroundProzess:
         data['id'] = int(self.net.id)
         data['position'] = self.position
         data['connected'] = True
-        data['mouse'] = self.mouse
         data['player_frame'] = self.player_frame
         data['weapon_frame'] = self.weapon_frame
         data['health'] = self.health
@@ -94,7 +92,6 @@ class backgroundProzess:
         while self.conn.poll():
             data = self.conn.recv()
             self.position = data['position']
-            self.mouse = data['mouse']
             self.player_frame = data['player_frame']
             self.weapon_frame = data['weapon_frame']
             self.health = data['health']

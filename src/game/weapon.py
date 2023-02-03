@@ -11,6 +11,13 @@ class WeaponType(Enum):
     Fist = {"Damage": 10, "damage_to_weapon_per_hit": 0, "Cooldown": 1, "IsShortRange": True}
     Sword = {"Damage": 20, "damage_to_weapon_per_hit": 10, "Cooldown": 2, "IsShortRange": True}
 
+    @staticmethod
+    def getObj(string):
+        for e in WeaponType:
+            if e.name == string:
+                return e
+        return WeaponType.Sword
+
 
 class Weapon(Animated):
 

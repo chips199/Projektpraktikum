@@ -35,37 +35,6 @@ class Game:
         self.counter = 0
         self.conn = conn
         self.process = process
-        # self.data = {
-        #     "1": {
-        #         "id": 0,
-        #         "position": [50, 50],
-        #         "mouse": [50, 50],
-        #         "connected": False,
-        #         "health": 100
-        #     },
-        #     "2": {
-        #         "id": 0,
-        #         "position": [50, 50],
-        #         "mouse": [50, 50],
-        #         "connected": False,
-        #         "health": 100
-        #     },
-        #     "3": {
-        #         "id": 0,
-        #         "position": [50, 50],
-        #         "mouse": [50, 50],
-        #         "connected": False,
-        #         "health": 100
-        #     },
-        #     "4": {
-        #         "id": 0,
-        #         "position": [50, 50],
-        #         "mouse": [50, 50],
-        #         "connected": False,
-        #         "health": 100
-        #     },
-        #     "id": 0
-        # }
         self.timer = datetime.datetime.now()
         self.update_background_process()
         self.id = int(self.data['id'])
@@ -82,7 +51,6 @@ class Game:
         self.online = [False, False, False, False]
         self.this_player_pos = [700, 50]
         self.pos = [[100, 100], [200, 100], [300, 100], [400, 100]]
-        self.mouse = [[0, 0], [0, 0], [0, 0], [0, 0]]
         self.player_frames = [[0, False, 1], [0, False, 1], [0, False, 1], [0, False, 1]]
         self.weapon_frames = [[0, False, 1], [0, False, 1], [0, False, 1], [0, False, 1]]
 
@@ -133,7 +101,8 @@ class Game:
                 if self.playerList[id].weapon.destroyed:
                     self.playerList[id].weapon = weapon.Weapon(weapon.WeaponType.Fist,
                                                                [self.playerList[id].x, self.playerList[id].y],
-                                                               self.playerList[id].fist_path)
+                                                               self.playerList[id].weapon_path[
+                                                                   weapon.WeaponType.Fist.name])
                 Weapon.Weapon.check_hit(self.playerList[id], self.playerList[:self.id] + self.playerList[self.id + 1:],
                                         self.map.solid_df)
                 if self.playerList[id].y > self.height:
@@ -196,11 +165,6 @@ class Game:
                                                         killed_by=self.playerList[id].killed_by,
                                                         directory=self.map.player_uris[int(id)])
 
-            # Mouse Position
-            self.playerList[id].mousepos = pygame.mouse.get_pos()
-            # print("Handling mouse:", datetime.datetime.now() - timer)
-            # timer = datetime.datetime.now()
-
             # Send Data about this player and get some over the others als reply
             self.send_to_background_process()
             # print("Handling send:", datetime.datetime.now() - timer)
@@ -216,6 +180,12 @@ class Game:
                 self.playerList[i].current_frame = data_player[0]
                 self.playerList[i].animation_running = data_player[1]
                 self.playerList[i].animation_direction = data_player[2]
+                if self.playerList[i].weapon.weapon_type != weapon.WeaponType.getObj(data_weapon[3]):
+                    self.playerList[i].weapon = weapon.Weapon(weapon.WeaponType.getObj(data_weapon[3]),
+                                                              [self.playerList[i].x, self.playerList[i].y],
+                                                              self.playerList[i].weapon_path[
+                                                                  weapon.WeaponType.getObj(data_weapon[3]).name])
+                self.playerList[i].weapon.durability = data_weapon[4]
                 self.playerList[i].weapon.current_frame = data_weapon[0]
                 self.playerList[i].weapon.animation_running = data_weapon[1]
                 self.playerList[i].weapon.animation_direction = data_weapon[2]
@@ -237,7 +207,6 @@ class Game:
             for p in self.playerList:
                 if p.is_connected:
                     p.draw(self.canvas.get_canvas())
-                    # pygame.draw.circle(self.canvas.get_canvas(), (255, 0, 0), p.mousepos, 20)
             if not self.playerList[id].is_alive():
                 # Draw Death-screen
                 self.canvas.get_canvas().blit(pygame.image.load(wrk_dir + '\\wasted.png').convert_alpha(), (0, 0))
@@ -245,10 +214,10 @@ class Game:
                 # Generate Scoreboard
                 can = self.canvas.get_canvas()
                 scoreboard = pygame.image.load(wrk_dir + '\\Scoreboard.png').convert_alpha()
-                Canvas.draw_text(scoreboard, "0", 20, (255, 255, 255), 60, 57)
-                Canvas.draw_text(scoreboard, "1", 20, (255, 255, 255), 60, 93)
-                Canvas.draw_text(scoreboard, "2", 20, (255, 255, 255), 60, 128)
-                Canvas.draw_text(scoreboard, "3", 20, (255, 255, 255), 60, 165)
+                Canvas.draw_text(scoreboard, "Player 0", 20, (255, 0, 255), 40, 57)
+                Canvas.draw_text(scoreboard, "Player 1", 20, (226, 200, 0), 40, 93)
+                Canvas.draw_text(scoreboard, "Player 2", 20, (160, 32, 240), 40, 128)
+                Canvas.draw_text(scoreboard, "Player 3", 20, (64, 224, 208), 40, 165)
                 Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["0"][0]), 20, (255, 255, 255), 178,
                                  57)
                 Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["1"][0]), 20, (255, 255, 255), 178,
@@ -322,13 +291,14 @@ class Game:
     def send_to_background_process(self):
         temp_data = {
             "position": [int(self.playerList[int(self.data["id"])].x), int(self.playerList[int(self.data["id"])].y)],
-            "mouse": self.playerList[int(self.data['id'])].mousepos,
             "player_frame": [self.playerList[int(self.data['id'])].current_frame,
                              self.playerList[int(self.data['id'])].animation_running,
                              self.playerList[int(self.data['id'])].animation_direction],
             "weapon_frame": [self.playerList[int(self.data['id'])].weapon.current_frame,
                              self.playerList[int(self.data['id'])].weapon.animation_running,
-                             self.playerList[int(self.data['id'])].weapon.animation_direction],
+                             self.playerList[int(self.data['id'])].weapon.animation_direction,
+                             self.playerList[int(self.data['id'])].weapon.weapon_type.name,
+                             self.playerList[int(self.data['id'])].weapon.durability],
             "health": self.playerList[int(self.data['id'])].health,
             "killed_by": self.playerList[int(self.data['id'])].killed_by
         }
@@ -368,7 +338,9 @@ class Game:
                         else:
                             erg_weapon.append([self.playerList[int(self.data["id"])].weapon.current_frame,
                                                self.playerList[int(self.data["id"])].weapon.animation_running,
-                                               self.playerList[int(self.data["id"])].weapon.animation_direction])
+                                               self.playerList[int(self.data["id"])].weapon.animation_direction,
+                                               self.playerList[int(self.data["id"])].weapon.weapon_type.name,
+                                               self.playerList[int(self.data["id"])].weapon.durability])
                     elif key2 == "health":
                         if key != str(self.id):
                             erg_health.append(value2)
