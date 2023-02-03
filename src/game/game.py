@@ -187,9 +187,10 @@ class Game:
                 # timer = datetime.datetime.now()
             else:
                 # if player is dead, respawn
-                self.playerList[id] = Player.Player(int(id), self.data["metadata"]["spawnpoints"][str(id)],
-                                                    killed_by=self.playerList[id].killed_by,
-                                                    directory=self.map.player_uris[int(id)])
+                if datetime.datetime.now() - self.playerList[id].death_time > datetime.timedelta(seconds=3):
+                    self.playerList[id] = Player.Player(int(id), self.data["metadata"]["spawnpoints"][str(id)],
+                                                        killed_by=self.playerList[id].killed_by,
+                                                        directory=self.map.player_uris[int(id)])
 
             # Mouse Position
             self.playerList[id].mousepos = pygame.mouse.get_pos()
@@ -243,7 +244,7 @@ class Game:
             self.map.draw(self.canvas.get_canvas())
             # Draw Players
             for p in self.playerList:
-                if p.is_connected and p.health > 0:
+                if p.is_connected:
                     p.draw(self.canvas.get_canvas())
                     # pygame.draw.circle(self.canvas.get_canvas(), (255, 0, 0), p.mousepos, 20)
             if not self.playerList[id].is_alive():
