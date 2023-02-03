@@ -55,7 +55,8 @@ print("Waiting for a connection")
 # load the config file as basis for a fresh game
 seperator = "\\" if platform.system() == 'Windows' else "/"
 config_file = seperator.join(
-    list(os.path.abspath(os.path.dirname(__file__)).split(seperator)[:-1])) + f"{seperator}game{seperator}configuration.json"
+    list(os.path.abspath(os.path.dirname(__file__)).split(seperator)[
+         :-1])) + f"{seperator}game{seperator}configuration.json"
 # print("\\".join(list(os.path.abspath(os.path.dirname(__file__)).split("\\")[:-1])) + "\\game\\configuration.json")
 with open(config_file) as file:
     game_data = json.load(file)
@@ -89,6 +90,7 @@ def reset_games():
             # get session_id and set game_data to default and reset map
             game_id = list(game_data_dict.keys())[i]
             game_data_dict[game_id] = copy(game_data)
+            game_data_dict[game_id]["metadata"] = copy(game_data["metadata"])
             maps_dict[game_id] = "none"
             # game_data_dict does not reset online, so manually reset it
             for n in range(number_of_players_per_game):
@@ -246,6 +248,13 @@ def threaded_client(conn):
             if data:
                 # parse the client data into the game_data Dictionary, and send the result back to the client
                 game_data_dict[game_id][this_pid] = json.loads(reply)
+                # print(game_data_dict[game_id][this_pid])
+                deaths = game_data_dict[game_id][this_pid]["killed_by"]
+                kills = list(map(lambda x: x[1]["killed_by"],
+                                 list(filter(lambda x: x[0] != "metadata", game_data_dict[game_id].items()))))
+                for k, v in enumerate(zip(*kills)):
+                    game_data_dict[game_id]["metadata"]["scoreboard"][str(k)][0] = sum(v)
+                game_data_dict[game_id]["metadata"]["scoreboard"][str(this_pid)][1] = sum(deaths)
                 conn.sendall(str.encode(json.dumps(game_data_dict[game_id])))
                 # to track how often the client sends a message track the time
                 last_msg = datetime.datetime.now()

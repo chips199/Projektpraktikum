@@ -16,19 +16,28 @@ class Player(Animated):
     mousepos = (0, 0)
     health = 100
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, pid, *args, killed_by=[0, 0, 0, 0], **kwargs):
         super(Player, self).__init__(*args, **kwargs)
 
+        self.falling_time = datetime.datetime.now()
+        self.jumping_time = datetime.datetime.now()
+        # self.x = startx
+        # self.y = starty
+        self.id = pid
+        self.velocity = 7
         self.current_moving_velocity = 7
         self.moving_velocity_on_ground = self.moving_velocity_in_air = 7
         self.velocity_gravity = 1
         self.velocity_jumping = self.max_jumping_speed = 20
+        self.velocity_time = 15
         self.landed = False
         self.is_jumping = False
         self.is_falling = True
         self.block_x_axis = False
         self.moving_on_edge = False
         self.cut_frames(2)
+        self.killed_by = killed_by
+        # self.color = color
         self.weapon = weapon
         self.velocity_counter = 0
         self.velocity_counter2 = 0
@@ -204,19 +213,6 @@ class Player(Animated):
             if vel <= 0:
                 self.is_jumping = False
                 self.velocity_jumping = self.max_jumping_speed
-
-    def beaten(self, weapon_enemy):
-        """
-        player was beaten
-        player is subtracted the damage of the weapon and it is checked if the player died during the attack
-        :param weapon_enemy The weapon with which the player was hit
-        :return None
-        """
-        self.health -= weapon_enemy.damage
-        if self.health <= 0:
-            print("Player died")
-            # TODO: Anzeige auf Screen und Spieler ausblenden?
-            self.health = 0
 
     def is_alive(self):
         """

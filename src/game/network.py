@@ -11,8 +11,8 @@ class Network:
         # use the url for connecting to an external server
         # use tht second line to connect to a local server, which is visible in a network
         # use the third if it is just local
-        self.host, self.port = "0.tcp.eu.ngrok.io", 17434
-        # self.host, self.port = "localhost", 5556
+        # self.host, self.port = "0.tcp.eu.ngrok.io", 17434
+        self.host, self.port = "localhost", 5556
         self.addr = (self.host, self.port)
         self.id, self.session_id = self.connect_lobby(msg)
         self.map_name = self.get_map()
@@ -77,37 +77,3 @@ class Network:
         # print("rpl: " + rpl)
         # print("bool: " + str(rpl == "True"))
         return rpl == "True"
-
-
-def sth(str):
-    # create networkelement also creates connection
-    net = Network(str)
-    # check for errors, like full lobby, or unknown session_id or server, or if none no connection
-    if net.id == 5 or net.id is None:
-        print(net.session_id)
-        exit(1)
-    pressed_button = True
-    while not net.game_started():
-        try:
-            number_of_players_connected = int(net.check_lobby())
-            # print(number_of_players_connected)
-
-            # display connected players
-            # ...
-
-            if pressed_button or number_of_players_connected == int(net.get_max_number_of_players()):
-                break
-        except ValueError:
-            print(net.check_lobby())
-            exit(1)
-    # start game
-    net.start_game()
-    # g = game.Game(1600, 900, net)
-    # g.run()
-
-
-if __name__ == '__main__':
-    try:
-        sth("basicmap")
-    except ConnectionRefusedError:
-        print("Connection failed")

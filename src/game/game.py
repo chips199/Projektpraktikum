@@ -9,6 +9,8 @@ import pygame
 
 import multiprocessing
 
+from src.game.canvas import Canvas
+
 from src.game import canvas, weapon
 from src.game.map import Map
 from src.game import player as Player
@@ -85,10 +87,10 @@ class Game:
         self.weapon_frames = [[0, False, 1], [0, False, 1], [0, False, 1], [0, False, 1]]
 
         self.playerList = [
-            Player.Player(self.data["metadata"]["spawnpoints"]["0"], directory=self.map.player_uris[0]),
-            Player.Player(self.data["metadata"]["spawnpoints"]["1"], directory=self.map.player_uris[1]),
-            Player.Player(self.data["metadata"]["spawnpoints"]["2"], directory=self.map.player_uris[2]),
-            Player.Player(self.data["metadata"]["spawnpoints"]["3"], directory=self.map.player_uris[3])]
+            Player.Player(0, self.data["metadata"]["spawnpoints"]["0"], directory=self.map.player_uris[0]),
+            Player.Player(1, self.data["metadata"]["spawnpoints"]["1"], directory=self.map.player_uris[1]),
+            Player.Player(2, self.data["metadata"]["spawnpoints"]["2"], directory=self.map.player_uris[2]),
+            Player.Player(3, self.data["metadata"]["spawnpoints"]["3"], directory=self.map.player_uris[3])]
 
         self.playerList[self.id].set_velocity(self.data["metadata"]["spawnpoints"]["velocity"])
 
@@ -97,6 +99,7 @@ class Game:
         self.counter_reset_timer = 0
         self.time_total = 0
         self.new_fps_timer = datetime.datetime.now()
+        self.show_scoreboard = False
 
     def run(self):
         """
@@ -141,6 +144,11 @@ class Game:
                 # get the key presses
                 keys = pygame.key.get_pressed()
 
+                # scoreboard
+                if keys[pygame.K_TAB]:
+                    self.show_scoreboard = True
+                else:
+                    self.show_scoreboard = False
                 # Hit
                 if keys[pygame.K_s]:
                     # Check if Player can use his weapon
@@ -177,6 +185,11 @@ class Game:
 
                 # print("Handling Keys:", datetime.datetime.now() - timer)
                 # timer = datetime.datetime.now()
+            else:
+                # if player is dead, respawn
+                self.playerList[id] = Player.Player(int(id), self.data["metadata"]["spawnpoints"][str(id)],
+                                                    killed_by=self.playerList[id].killed_by,
+                                                    directory=self.map.player_uris[int(id)])
 
             # Mouse Position
             self.playerList[id].mousepos = pygame.mouse.get_pos()
@@ -211,8 +224,9 @@ class Game:
             #     self.playerList[i].mousepos = on
 
             # sync animation frames from player and weapon
-            self.player_frames, self.weapon_frames, health = self.parse_frame()
-            for i, (data_player, data_weapon, health) in enumerate(zip(self.player_frames, self.weapon_frames, health)):
+            self.player_frames, self.weapon_frames, health, killed = self.parse_frame()
+            for i, (data_player, data_weapon, health, killed) in enumerate(
+                    zip(self.player_frames, self.weapon_frames, health, killed)):
                 self.playerList[i].current_frame = data_player[0]
                 self.playerList[i].animation_running = data_player[1]
                 self.playerList[i].animation_direction = data_player[2]
@@ -220,6 +234,7 @@ class Game:
                 self.playerList[i].weapon.animation_running = data_weapon[1]
                 self.playerList[i].weapon.animation_direction = data_weapon[2]
                 self.playerList[i].health = health
+                self.playerList[i].killed_by = killed
 
             # print("Handling pos parsing:", datetime.datetime.now() - timer)
             # timer = datetime.datetime.now()
@@ -228,11 +243,35 @@ class Game:
             self.map.draw(self.canvas.get_canvas())
             # Draw Players
             for p in self.playerList:
-                if p.is_connected:
+                if p.is_connected and p.health > 0:
                     p.draw(self.canvas.get_canvas())
                     # pygame.draw.circle(self.canvas.get_canvas(), (255, 0, 0), p.mousepos, 20)
             if not self.playerList[id].is_alive():
                 self.canvas.get_canvas().blit(pygame.image.load(wrk_dir + '\\wasted.png').convert_alpha(), (0, 0))
+            if self.show_scoreboard:
+                can = self.canvas.get_canvas()
+                scoreboard = pygame.image.load(wrk_dir + '\\Scoreboard.png').convert_alpha()
+                Canvas.draw_text(scoreboard, "0", 20, (255, 255, 255), 60, 57)
+                Canvas.draw_text(scoreboard, "1", 20, (255, 255, 255), 60, 93)
+                Canvas.draw_text(scoreboard, "2", 20, (255, 255, 255), 60, 128)
+                Canvas.draw_text(scoreboard, "3", 20, (255, 255, 255), 60, 165)
+                Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["0"][0]), 20, (255, 255, 255), 178,
+                                 57)
+                Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["1"][0]), 20, (255, 255, 255), 178,
+                                 93)
+                Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["2"][0]), 20, (255, 255, 255), 178,
+                                 128)
+                Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["3"][0]), 20, (255, 255, 255), 178,
+                                 165)
+                Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["0"][1]), 20, (255, 255, 255), 310,
+                                 57)
+                Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["1"][1]), 20, (255, 255, 255), 310,
+                                 93)
+                Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["2"][1]), 20, (255, 255, 255), 310,
+                                 128)
+                Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["3"][1]), 20, (255, 255, 255), 310,
+                                 165)
+                can.blit(scoreboard, (100, 100))
             # Update Canvas
             self.canvas.update()
             # print(self.playerList[id].x, self.playerList[id].y)
@@ -296,7 +335,8 @@ class Game:
             "weapon_frame": [self.playerList[int(self.data['id'])].weapon.current_frame,
                              self.playerList[int(self.data['id'])].weapon.animation_running,
                              self.playerList[int(self.data['id'])].weapon.animation_direction],
-            "health": self.playerList[int(self.data['id'])].health
+            "health": self.playerList[int(self.data['id'])].health,
+            "killed_by": self.playerList[int(self.data['id'])].killed_by
         }
         self.conn.send(temp_data)
 
@@ -314,6 +354,7 @@ class Game:
         erg_player = []
         erg_weapon = []
         erg_health = []
+        erg_killed_by = []
         for key, value in self.data.items():
             # since a fifth dictionary entry named 'id' is added for the player id, ignore this key/entry
             if key != "id" and key != "metadata":
@@ -337,9 +378,14 @@ class Game:
                             erg_health.append(value2)
                         else:
                             erg_health.append(self.playerList[int(self.data["id"])].health)
+                    elif key2 == "killed_by":
+                        if key != str(self.id):
+                            erg_killed_by.append(value2)
+                        else:
+                            erg_killed_by.append(self.playerList[int(self.data["id"])].killed_by)
             else:
                 continue
-        return erg_player, erg_weapon, erg_health
+        return erg_player, erg_weapon, erg_health, erg_killed_by
 
     # @staticmethod
     def parse_pos(self):
