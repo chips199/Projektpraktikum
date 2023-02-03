@@ -17,6 +17,7 @@ class MyWindow(tk.CTk):
         self.window_height = window_height
         self.window_width = window_width
         self.run = True
+        self.process = None
         # Set the appearance mode of the window to 'dark'
         tk.set_appearance_mode("dark")
         # Set the default color theme of the window to 'dark-blue'
@@ -33,14 +34,19 @@ class MyWindow(tk.CTk):
         self.sizing_height = sizing_height
 
     def on_closing(self):
-        if messagebox.askokcancel("Quit", "Do you want to quit?"):
-            self.run = False
-            self.destroy()
+        # if messagebox.askokcancel("Quit", "Do you want to quit?"):
+        if self.process is not None:
+            self.process.kill()  # type:ignore[unreachable]
+        self.run = False
+        self.destroy()
+
+    def set_process(self, process):
+        self.process = process
 
     def move_out_of_window(self,
                            widget_list: list['MyFrame|MyLabel'],
                            direction_list: list[str],
-                           delay: int = 20,
+                           delay: int = 17,
                            stepsize: int = 1,
                            anchor: str = tk.NW) -> None:
         """
@@ -101,4 +107,4 @@ class MyWindow(tk.CTk):
                                                                         delay,
                                                                         stepsize,
                                                                         anchor))
-        # self.update()
+        self.update()
