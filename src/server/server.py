@@ -90,7 +90,10 @@ def reset_games():
             # get session_id and set game_data to default and reset map
             game_id = list(game_data_dict.keys())[i]
             game_data_dict[game_id] = copy(game_data)
-            game_data_dict[game_id]["metadata"] = copy(game_data["metadata"])
+            game_data_dict[game_id]["metadata"]["scoreboard"] = {"0": [0, 0],
+                                                                 "1": [0, 0],
+                                                                 "2": [0, 0],
+                                                                 "3": [0, 0]}
             maps_dict[game_id] = "none"
             # game_data_dict does not reset online, so manually reset it
             for n in range(number_of_players_per_game):
