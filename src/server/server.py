@@ -95,6 +95,7 @@ def reset_games():
             # game_data_dict does not reset online, so manually reset it
             for n in range(number_of_players_per_game):
                 game_data_dict[game_id][str(n)]["connected"] = False
+                game_data_dict[game_id][str(n)]["killed_by"] = [0, 0, 0, 0]
             print(f"{list(game_data_dict.keys())[i]} reset, because no player was there anymore")
 
 
