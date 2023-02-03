@@ -106,16 +106,6 @@ class MenuSetup:
 
     def load_main_frame(self):
         # -------------------------------------------  MainFrame  -------------------------------------------
-
-        # Hintergrundbild
-        background_image = tk.CTkImage(dark_image=Image.open(wrk_dir + r"\..\basicmap\solid\basic_map_structures.png"),
-                                       size=(self.window_width, self.window_height))
-        # noinspection PyTypeChecker
-        label_background = tk.CTkLabel(master=self.main_frame,
-                                       text=None,
-                                       image=background_image)
-        label_background.place(x=0, y=0)
-
         # Game Name Label
         game_name_image = tk.CTkImage(dark_image=Image.open(wrk_dir + r"\..\stick_wars_schriftzug.png"),
                                       size=(int(1225 * self.sizing_width * 0.9), int(164 * self.sizing_height * 0.9)))
@@ -139,10 +129,20 @@ class MenuSetup:
                                    justify='left')
 
     def load_interaction_frame(self):
-        self.interaction_frame = MyFrame(master=self.root, width=int(self.window_width),
-                                         height=int(280 * self.sizing_height),
+        self.interaction_frame = MyFrame(master=self.root,
+                                         width=self.root.window_width,
+                                         height=int(730 * self.sizing_height),
                                          fg_color="#212121")
-        self.interaction_frame.place(anchor='center', x=self.window_width / 2, y=self.window_height * 0.45)
+        self.interaction_frame.place(anchor='sw', x=0, y=self.window_height)
+
+        # Hintergrundbild
+        background_image = tk.CTkImage(dark_image=Image.open(wrk_dir + r"\..\basicmap\solid\basic_map_structures.png"),
+                                       size=(self.window_width, self.window_height))
+        # noinspection PyTypeChecker
+        label_background = tk.CTkLabel(master=self.interaction_frame,
+                                       text=None,
+                                       image=background_image)
+        label_background.place(x=0, y=self.root.window_height*self.sizing_height+40, anchor="sw")
 
         # Session ID Eingabefeld
         self.entry_session_id = MyEntry(master=self.interaction_frame,
@@ -151,7 +151,7 @@ class MenuSetup:
                                         height=self.h,
                                         font=("None", self.h * 0.5),
                                         corner_radius=self.h / 3)
-        self.entry_session_id.place(relx=0.5, rely=0.0, anchor='n')
+        self.entry_session_id.place(relx=0.47, rely=0.1, anchor='n')
         self.root.update()
 
         # Create 'Play/Start Button'
@@ -334,11 +334,9 @@ class MenuSetup:
     # __________________command: Functions__________________
 
     def start_new_session(self):
-        self.clear_frame_sliding(widget_list=[self.interaction_frame,
-                                              self.main_frame.winfo_children()[0]],
-                                 direction_list=["up",
-                                                 "down"],
-                                 after_time=2400,
+        self.clear_frame_sliding(widget_list=[self.interaction_frame],
+                                 direction_list=["down"],
+                                 after_time=1500,
                                  func=lambda: self.load_choose_map_frame())
 
     def create_lobby(self, map_name):
@@ -347,24 +345,22 @@ class MenuSetup:
                            success_func=lambda: self.clear_frame_sliding(
                                widget_list=[self.choose_map_frame],
                                direction_list=["down"],
-                               stepsize=7,
-                               after_time=2500,
+                               # stepsize=7,
+                               after_time=1200,
                                func=lambda: self.load_lobby_frame(),
                                func2=lambda: self.check_if_game_started(),
-                               func3=lambda: self.main_frame.after(3000, lambda: self.update_player())))
+                               func3=lambda: self.main_frame.after(1700, lambda: self.update_player())))
 
     def join_lobby(self):
         self.start_network(argument=self.entry_session_id.get(),  # type:ignore[union-attr]
                            update_func=lambda: self.update_background_process(),
                            success_func=lambda: self.clear_frame_sliding(
-                               widget_list=[self.interaction_frame,
-                                            self.main_frame.winfo_children()[0]],
-                               direction_list=["up",
-                                               "down"],
-                               after_time=2400,
+                               widget_list=[self.interaction_frame],
+                               direction_list=["down"],
+                               after_time=1200,
                                func=lambda: self.load_lobby_frame(),
                                fun2=lambda: self.check_if_game_started(),
-                               func3=lambda: self.main_frame.after(3000, lambda: self.update_player())))
+                               func3=lambda: self.main_frame.after(1700, lambda: self.update_player())))
 
     def start_game(self):
         self.conn1.send("start")  # type:ignore[attr-defined]
@@ -374,7 +370,7 @@ class MenuSetup:
         # important sleep, don't remove!!! Neccessary for the background task to realize that the game
         # has started, to send correct data to the game
         sleep(2)
-        g = game.Game(w=1600, h=900, conn=self.conn1, process = self.process)
+        g = game.Game(w=1600, h=900, conn=self.conn1, process=self.process)
         g.run()
 
     # __________________other Functions__________________
@@ -388,7 +384,7 @@ class MenuSetup:
     def clear_frame_sliding(self,
                             widget_list: list['MyLabel|tk.CTkButton|MyFrame'],
                             direction_list: list[str],
-                            stepsize: int = 5,
+                            stepsize: int = 8,
                             after_time: int = 2000,
                             func: Optional[Union[Callable, None]] = None,  # type:ignore[type-arg]
                             **kwargs: Optional[Union[Callable, None]]) -> None:  # type:ignore[type-arg]
@@ -407,13 +403,12 @@ class MenuSetup:
                 self.conn1, self.conn2 = multiprocessing.Pipe(duplex=True)
                 self.process = multiprocessing.Process(target=backgroundProzess, args=(argument, self.conn2))
                 self.process.start()
+                self.root.set_process(self.process)
                 while not self.conn1.poll():
                     # waiting for the first message of background process
                     sleep(0.1)
                 self.timer = datetime.datetime.now()
                 update_func()
-            # else:
-            #     process = None
 
             if argument == "" or self.data["id"] == "5":  # type:ignore[comparison-overlap]
                 if argument == "":
@@ -458,8 +453,7 @@ class MenuSetup:
         self.update_background_after_id = self.main_frame.after(300, self.update_background_process)
 
     def send_data(self, msg):
-        data = msg
-        self.conn1.send(data)  # type:ignore[attr-defined]
+        self.conn1.send(msg)  # type:ignore[attr-defined]
 
 
 if __name__ == "__main__":

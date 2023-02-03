@@ -25,7 +25,8 @@ class Animated:
         # self.current_frame = None
         self.x = start[0]
         self.y = start[1]
-        self.animation_direction = 1  # 1 mean right, 2 means left
+        self.scale = 0.8
+        self.animation_direction = 0  # 0 mean right, 1 means left
         self.animation_running = False
 
         self.images_right, self.images_left = self.load_images()
@@ -35,13 +36,16 @@ class Animated:
         self.frame_height = self.images_left[0].get_height()  # height of each frame
         self.current_frame = 0
 
+    def set_pos(self, x, y):
+        self.x = x
+        self.y = y
 
     def draw(self, **kwargs):
         """
         displays a player to the canvas
         :param g: pygame canvas
         """
-        if self.animation_direction == 1:
+        if self.animation_direction == 0:
             self.animate(kwargs["g"], self.images_right)
         else:
             self.animate(kwargs["g"], self.images_left)
@@ -50,6 +54,15 @@ class Animated:
         self.images_right = list(x for i, x in enumerate(self.images_right) if i % int(n) == 0)
         self.images_left = list(x for i, x in enumerate(self.images_left) if i % int(n) == 0)
         self.frame_count = len(self.images_right) - 1  # amount of frames of animation, starting at index 0
+
+    def double_frames(self, factor: int):
+        copy_right = self.images_right[:]
+        copy_left = self.images_left[:]
+        for index, (image_right, image_left) in reversed(list(enumerate(zip(copy_right, copy_left)))):
+            for _ in range(factor):
+                self.images_right.insert(index, image_right)
+                self.images_left.insert(index, image_left)
+        self.frame_count = len(self.images_right) - 1
 
     def animate(self, g, images):
         player_rec = pygame.Rect(self.x, self.y, self.frame_width, self.frame_height)
@@ -61,12 +74,20 @@ class Animated:
             self.current_frame = 0
             self.animation_running = False
 
+    def draw_animation_once(self, g, reset=False):
+        if self.current_frame < self.frame_count:
+            self.animation_running = True
+            self.draw(g=g)
+        else:
+            self.animation_running = False
+            if reset:
+                self.current_frame = 0
 
     def stop_animation(self):
         self.animation_running = False
 
-    def set_animation_direction(self, drn):
-        self.animation_direction = drn
+    def start_animation_in_direction(self, direction):
+        self.animation_direction = direction
         self.animation_running = True
 
     def load_images(self):
@@ -85,6 +106,7 @@ class Animated:
             image_path = self.directory + r"/" + filename
             try:
                 image = pygame.image.load(image_path).convert_alpha()
+                image = pygame.transform.scale(image, (image.get_width() * self.scale, image.get_height() * self.scale))
                 if len(images_right) == 0:
                     self.edge_surface = pygame.transform.laplacian(image).convert_alpha()
                     alpha_array = pygame.surfarray.pixels_alpha(self.edge_surface)
@@ -101,7 +123,6 @@ class Animated:
         self.relativ_solids_df = pd.DataFrame(self.relativ_solids, columns=['x', 'y'])
         self.solid_df = pd.DataFrame(self.solid, columns=['x', 'y'])
         return images_right, images_left
-
 
     def get_relativ_dataframe(self, firstFrame=False):
         if firstFrame:

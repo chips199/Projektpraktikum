@@ -77,6 +77,8 @@ class Game:
         self.canvas = canvas.Canvas(self.width, self.height, str(self.id) + "Stick  Wars")
         # self.map = Map(self, map_names_dict[self.data['map_name']])
         self.map = Map(self, map_names_dict[self.data["metadata"]["map"]])
+        print("MAP:", self.data["metadata"]["map"])
+        print("SPAWNPOINTS:", self.data["metadata"]["spawnpoints"])
         self.online = [False, False, False, False]
         self.this_player_pos = [700, 50]
         self.pos = [[100, 100], [200, 100], [300, 100], [400, 100]]
@@ -89,6 +91,8 @@ class Game:
             Player.Player(1, self.data["metadata"]["spawnpoints"]["1"], directory=self.map.player_uris[1]),
             Player.Player(2, self.data["metadata"]["spawnpoints"]["2"], directory=self.map.player_uris[2]),
             Player.Player(3, self.data["metadata"]["spawnpoints"]["3"], directory=self.map.player_uris[3])]
+
+        self.playerList[self.id].set_velocity(self.data["metadata"]["spawnpoints"]["velocity"])
 
         self.min_timer = 0
         self.max_timer = 0
@@ -111,12 +115,12 @@ class Game:
         # game loop
         while run:
             fps_timer = datetime.datetime.now()
+            # timer = datetime.datetime.now()
 
             # pygame stuff for the max fps
             clock.tick(100)
             # print()
-            print("FPS:", self.update_fps())
-            # timer = datetime.datetime.now()
+            # print("FPS:", self.update_fps())
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
@@ -134,8 +138,8 @@ class Game:
                                         self.map.solid_df)
                 # handling pygame events
 
-                # print("Handling Events:", datetime.datetime.now() - time)
-                # time = datetime.datetime.now()
+                # print("Handling Events:", datetime.datetime.now() - timer)
+                # timer = datetime.datetime.now()
 
                 # get the key presses
                 keys = pygame.key.get_pressed()
@@ -151,20 +155,28 @@ class Game:
                     if self.playerList[id].weapon.can_hit():
                         # Check if an enemy player is in range
                         self.playerList[id].weapon.hit()
-                        self.playerList[id].weapon.set_animation_direction(self.playerList[id].animation_direction)
+                        self.playerList[id].weapon.start_animation_in_direction(self.playerList[id].animation_direction)
 
                 if keys[pygame.K_d] and not self.playerList[id].block_x_axis:
                     if self.playerList[id].landed:
-                        self.playerList[id].set_animation_direction(1)
-                    self.playerList[id].move(0, self.nextToSolid(self.playerList[id], 0, self.playerList[id].velocity))
+                        self.playerList[id].start_animation_in_direction(0)
+                    self.playerList[id].move(0, self.nextToSolid(self.playerList[id], 0,
+                                                                 self.playerList[id].current_moving_velocity))
+                    self.playerList[id].reset_sliding_counter()
 
                 elif keys[pygame.K_a] and not self.playerList[id].block_x_axis:
                     if self.playerList[id].landed:
-                        self.playerList[id].set_animation_direction(2)
-                    self.playerList[id].move(1, self.nextToSolid(self.playerList[id], 1, self.playerList[id].velocity))
+                        self.playerList[id].start_animation_in_direction(1)
+                    self.playerList[id].move(1, self.nextToSolid(self.playerList[id], 1,
+                                                                 self.playerList[id].current_moving_velocity))
+                    self.playerList[id].reset_sliding_counter()
+
+                elif self.data["metadata"]["map"] == "schneemap":
+                    self.playerList[id].keep_sliding(func=self.nextToSolid)
 
                 # Jump
                 if keys[pygame.K_SPACE] or self.playerList[id].is_jumping or keys[pygame.K_w]:
+                    self.playerList[id].stop_sliding()
                     self.playerList[id].stop_animation()
                     self.playerList[id].jump(func=self.nextToSolid)
 
@@ -264,73 +276,36 @@ class Game:
             self.canvas.update()
             # print(self.playerList[id].x, self.playerList[id].y)
             # print("Handling redraw:", datetime.datetime.now() - timer)
-
             # timer = datetime.datetime.now()
 
-            # while datetime.datetime.now() - fps_timer < datetime.timedelta(milliseconds=20):
-            #     continue
             self.send_to_background_process()
 
-            # if self.counter_reset_timer > 0:
-            #     print(round(self.time_total / 1000, 3) / self.counter_reset_timer) #
+            this_time = int((datetime.datetime.now() - fps_timer).microseconds)
+            delay = 0.0
 
             if self.counter_reset_timer > 0 and \
-                    round(self.time_total / 1000, 3) / self.counter_reset_timer < 16:
-                # print("counter reset timer:", self.counter_reset_timer)
-                # print("time total:", round(self.time_total / 1000, 3))
-                delay = self.counter_reset_timer * 16 - round(self.time_total / 1000, 3)
-                # print("should wait:", delay)
-                # print("---")
-                # print("time now:", datetime.datetime.now())
-                # print("delay:", datetime.timedelta(milliseconds=delay))
-                # print("subtraktion:", datetime.datetime.now() - datetime.timedelta(milliseconds=delay))
-                # print("in microseconds:", (datetime.datetime.now() - datetime.timedelta(milliseconds=delay)).microsecond)
-                wait_time = datetime.datetime.now()
-                while datetime.datetime.now() - wait_time < datetime.timedelta(microseconds=delay * 1000):
-                    # print("in while")
-                    continue
-                # print((datetime.datetime.now() - wait_time).microseconds / 1000)
+                    round((self.time_total + this_time) / 1000, 3) / (self.counter_reset_timer + 1) < 16:
+                delay = (self.counter_reset_timer + 1) * 16 - round((self.time_total + this_time) / 1000, 3)
 
-            # while datetime.datetime.now() - fps_timer < datetime.timedelta(milliseconds=20):
-            #     # print("wait Game")
-            #     # self.send_to_background_process()
-            #     continue
+            elif self.counter_reset_timer == 0:
+                delay = 16 - this_time / 1000
+
+            wait_time = datetime.datetime.now()
+            while datetime.datetime.now() - wait_time < datetime.timedelta(microseconds=(delay - 0.5) * 1000):
+                continue
+                # print((datetime.datetime.now() - wait_time).microseconds / 1000)
+            # timer = datetime.datetime.now()
 
             # print("TOTAL TIME:", datetime.datetime.now() - fps_timer)
 
-            # self.process.kill() # process muss noch aus MenuSetup übergeben werden
-            # -----------------------------------------------
             this_time = int((datetime.datetime.now() - fps_timer).microseconds)
-            # print("TYPE this time:", type(this_time), "VAL:", this_time)
-            # print("TYPE min timer:", type(self.min_timer), "VAL:", self.min_timer)
-            # print("TYPE max timer:", type(self.max_timer), "VAL:", self.max_timer)
-
-            if self.counter_reset_timer == 0:
-                # print("COUNTER RESET")
-                self.min_timer = this_time
-                self.max_timer = this_time
-                self.time_total = 0
-                # print(self.min_timer, type(self.min_timer))
-                # print(self.max_timer, type(self.max_timer))
-                # print(this_time < self.min_timer)
-            elif this_time < self.min_timer:
-                self.min_timer = this_time
-            elif this_time > self.max_timer:
-                self.max_timer = this_time
             self.counter_reset_timer += 1
             self.time_total += this_time
 
-            # if self.counter_reset_timer == 60:
-            if datetime.datetime.now() - self.new_fps_timer > datetime.timedelta(milliseconds=990):
-                # print("MIN TIME:", round(self.min_timer / 1000, 3))
-                # print("MAX TIME:", round(self.max_timer / 1000, 3))
-                # print("TIME TOTAL:", round(self.time_total / 1000, 3))
-                # print("COUNTER:", self.counter_reset_timer)
-                # print()
+            if self.counter_reset_timer == 10:
                 self.counter_reset_timer = 0
+                self.time_total = 0
                 self.new_fps_timer = datetime.datetime.now()
-
-            # -----------------------------------------------
 
         self.process.kill()  # muss noch übergeben werden
         pygame.quit()
