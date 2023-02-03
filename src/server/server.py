@@ -248,11 +248,13 @@ def threaded_client(conn):
             if data:
                 # parse the client data into the game_data Dictionary, and send the result back to the client
                 game_data_dict[game_id][this_pid] = json.loads(reply)
-                print(game_data_dict[game_id][this_pid])
-                killed_by = game_data_dict[game_id][this_pid]["killed_by"]
-                for k, v in killed_by.items():
-                    game_data_dict[game_id]["metadata"]["scoreboard"][str(k)][0] += 1
-                game_data_dict[game_id]["metadata"]["scoreboard"][str(this_pid)][1] = sum(killed_by.values())
+                # print(game_data_dict[game_id][this_pid])
+                deaths = game_data_dict[game_id][this_pid]["killed_by"]
+                kills = list(map(lambda x: x[1]["killed_by"],
+                                 list(filter(lambda x: x[0] != "metadata", game_data_dict[game_id].items()))))
+                for k, v in enumerate(zip(*kills)):
+                    game_data_dict[game_id]["metadata"]["scoreboard"][str(k)][0] = sum(v)
+                game_data_dict[game_id]["metadata"]["scoreboard"][str(this_pid)][1] = sum(deaths)
                 conn.sendall(str.encode(json.dumps(game_data_dict[game_id])))
                 # to track how often the client sends a message track the time
                 last_msg = datetime.datetime.now()

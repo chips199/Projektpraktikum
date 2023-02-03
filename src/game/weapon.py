@@ -112,7 +112,7 @@ class Weapon(Animated):
                     pl.health -= p.weapon.weapon_type.value["Damage"]
                     p.weapon.hitted_me = True
                     if not pl.is_alive():
-                        pl.killed_by[str(p.id)] += 1
+                        pl.killed_by[int(p.id)] += 1
             else:
                 p.weapon.hitted_me = False
         # hitting wall
@@ -121,6 +121,6 @@ class Weapon(Animated):
                 pl.health -= pl.weapon.weapon_type.value["Damage"]
                 pl.weapon.hitted_me = True
                 if not pl.is_alive():
-                    pl.killed_by[str(pl.id)] += 1
+                    pl.killed_by[int(pl.id)] += 1
         else:
             pl.weapon.hitted_me = False

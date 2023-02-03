@@ -176,6 +176,7 @@ class Game:
             else:
                 # if player is dead, respawn
                 self.playerList[id] = Player.Player(int(id), self.data["metadata"]["spawnpoints"][str(id)],
+                                                    killed_by=self.playerList[id].killed_by,
                                                     directory=self.map.player_uris[int(id)])
 
             # Mouse Position
@@ -212,7 +213,8 @@ class Game:
 
             # sync animation frames from player and weapon
             self.player_frames, self.weapon_frames, health, killed = self.parse_frame()
-            for i, (data_player, data_weapon, health, killed) in enumerate(zip(self.player_frames, self.weapon_frames, health, killed)):
+            for i, (data_player, data_weapon, health, killed) in enumerate(
+                    zip(self.player_frames, self.weapon_frames, health, killed)):
                 self.playerList[i].current_frame = data_player[0]
                 self.playerList[i].animation_running = data_player[1]
                 self.playerList[i].animation_direction = data_player[2]
@@ -221,7 +223,6 @@ class Game:
                 self.playerList[i].weapon.animation_direction = data_weapon[2]
                 self.playerList[i].health = health
                 self.playerList[i].killed_by = killed
-
 
             # print("Handling pos parsing:", datetime.datetime.now() - timer)
             # timer = datetime.datetime.now()
@@ -403,7 +404,10 @@ class Game:
                         else:
                             erg_health.append(self.playerList[int(self.data["id"])].health)
                     elif key2 == "killed_by":
-                        erg_killed_by.append(value2)
+                        if key != str(self.id):
+                            erg_killed_by.append(value2)
+                        else:
+                            erg_killed_by.append(self.playerList[int(self.data["id"])].killed_by)
             else:
                 continue
         return erg_player, erg_weapon, erg_health, erg_killed_by

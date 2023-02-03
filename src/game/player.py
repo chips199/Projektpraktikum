@@ -15,9 +15,11 @@ class Player(Animated):
     mousepos = (0, 0)
     health = 100
 
-    def __init__(self, pid, *args, **kwargs):
+    def __init__(self, pid, *args, killed_by=[0, 0, 0, 0], **kwargs):
         super(Player, self).__init__(*args, **kwargs)
 
+        if killed_by is None:
+            killed_by = [0, 0, 0, 0]
         self.falling_time = datetime.datetime.now()
         self.jumping_time = datetime.datetime.now()
         # self.x = startx
@@ -32,7 +34,7 @@ class Player(Animated):
         self.is_falling = True
         self.block_x_axis = False
         self.cut_frames(2)
-        self.killed_by = {"0": 0, "1": 0, "2": 0, "3": 0}
+        self.killed_by = killed_by
         # self.color = color
         self.weapon = weapon
         self.velocity_counter = 0
