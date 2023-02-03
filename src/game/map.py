@@ -20,14 +20,6 @@ class Map():
         except:
             self.background = "no image found"  # type: ignore[assignment]
 
-        # # load player images
-        # for filename in os.listdir(self.directory + r'/player'):
-        #     playerimg = os.path.join(self.directory + r'/player', filename)
-        #     if not os.path.isfile(playerimg) or filename[-3:] != 'png':
-        #         print(str(playerimg) + ' is not a  png file')
-        #         continue
-        #     self.player_uris.append(playerimg)
-
         # load player images
         for directory in next(os.walk(self.directory + r'\player\animation'))[1]:
             if directory[-3:] == 'png':
@@ -68,13 +60,10 @@ class Map():
                 for xi, x in enumerate(y):
                     if x > 100:
                         solid.append((xi, yi))
+
         # Add surface borders
-        # horizontal edges
-        # for x in range(self.game.width):
-        #     solid.append((x, 0))
-            # solid.append((x, self.game.height))
         # vertical edges
-        for y in range(self.game.height):
+        for y in range(-self.game.height, self.game.height):
             solid.append((0, y))
             solid.append((self.game.width, y))
 

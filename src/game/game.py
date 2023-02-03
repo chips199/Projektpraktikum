@@ -209,29 +209,10 @@ class Game:
             # print("Handling update:", datetime.datetime.now() - timer)
             # timer = datetime.datetime.now()
 
-            # synchronise positions
-            self.pos = self.parse_pos()
-            for i, position in enumerate(self.pos):
-                self.playerList[i].x, self.playerList[i].y = position
-            for p in self.playerList:
-                if p == self.playerList[id]:
-                    continue
-                p.refresh_solids()
-
-            # synchronise Online stati
-            self.online = self.parse_online()
-            for i, on in enumerate(self.online):
-                self.playerList[i].is_connected = on
-
-            # sync mouse
-            # mouse = self.parse_mouse(self.data)
-            # for i, on in enumerate(self.mouse):
-            #     self.playerList[i].mousepos = on
-
-            # sync animation frames from player and weapon
-            self.player_frames, self.weapon_frames, health, killed = self.parse_frame()
-            for i, (data_player, data_weapon, health, killed) in enumerate(
-                    zip(self.player_frames, self.weapon_frames, health, killed)):
+            # sync data
+            self.player_frames, self.weapon_frames, health, killed, pos, con = self.parse()
+            for i, (data_player, data_weapon, health, killed, pos, con) in enumerate(
+                    zip(self.player_frames, self.weapon_frames, health, killed, pos, con)):
                 self.playerList[i].current_frame = data_player[0]
                 self.playerList[i].animation_running = data_player[1]
                 self.playerList[i].animation_direction = data_player[2]
@@ -240,7 +221,13 @@ class Game:
                 self.playerList[i].weapon.animation_direction = data_weapon[2]
                 self.playerList[i].health = health
                 self.playerList[i].killed_by = killed
+                self.playerList[i].x, self.playerList[i].y = pos
+                self.playerList[i].is_connected = con
 
+            for p in self.playerList:
+                if p == self.playerList[id]:
+                    continue
+                p.refresh_solids()
             # print("Handling pos parsing:", datetime.datetime.now() - timer)
             # timer = datetime.datetime.now()
 
@@ -252,8 +239,10 @@ class Game:
                     p.draw(self.canvas.get_canvas())
                     # pygame.draw.circle(self.canvas.get_canvas(), (255, 0, 0), p.mousepos, 20)
             if not self.playerList[id].is_alive():
+                # Draw Death-screen
                 self.canvas.get_canvas().blit(pygame.image.load(wrk_dir + '\\wasted.png').convert_alpha(), (0, 0))
             if self.show_scoreboard:
+                # Generate Scoreboard
                 can = self.canvas.get_canvas()
                 scoreboard = pygame.image.load(wrk_dir + '\\Scoreboard.png').convert_alpha()
                 Canvas.draw_text(scoreboard, "0", 20, (255, 255, 255), 60, 57)
@@ -276,10 +265,10 @@ class Game:
                                  128)
                 Canvas.draw_text(scoreboard, str(self.data["metadata"]["scoreboard"]["3"][1]), 20, (255, 255, 255), 310,
                                  165)
+                # Draw the Scoreboard
                 can.blit(scoreboard, (100, 100))
             # Update Canvas
             self.canvas.update()
-            # print(self.playerList[id].x, self.playerList[id].y)
             # print("Handling redraw:", datetime.datetime.now() - timer)
             # timer = datetime.datetime.now()
 
@@ -350,7 +339,7 @@ class Game:
         fps = str(int(clock.get_fps()))
         return fps
 
-    def parse_frame(self):
+    def parse(self):
         """
         extracts positions from server data
         :return: list of player frames [current_frame, animation_running, animation_direction],
@@ -360,6 +349,8 @@ class Game:
         erg_weapon = []
         erg_health = []
         erg_killed_by = []
+        erg_pos = []
+        erg_con = []
         for key, value in self.data.items():
             # since a fifth dictionary entry named 'id' is added for the player id, ignore this key/entry
             if key != "id" and key != "metadata":
@@ -388,71 +379,20 @@ class Game:
                             erg_killed_by.append(value2)
                         else:
                             erg_killed_by.append(self.playerList[int(self.data["id"])].killed_by)
-            else:
-                continue
-        return erg_player, erg_weapon, erg_health, erg_killed_by
-
-    # @staticmethod
-    def parse_pos(self):
-        """
-        extracts positions from server data
-        :param data: string from server
-        :return: list of player positions
-        """
-        erg = []
-        for key, value in self.data.items():
-            if key != "id":
-                for key2, value2 in value.items():
-                    if key2 == "position":
+                    elif key2 == "position":
                         if key != str(self.id):
-                            erg.append(value2)
+                            erg_pos.append(value2)
                         else:
-                            erg.append([int(self.playerList[int(self.data["id"])].x),
-                                        int(self.playerList[int(self.data["id"])].y)])
-            else:
-                continue
-        return erg
-
-    # @staticmethod
-    def parse_online(self):
-        """
-        extracts online information from server data
-        :param data: string from server
-        :return: list of online stati
-        """
-        erg = []
-        for key, value in self.data.items():
-            if key != "id":
-                for key2, value2 in value.items():
-                    if key2 == "connected":
+                            erg_pos.append([int(self.playerList[int(self.data["id"])].x),
+                                            int(self.playerList[int(self.data["id"])].y)])
+                    elif key2 == "connected":
                         if key != str(self.id):
-                            erg.append(value2)
+                            erg_con.append(value2)
                         else:
-                            erg.append(True)
+                            erg_con.append(True)
             else:
                 continue
-        return erg
-
-    @staticmethod
-    def parse_mouse(data):  # noch nicht an background process angepasst
-        """
-        extracts mouse information from server data
-        :param data: string from server
-        :return: list of mouse positions
-        """
-        erg = []
-        try:
-            jdata = json.loads(data)
-            for d in jdata:
-                erg.append(jdata[d]["mouse"])
-            return erg
-        except:
-            erg.clear()
-            with open(config_file) as file:
-                sample = json.load(file)
-            for p in sample:
-                erg.append(sample[p]["mouse"])
-            return erg
+        return erg_player, erg_weapon, erg_health, erg_killed_by, erg_pos, erg_con
 
     def nextToSolid(self, player, dirn, distance):
         """
