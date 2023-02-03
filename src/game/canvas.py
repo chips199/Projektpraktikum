@@ -15,6 +15,7 @@ class Canvas:
 
     def get_canvas(self):
         return self.screen
+
     @staticmethod
     def draw_text(g, text, size, color, x, y):
         pygame.font.init()
