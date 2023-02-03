@@ -3,6 +3,7 @@ from datetime import datetime
 from enum import Enum
 
 import pandas as pd
+import pygame.image
 
 from src.game.animated import Animated
 
@@ -16,7 +17,7 @@ class WeaponType(Enum):
         for e in WeaponType:
             if e.name == string:
                 return e
-        return WeaponType.Sword
+        return WeaponType.Fist
 
 
 class Weapon(Animated):
@@ -30,6 +31,12 @@ class Weapon(Animated):
         self.weapon_type = waepon_type
         if self.weapon_type == WeaponType.Fist:
             self.cut_frames(2)
+        self.drop_img = None
+        try:
+            self.drop_img = pygame.image.load(
+                "\\".join(self.directory.split("\\")[:-2]) + "\\" + self.weapon_type.name + ".png").convert_alpha()
+        except FileNotFoundError:
+            pass
         self.last_hit = int(round(datetime.now().timestamp()))
         self.hitted = list()
         self.hitted_me = False

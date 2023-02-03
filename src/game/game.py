@@ -45,7 +45,7 @@ class Game:
         self.height = h
         self.canvas = canvas.Canvas(self.width, self.height, str(self.id) + "Stick  Wars")
         # self.map = Map(self, map_names_dict[self.data['map_name']])
-        self.map = Map(self, map_names_dict[self.data["metadata"]["map"]])
+        self.map = Map(self, map_names_dict[self.data["metadata"]["map"]], self.data['metadata']['spawnpoints']['items'])
         print("MAP:", self.data["metadata"]["map"])
         print("SPAWNPOINTS:", self.data["metadata"]["spawnpoints"])
         self.online = [False, False, False, False]
@@ -122,6 +122,17 @@ class Game:
                     self.show_scoreboard = True
                 else:
                     self.show_scoreboard = False
+                # pick up weapon
+                if keys[pygame.K_e]:
+                    for w in self.map.items:
+                        new_weapon = w.getItem(self.playerList[id].solid_df)
+                        if new_weapon is not None:
+                            self.playerList[id].weapon = weapon.Weapon(new_weapon,
+                                                                       [self.playerList[id].x, self.playerList[id].y],
+                                                                       self.playerList[id].weapon_path[
+                                                                           new_weapon.name])
+                        break
+
                 # Hit
                 if keys[pygame.K_s]:
                     # Check if Player can use his weapon

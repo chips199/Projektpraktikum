@@ -4,16 +4,26 @@ import pygame
 from typing import List
 from pandas import DataFrame
 
+from src.game import weapon
+from src.game.item import Item
+from src.game.weapon import *
+
 
 class Map():
     solid_df: DataFrame
     staticimages = list()  # type: List[pygame.surface.Surface]
     player_uris = list()  # type: List[str]
 
-    def __init__(self, game, uri):
+    def __init__(self, game, uri, items):
         self.game = game
         self.directory = uri
-
+        self.items = list()
+        self.weapon_path = {
+            weapon.WeaponType.Sword.name: self.directory + f"\\waffen\\schwert\\Sword.png"}
+        for k, v in items.items():
+            for w in v:
+                print(k)
+                self.items.append(Item(WeaponType.getObj(k), w, self.weapon_path[k]))
         # load background
         try:
             self.background = pygame.image.load(uri + r'/background.png').convert_alpha()
@@ -103,6 +113,5 @@ class Map():
             screen.blit(self.background, canvas_rec)
             if len(self.staticimages) != 0:
                 screen.blit(self.static_objects_img, canvas_rec)
-
-        else:
-            screen.fill((41, 41, 41))
+        for i in self.items:
+            i.draw(screen)
