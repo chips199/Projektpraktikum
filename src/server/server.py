@@ -254,7 +254,7 @@ def threaded_client(conn):
                 game_data_dict[game_id][this_pid] = json.loads(reply)
                 # print(game_data_dict[game_id][this_pid])
                 deaths = game_data_dict[game_id][this_pid]["killed_by"]
-                kills = list(map(lambda x: x[1]["killed_by"],  # type: ignore[no-any-return]
+                kills = list(map(lambda x: x[1]["killed_by"][:4],  # type: ignore[no-any-return]
                                  list(filter(lambda x: x[0] != "metadata", game_data_dict[game_id].items()))))
                 for k, v in enumerate(zip(*kills)):
                     game_data_dict[game_id]["metadata"]["scoreboard"][str(k)][0] = sum(v)

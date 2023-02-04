@@ -101,21 +101,6 @@ class Weapon(Animated):
         self.last_hit = int(round(datetime.now().timestamp()))
         self.destroyed = self.durability <= 0
 
-    def check_hit1(self, pl, players, map_df):
-        pl_hitted = self.hitted.__contains__(-99)
-        wdf = self.get_dataframe(self.current_frame)
-        for ip, p in enumerate(players):
-            if not pd.merge(wdf, p.solid_df, how='inner', on=['x', 'y']).empty:
-                if not self.hitted.__contains__(ip):
-                    self.hitted.append(ip)
-                    p.health -= self.weapon_type.value["Damage"]
-        if not pd.merge(wdf, map_df, how='inner', on=['x', 'y']).empty and not pl_hitted:
-            self.hitted.append(-99)
-            pl.health -= self.weapon_type.value["Damage"]
-        if self.current_frame == self.frame_count:
-            self.hitted = list()
-            self.destroyed = self.durability <= 0
-
     @staticmethod
     def check_hit(pl, players, map_df):
         pldf = pl.solid_df
@@ -138,7 +123,7 @@ class Weapon(Animated):
                 pl.health -= pl.weapon.weapon_type.value["Damage"]
                 pl.weapon.hitted_me = True
                 if not pl.is_alive():
-                    pl.killed_by[int(pl.id)] += 1
+                    pl.killed_by[4] += 1
                     pl.death_time = datetime.now()
         else:
             pl.weapon.hitted_me = False

@@ -6,7 +6,7 @@
 	"health": 100,
     "player_frame": [0, false, 1],
     "weapon_data": [0, false, 1, "Fist", 100],
-    "killed_by": [0, 0, 0, 0]
+    "killed_by": [0, 0, 0, 0, 0]
   },
   "1": {
     "id": 1,
@@ -15,7 +15,7 @@
 	"health": 100,
     "player_frame": [0, false, 1],
     "weapon_data": [0, false, 1, "Fist", 100],
-    "killed_by": [0, 0, 0, 0]
+    "killed_by": [0, 0, 0, 0, 0]
   },
   "2": {
     "id": 2,
@@ -24,7 +24,7 @@
 	"health": 100,
     "player_frame": [0, false, 1],
     "weapon_data": [0, false, 1, "Fist", 100],
-    "killed_by": [0, 0, 0, 0]
+    "killed_by": [0, 0, 0, 0, 0]
   },
   "3": {
     "id": 3,
@@ -33,7 +33,7 @@
 	"health": 100,
     "player_frame": [0, false, 1],
     "weapon_data": [0, false, 1, "Fist", 100],
-    "killed_by": [0, 0, 0, 0]
+    "killed_by": [0, 0, 0, 0, 0]
   },
   "metadata": {
     "map": "basicmap",

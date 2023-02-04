@@ -26,7 +26,7 @@ class backgroundProzess:
         self.player_frame = [0, False, 1]
         self.weapon_frame = [0, False, 1, "Fist", 100]
         self.health = 100
-        self.killed_by = [0, 0, 0, 0]
+        self.killed_by = [0, 0, 0, 0, 0]
 
         # self.net.send("ready")
 

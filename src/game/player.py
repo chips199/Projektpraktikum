@@ -16,9 +16,11 @@ class Player(Animated):
     mousepos = (0, 0)
     health = 100
 
-    def __init__(self, pid, *args, killed_by=[0, 0, 0, 0], **kwargs):
+    def __init__(self, pid, *args, killed_by=None, **kwargs):
         super(Player, self).__init__(*args, **kwargs)
 
+        if killed_by is None:
+            killed_by = [0, 0, 0, 0, 0]
         self.falling_time = datetime.datetime.now()
         self.jumping_time = datetime.datetime.now()
         # self.x = startx
