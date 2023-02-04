@@ -108,7 +108,7 @@ class Game:
                 if self.playerList[id].y > self.height:
                     self.playerList[id].health = 0
                     self.playerList[id].death_time = datetime.datetime.now()
-                    self.playerList[id].killed_by[id] += 1
+                    self.playerList[id].killed_by[4] += 1
                 # handling pygame events
 
                 # print("Handling Events:", datetime.datetime.now() - timer)
@@ -164,6 +164,7 @@ class Game:
                     self.playerList[id] = Player.Player(int(id), self.data["metadata"]["spawnpoints"][str(id)],
                                                         killed_by=self.playerList[id].killed_by,
                                                         directory=self.map.player_uris[int(id)])
+                    self.playerList[self.id].set_velocity(self.data["metadata"]["spawnpoints"]["velocity"])
 
             # Send Data about this player and get some over the others als reply
             self.send_to_background_process()
