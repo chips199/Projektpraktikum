@@ -14,16 +14,12 @@ class Map():
     staticimages = list()  # type: List[pygame.surface.Surface]
     player_uris = list()  # type: List[str]
 
-    def __init__(self, game, uri, items):
+    def __init__(self, game, uri):
         self.game = game
         self.directory = uri
         self.items = list()
         self.weapon_path = {
             weapon.WeaponType.Sword.name: self.directory + f"\\waffen\\schwert\\Sword.png"}
-        for k, v in items.items():
-            for w in v:
-                print(k)
-                self.items.append(Item(WeaponType.getObj(k), w, self.weapon_path[k]))
         # load background
         try:
             self.background = pygame.image.load(uri + r'/background.png').convert_alpha()
@@ -102,6 +98,12 @@ class Map():
             for image in comb_images:
                 self.static_objects_img.blit(image, (0, 0))
             self.static_objects_img = self.static_objects_img.convert_alpha()
+
+    def setitems(self, item_dict):
+        self.items = list()
+        for k, v in item_dict.items():
+            for pos in v:
+                self.items.append(Item(WeaponType.getObj(k), pos, self.weapon_path[k]))
 
     def draw(self, screen):
         """

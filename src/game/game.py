@@ -45,7 +45,7 @@ class Game:
         self.height = h
         self.canvas = canvas.Canvas(self.width, self.height, str(self.id) + "Stick  Wars")
         # self.map = Map(self, map_names_dict[self.data['map_name']])
-        self.map = Map(self, map_names_dict[self.data["metadata"]["map"]], self.data['metadata']['spawnpoints']['items'])
+        self.map = Map(self, map_names_dict[self.data["metadata"]["map"]])
         print("MAP:", self.data["metadata"]["map"])
         print("SPAWNPOINTS:", self.data["metadata"]["spawnpoints"])
         self.online = [False, False, False, False]
@@ -210,6 +210,10 @@ class Game:
                 if p == self.playerList[id]:
                     continue
                 p.refresh_solids()
+
+            #sync items
+            print(self.data["metadata"]["spawnpoints"]["items"])
+            self.map.setitems(self.data["metadata"]["spawnpoints"]["items"])
             # print("Handling pos parsing:", datetime.datetime.now() - timer)
             # timer = datetime.datetime.now()
 

@@ -6,7 +6,11 @@
     "3" : [1350, 40],
     "velocity": [7, 7, 20, 0],
     "items": {
-      "Sword": [[780, 380]]
+      "Sword": []
+    },
+    "item_spawnpoints" : [[780, 380]],
+    "item-odds" : {
+      "Sword": 0.25
     }
   },
   "platformmap" : {
@@ -17,6 +21,10 @@
     "velocity": [7, 7, 15, 1],
     "items": {
       "Sword": [[780, 400]]
+    },
+    "item_spawnpoints" : [[780, 380]],
+    "item-odds" : {
+      "Sword": 0.25
     }
   },
   "schneemap" : {
@@ -27,6 +35,10 @@
     "velocity": [4, 7, 20, 0],
     "items": {
       "Sword": [[780, 400]]
+    },
+    "item_spawnpoints" : [[780, 380]],
+    "item-odds" : {
+      "Sword": 0.25
     }
   }
 }
