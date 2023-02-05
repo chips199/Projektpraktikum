@@ -44,8 +44,10 @@ class Game:
         self.width = w
         self.height = h
         self.canvas = canvas.Canvas(self.width, self.height, str(self.id) + "Stick  Wars")
+        self.printLoading(0.1)
         # self.map = Map(self, map_names_dict[self.data['map_name']])
         self.map = Map(self, map_names_dict[self.data["metadata"]["map"]])
+        self.printLoading(0.2)
         print("MAP:", self.data["metadata"]["map"])
         print("SPAWNPOINTS:", self.data["metadata"]["spawnpoints"])
         self.online = [False, False, False, False]
@@ -53,15 +55,14 @@ class Game:
         self.pos = [[100, 100], [200, 100], [300, 100], [400, 100]]
         self.player_frames = [[0, False, 1], [0, False, 1], [0, False, 1], [0, False, 1]]
         self.weapon_frames = [[0, False, 1], [0, False, 1], [0, False, 1], [0, False, 1]]
-
+        self.printLoading(0.5)
         self.playerList = [
             Player.Player(0, self.data["metadata"]["spawnpoints"]["0"], directory=self.map.player_uris[0]),
             Player.Player(1, self.data["metadata"]["spawnpoints"]["1"], directory=self.map.player_uris[1]),
             Player.Player(2, self.data["metadata"]["spawnpoints"]["2"], directory=self.map.player_uris[2]),
             Player.Player(3, self.data["metadata"]["spawnpoints"]["3"], directory=self.map.player_uris[3])]
-
         self.playerList[self.id].set_velocity(self.data["metadata"]["spawnpoints"]["velocity"])
-
+        self.printLoading(0.7)
         self.min_timer = 0
         self.max_timer = 0
         self.counter_reset_timer = 0
@@ -273,6 +274,24 @@ class Game:
 
         self.process.kill()  # muss noch übergeben werden
         pygame.quit()
+
+    def printLoading(self, percent):
+        """
+        displayes a loading screen
+        :param percent: percetige to display
+        """
+        pygame.draw.line(surface=self.canvas.get_canvas(),
+                         color=pygame.Color(255, 255, 255),
+                         start_pos=(480, 430),
+                         end_pos=(1100, 430),
+                         width=110)
+        pygame.draw.line(surface=self.canvas.get_canvas(),
+                         color=pygame.Color(0, 255, 0),
+                         start_pos=(480, 430),
+                         end_pos=(480 + (1100 - 480) * percent, 430),
+                         width=110)
+        self.canvas.get_canvas().blit(pygame.image.load(wrk_dir + '\\Loadingscreen.png').convert_alpha(), (0, 0))
+        self.canvas.update()
 
     def update_background_process(self):
         # if datetime.datetime.now() - self.timer >= datetime.timedelta(seconds=1):
