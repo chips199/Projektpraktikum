@@ -8,10 +8,8 @@ import customtkinter as tk
 from PIL import Image
 
 from src.game import game
-from src.game.network import Network
 from src.game.backgroundProzess import backgroundProzess
 
-from src.menu.MyEntry import MyEntry
 from src.menu.MyFrame import MyFrame
 from src.menu.MyLabel import MyLabel
 from src.menu.MyWindow import MyWindow
@@ -97,12 +95,18 @@ class MenuSetup:
         self.lobby_frame = None
         self.choose_map_frame = None
 
-    def run(self):
+    def run(self) -> None:
+        """
+        Start the mainloop of the window
+        """
+        # Load the main frame
         self.load_main_frame()
+        # Load the interaction frame
         self.load_interaction_frame()
+        # Start the mainloop
         self.root.mainloop()
 
-    # __________________loading Frame Functions__________________
+        # __________________loading Frame Functions__________________
 
     def load_main_frame(self):
         # -------------------------------------------  MainFrame  -------------------------------------------
@@ -131,7 +135,7 @@ class MenuSetup:
     def load_interaction_frame(self):
         self.interaction_frame = MyFrame(master=self.root,
                                          width=self.root.window_width,
-                                         height=int(730 * self.sizing_height),
+                                         height=int(710 * self.sizing_height),
                                          fg_color="#212121")
         self.interaction_frame.place(anchor='sw', x=0, y=self.window_height)
 
@@ -142,15 +146,15 @@ class MenuSetup:
         label_background = tk.CTkLabel(master=self.interaction_frame,
                                        text=None,
                                        image=background_image)
-        label_background.place(x=0, y=self.root.window_height*self.sizing_height+40, anchor="sw")
+        label_background.place(x=0, y=self.root.window_height - (130 * self.sizing_height), anchor="sw")
 
         # Session ID Eingabefeld
-        self.entry_session_id = MyEntry(master=self.interaction_frame,
-                                        placeholder_text="Session ID",
-                                        width=self.w,
-                                        height=self.h,
-                                        font=("None", self.h * 0.5),
-                                        corner_radius=self.h / 3)
+        self.entry_session_id = tk.CTkEntry(master=self.interaction_frame,
+                                            placeholder_text="Session ID",
+                                            width=self.w,
+                                            height=self.h,
+                                            font=("None", self.h * 0.5),
+                                            corner_radius=int(self.h / 3))
         self.entry_session_id.place(relx=0.47, rely=0.1, anchor='n')
         self.root.update()
 
@@ -334,8 +338,8 @@ class MenuSetup:
     # __________________command: Functions__________________
 
     def start_new_session(self):
-        self.clear_frame_sliding(widget_list=[self.interaction_frame],
-                                 direction_list=["down"],
+        self.clear_frame_sliding(widget=self.interaction_frame,
+                                 direction="down",
                                  after_time=1500,
                                  func=lambda: self.load_choose_map_frame())
 
@@ -343,8 +347,8 @@ class MenuSetup:
         self.start_network(argument=map_name,
                            update_func=lambda: self.update_background_process(),
                            success_func=lambda: self.clear_frame_sliding(
-                               widget_list=[self.choose_map_frame],
-                               direction_list=["down"],
+                               widget=self.choose_map_frame,
+                               direction="down",
                                # stepsize=7,
                                after_time=1200,
                                func=lambda: self.load_lobby_frame(),
@@ -355,8 +359,8 @@ class MenuSetup:
         self.start_network(argument=self.entry_session_id.get(),  # type:ignore[union-attr]
                            update_func=lambda: self.update_background_process(),
                            success_func=lambda: self.clear_frame_sliding(
-                               widget_list=[self.interaction_frame],
-                               direction_list=["down"],
+                               widget=self.interaction_frame,
+                               direction="down",
                                after_time=1200,
                                func=lambda: self.load_lobby_frame(),
                                fun2=lambda: self.check_if_game_started(),
@@ -382,14 +386,14 @@ class MenuSetup:
             self.root.after(1500, lambda: self.check_if_game_started())
 
     def clear_frame_sliding(self,
-                            widget_list: list['MyLabel|tk.CTkButton|MyFrame'],
-                            direction_list: list[str],
+                            widget: ['MyLabel|tk.CTkButton|MyFrame'],
+                            direction: str,
                             stepsize: int = 8,
                             after_time: int = 2000,
                             func: Optional[Union[Callable, None]] = None,  # type:ignore[type-arg]
                             **kwargs: Optional[Union[Callable, None]]) -> None:  # type:ignore[type-arg]
-        self.root.move_out_of_window(widget_list=widget_list,
-                                     direction_list=direction_list,
+        self.root.move_out_of_window(widget=widget,
+                                     direction=direction,
                                      stepsize=stepsize)
         if func is not None:
             self.main_frame.after(after_time, lambda: func())
@@ -417,9 +421,9 @@ class MenuSetup:
                     msg = str(self.data["s_id"])
                 self.label_error.label_hide_show(  # type:ignore[union-attr]
                     x=int(self.window_width / 2),
-                    y=int(self.label_game_name.winfo_y() +  # type:ignore[union-attr]
-                          self.label_game_name.winfo_height() +  # type:ignore[union-attr]
-                          30 * self.sizing_height),
+                    y=int((self.label_game_name.winfo_y() +  # type:ignore[union-attr]
+                           self.label_game_name.winfo_height() +  # type:ignore[union-attr]
+                           15) * self.sizing_height),
                     time=3000,
                     message=msg)
                 # kill process (network) if session_id is invalid, in future we should be able to update the network
@@ -434,9 +438,9 @@ class MenuSetup:
         except ConnectionRefusedError:
             self.label_error.label_hide_show(  # type:ignore[union-attr]
                 x=int(self.window_width / 2),
-                y=int(self.label_game_name.winfo_y() +  # type:ignore[union-attr]
-                      self.label_game_name.winfo_height() +  # type:ignore[union-attr]
-                      30 * self.sizing_height),
+                y=int((self.label_game_name.winfo_y() +  # type:ignore[union-attr]
+                       self.label_game_name.winfo_height() +  # type:ignore[union-attr]
+                       15) * self.sizing_height),
                 time=3000,
                 message="No answer from server")
 

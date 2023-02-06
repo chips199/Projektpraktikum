@@ -4,6 +4,12 @@ import customtkinter as tk
 
 class MyLabel(tk.CTkLabel):
     def __init__(self, *args, **kwargs):
+        """
+        Initialize the MyLabel class
+
+        :param args: Arguments for superclass
+        :param kwargs: Keyword Arguments for superclass
+        """
         super(MyLabel, self).__init__(*args, **kwargs)
 
         # create instance variable to store the scheduled event id
@@ -20,7 +26,14 @@ class MyLabel(tk.CTkLabel):
                         y: int,
                         time: int,
                         message: str = "No message given") -> None:
+        """
+        Show the label at the given x and y position for a given amount of time
 
+        :param x: X-coordinate of the label on the window
+        :param y: Y-coordinate of the label on the window
+        :param time: Amount of time in milliseconds for which the label should be visible
+        :param message: Message to be displayed in the label
+        """
         # Check if there's an scheduled event
         if self.after_id is not None:
             # cancel the scheduled event
@@ -44,13 +57,12 @@ class MyLabel(tk.CTkLabel):
         """
         Move self (Label) to the given x and y coordinate
 
-        Parameters:
-            - x (int): x-coordinate to move to
-            - y (int): y-coordinate to move to
-            - stepsize (int): Number of pixels the widget should be moved each time, default is 5
-            - delay (int): Delay time in milliseconds before the next move, default is 25
-            - ending_function ('function'): A function that will be called once the x and y coordinates are reached,
-                                            Default is None
+        :param x: x-coordinate to move to
+        :param y: y-coordinate to move to
+        :param stepsize: Number of pixels the widget should be moved each time, default is 5
+        :param delay: Delay time in milliseconds before the next move, default is 25
+        :param ending_function: A function that will be called once the x and y coordinates are reached, default is None
+        :return: None
         """
         x_sized = round(x * self.sizing_width)
         y_sized = round(y * self.sizing_height)
@@ -102,14 +114,14 @@ class MyLabel(tk.CTkLabel):
                        stepsize: int = 1) -> None:
 
         """
-        Move the label between two positions in a loop with a certain delay and stepsize
+        Perform an idle animation by alternating between two positions.
 
-        Parameters:
-        - pos_one (tuple[int, int]): x and y coordinate of position one
-        - pos_two (tuple[int, int]): x and y coordinate of position two
-        - next_pos (str): position to which the label should be moved, should be either 'one' or 'two'
-        - delay (int): Delay time in milliseconds before the next move, default is 30
-        - stepsize (int): Number of pixels the label should be moved each time, default is 1
+        :param pos_one: The first position to move to (x, y). Default is (0, 0).
+        :param pos_two: The second position to move to (x, y). Default is (0, 0).
+        :param next_pos: The next position to move to. Either "one" or "two". Default is "two".
+        :param delay: Delay time in milliseconds before the next move. Default is 35.
+        :param stepsize: Number of pixels the widget should be moved each time. Default is 1.
+        :return: None
         """
 
         # move the label to position one
