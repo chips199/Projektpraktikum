@@ -252,7 +252,6 @@ class Game:
             # Draw Endscreen
             kills_per_player = list(
                 map(lambda x: x[0], self.data["metadata"]["scoreboard"].values()))  # type:ignore[no-any-return]
-            print(kills_per_player)
             mvp = kills_per_player.index(max(kills_per_player))
             if datetime.datetime.now() > self.end_time or max(kills_per_player) >= self.kills_to_win:
                 self.canvas.get_canvas().fill((32, 32, 32))
