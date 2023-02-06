@@ -80,7 +80,8 @@ maps_dict = dict(zip(game_data_dict.keys(), repeat("none")))
 
 def game_server(game_id, this_gid):
     global game_data_dict
-    while not players_connected[this_gid].__contains__(3):
+    while not players_connected[this_gid].__contains__(3) and players_connected[this_gid].count(
+            0) != number_of_players_per_game:
         pass
     game_data_dict[game_id]["metadata"]["start"] = (datetime.datetime.now() + datetime.timedelta(seconds=15)).strftime(
         "%d/%m/%Y, %H:%M:%S")
