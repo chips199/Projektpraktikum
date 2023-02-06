@@ -82,10 +82,10 @@ class MyWindow(tk.CTk):
         :param process: object(Process)
         :return: None
         """
-        self.process = process
+        self.process = process  # type:ignore[assignment]
 
     def move_out_of_window(self,
-                           widget: ['MyFrame|MyLabel'],
+                           widget: ['MyFrame|MyLabel'],  # type:ignore[valid-type]
                            direction: str,
                            delay: int = 17,
                            stepsize: int = 1,
