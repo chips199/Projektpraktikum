@@ -219,7 +219,7 @@ class Game:
                 p.refresh_solids()
 
             # sync items
-            print(self.data["metadata"]["spawnpoints"]["items"])
+            # print(self.data["metadata"]["spawnpoints"]["items"])
             self.map.setitems(self.data["metadata"]["spawnpoints"]["items"])
             # print("Handling pos parsing:", datetime.datetime.now() - timer)
             # timer = datetime.datetime.now()
@@ -259,6 +259,15 @@ class Game:
                                  165)
                 # Draw the Scoreboard
                 can.blit(scoreboard, (100, 100))
+
+            kills_per_player = list(map(lambda x: x[0], self.data["metadata"]["scoreboard"].values()))
+            print(kills_per_player)
+            mvp = kills_per_player.index(max(kills_per_player))
+            if datetime.datetime.now() > self.end_time or max(kills_per_player) >= 1:
+                self.canvas.get_canvas().fill((32, 32, 32))
+                self.canvas.draw_text(self.canvas.get_canvas(), f"Player {mvp} has won",
+                                      200, (255, 255, 255), 200, 350)
+
             # Update Canvas
             self.canvas.update()
             # print("Handling redraw:", datetime.datetime.now() - timer)
