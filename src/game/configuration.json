@@ -2,29 +2,53 @@
   "0": {
     "id": 0,
     "position": [50,50],
-    "mouse": [0,0],
 	"connected": false,
-	"health": 100
+	"health": 100,
+    "player_frame": [0, false, 1],
+    "weapon_data": [0, false, 1, "Fist", 100],
+    "killed_by": [0, 0, 0, 0, 0]
   },
   "1": {
     "id": 1,
     "position": [100,100],
-    "mouse": [0,0],
 	"connected": false,
-	"health": 100
+	"health": 100,
+    "player_frame": [0, false, 1],
+    "weapon_data": [0, false, 1, "Fist", 100],
+    "killed_by": [0, 0, 0, 0, 0]
   },
   "2": {
     "id": 2,
     "position": [150,150],
-    "mouse": [0,0],
 	"connected": false,
-	"health": 100
+	"health": 100,
+    "player_frame": [0, false, 1],
+    "weapon_data": [0, false, 1, "Fist", 100],
+    "killed_by": [0, 0, 0, 0, 0]
   },
   "3": {
     "id": 3,
     "position": [200,200],
-    "mouse": [0,0],
 	"connected": false,
-	"health": 100
+	"health": 100,
+    "player_frame": [0, false, 1],
+    "weapon_data": [0, false, 1, "Fist", 100],
+    "killed_by": [0, 0, 0, 0, 0]
+  },
+  "metadata": {
+    "map": "basicmap",
+    "spawnpoints": {
+      "0" : [0,0],
+      "1" : [0,0],
+      "2" : [0,0],
+      "3" : [0,0],
+      "velocity": [7, 7, 20, 0]
+    },
+    "scoreboard": {
+    "0" : [0,0],
+    "1" : [0,0],
+    "2" : [0,0],
+    "3" : [0,0]
+    }
   }
 }

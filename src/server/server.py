@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+import platform
 import socket
 from _thread import start_new_thread
 import random
@@ -52,7 +53,11 @@ except socket.error as e:
 s.listen(number_of_games_at_a_time * number_of_players_per_game)
 print("Waiting for a connection")
 # load the config file as basis for a fresh game
-config_file = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', r'game\\configuration.json'))
+seperator = "\\" if platform.system() == 'Windows' else "/"
+config_file = seperator.join(
+    list(os.path.abspath(os.path.dirname(__file__)).split(seperator)[
+         :-1])) + f"{seperator}game{seperator}configuration.json"
+# print("\\".join(list(os.path.abspath(os.path.dirname(__file__)).split("\\")[:-1])) + "\\game\\configuration.json")
 with open(config_file) as file:
     game_data = json.load(file)
 # load spawn points
@@ -80,13 +85,20 @@ def reset_games():
     for i, g in enumerate(players_connected):
         # going through all games
         if g.count(2) + g.count(0) == number_of_players_per_game and g.count(2) > 0:
-            # if g.count(2) + g.count(0) + g.count(3) == number_of_players_per_game and g.count(2) > 0:
+            # set all players to not connected
             players_connected[i] = [0] * number_of_players_per_game
+            # get session_id and set game_data to default and reset map
             game_id = list(game_data_dict.keys())[i]
             game_data_dict[game_id] = copy(game_data)
+            game_data_dict[game_id]["metadata"]["scoreboard"] = {"0": [0, 0],
+                                                                 "1": [0, 0],
+                                                                 "2": [0, 0],
+                                                                 "3": [0, 0]}
             maps_dict[game_id] = "none"
+            # game_data_dict does not reset online, so manually reset it
             for n in range(number_of_players_per_game):
                 game_data_dict[game_id][str(n)]["connected"] = False
+                game_data_dict[game_id][str(n)]["killed_by"] = [0, 0, 0, 0]
             print(f"{list(game_data_dict.keys())[i]} reset, because no player was there anymore")
 
 
@@ -95,6 +107,7 @@ def threaded_client(conn):
     # receiving the first message
     start_msg = conn.recv(2048).decode()
     print(start_msg)
+
     # splitting create game and join, if the code is 4 digits long, try connecting, else try creating a new game
     if len(start_msg) == 4:
         # join lobby
@@ -161,6 +174,8 @@ def threaded_client(conn):
             exit(1)
         # get real game_id
         game_id = list(game_data_dict.keys())[this_gid]
+        game_data_dict[game_id]["metadata"]["map"] = start_msg
+        game_data_dict[game_id]["metadata"]["spawnpoints"] = this_spawn_points
         maps_dict[game_id] = start_msg
         conn.send(str.encode(f"{this_pid},{game_id}"))
         # finished creating game and booking player
@@ -209,12 +224,19 @@ def threaded_client(conn):
             reset_games()
             conn.close()
             exit(0)
-        elif (datetime.datetime.now() - last_msg).seconds > 10:
-            print("connection lost")
-            players_connected[this_gid][this_pid] = 2
+        elif (datetime.datetime.now() - last_msg).seconds > 2:
+            print("connection timeout")
+            players_connected[this_gid][this_pid] = 0
             reset_games()
             conn.close()
             exit(0)
+        # elif msg == "":
+        #     print("connection lost")
+        #     players_connected[this_gid][this_pid] = 0
+        #     reset_games()
+        #     conn.close()
+        #     exit(0)
+
         sleep(0.2)
 
     print("Game starts: " + game_id)
@@ -230,6 +252,13 @@ def threaded_client(conn):
             if data:
                 # parse the client data into the game_data Dictionary, and send the result back to the client
                 game_data_dict[game_id][this_pid] = json.loads(reply)
+                # print(game_data_dict[game_id][this_pid])
+                deaths = game_data_dict[game_id][this_pid]["killed_by"]
+                kills = list(map(lambda x: x[1]["killed_by"][:4],  # type: ignore[no-any-return]
+                                 list(filter(lambda x: x[0] != "metadata", game_data_dict[game_id].items()))))
+                for k, v in enumerate(zip(*kills)):
+                    game_data_dict[game_id]["metadata"]["scoreboard"][str(k)][0] = sum(v)
+                game_data_dict[game_id]["metadata"]["scoreboard"][str(this_pid)][1] = sum(deaths)
                 conn.sendall(str.encode(json.dumps(game_data_dict[game_id])))
                 # to track how often the client sends a message track the time
                 last_msg = datetime.datetime.now()

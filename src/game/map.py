@@ -21,12 +21,12 @@ class Map():
             self.background = "no image found"  # type: ignore[assignment]
 
         # load player images
-        for filename in os.listdir(self.directory + r'/player'):
-            playerimg = os.path.join(self.directory + r'/player', filename)
-            if not os.path.isfile(playerimg) or filename[-3:] != 'png':
-                print(str(playerimg) + ' is not a  png file')
+        for directory in next(os.walk(self.directory + r'\player\animation'))[1]:
+            if directory[-3:] == 'png':
+                print(str(directory) + ' is no folder')
                 continue
-            self.player_uris.append(playerimg)
+            self.player_uris.append(os.path.join(self.directory + r'\player\animation', directory))
+            print("directory:", os.path.join(self.directory + r'\player', directory))
 
         # load solid images and add solid pixels to solid list
         for filename in os.listdir(self.directory + r'/solid'):
@@ -60,33 +60,30 @@ class Map():
                 for xi, x in enumerate(y):
                     if x > 100:
                         solid.append((xi, yi))
+
         # Add surface borders
-        # horizontal edges
-        for x in range(self.game.width):
-            solid.append((x, 0))
-            # solid.append((x, self.game.height))
         # vertical edges
-        for y in range(self.game.height):
+        for y in range(-self.game.height, self.game.height):
             solid.append((0, y))
             solid.append((self.game.width, y))
 
         self.solid_df = pd.DataFrame(solid, columns=['x', 'y'])
 
         # load unsolid images
-        for filename in os.listdir(self.directory + r'/not_solid'):
-            nsimg = os.path.join(self.directory + r'/not_solid', filename)
-            if not os.path.isfile(nsimg):
-                print(str(nsimg) + ' is not a file')
-                continue
-
-            # load image for displaying
-            try:
-                img = pygame.image.load(nsimg)
-                img = img.convert_alpha()
-            except:
-                continue
-            print(str(nsimg) + ' erfolgreich in pygame geladen')
-            self.staticimages.append(img)
+        # for filename in os.listdir(self.directory + r'/not_solid'):
+        #     nsimg = os.path.join(self.directory + r'/not_solid', filename)
+        #     if not os.path.isfile(nsimg):
+        #         print(str(nsimg) + ' is not a file')
+        #         continue
+        #
+        #     # load image for displaying
+        #     try:
+        #         img = pygame.image.load(nsimg)
+        #         img = img.convert_alpha()
+        #     except:
+        #         continue
+        #     print(str(nsimg) + ' erfolgreich in pygame geladen')
+        #     self.staticimages.append(img)
 
         # generate one picture out of all solid and not solid images.
         comb_images = self.staticimages.copy()

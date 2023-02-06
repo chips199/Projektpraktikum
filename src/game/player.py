@@ -1,81 +1,138 @@
 import datetime
+import math
 from copy import copy
-from typing import List, Tuple
-import pandas as pd
-import pygame
+
+import pygame.draw
+
 from src.game import weapon
+from src.game.animated import Animated
 
 
-class Player():
-    width, height = 50, 100
+class Player(Animated):
     last_jump = datetime.datetime.now()
     height_jump = 200
     status_jump = 0
     is_connected = False
     mousepos = (0, 0)
-    user_weapon = weapon.Weapon(100, 15, 15, 1)
     health = 100
 
-    def __init__(self, startx, starty, game, image=None, color=(255, 0, 0)):
+    def __init__(self, pid, *args, killed_by=None, **kwargs):
+        super(Player, self).__init__(*args, **kwargs)
+
+        if killed_by is None:
+            killed_by = [0, 0, 0, 0, 0]
         self.falling_time = datetime.datetime.now()
         self.jumping_time = datetime.datetime.now()
-        self.x = startx
-        self.y = starty
-        self.game = game
-        self.velocity = 8
+        # self.x = startx
+        # self.y = starty
+        self.id = pid
+        self.velocity = 7
+        self.current_moving_velocity = 7
+        self.moving_velocity_on_ground = self.moving_velocity_in_air = 7
         self.velocity_gravity = 1
-        self.velocity_jumping = self.max_jumping_speed = 13
+        self.velocity_jumping = self.max_jumping_speed = 20
         self.velocity_time = 15
         self.landed = False
         self.is_jumping = False
         self.is_falling = True
         self.block_x_axis = False
-        self.color = color
+        self.moving_on_edge = False
+        self.cut_frames(2)
+        self.killed_by = killed_by
+        self.death_time = datetime.datetime.now()
+        # self.color = color
         self.weapon = weapon
-        solid = []  # type: List[Tuple[int, int]]
-        relativ_solids = []  # type: List[Tuple[int, int]]
-        try:
-            self.image = pygame.image.load(image)  # .convert_alpha()
-            # self.image.convert_alpha()
-            self.edge_surface = pygame.transform.laplacian(self.image).convert_alpha()
-            alpha_array = pygame.surfarray.pixels_alpha(self.edge_surface)
-            alpha_array = alpha_array.swapaxes(0, 1)
-            for yi, y in enumerate(alpha_array):
-                for xi, x in enumerate(y):
-                    if x > 200:
-                        solid.append((xi + self.x, yi + self.y))
-                        relativ_solids.append((xi, yi))
-        except:
-            self.image = "no image found"  # type: ignore[assignment]
-            # horizontal edges
-            for x in range(self.width):
-                solid.append((x + self.x, self.y))
-                relativ_solids.append((x, self.y))
-                solid.append((x + self.x, self.y + self.height))
-                relativ_solids.append((x, self.y + self.height))
-            # vertical edges
-            for y in range(self.height):
-                solid.append((self.x, self.y + y))
-                relativ_solids.append((self.x, y))
-                solid.append((self.x + self.width, self.y + y))
-                relativ_solids.append((self.x + self.width, y))
-        self.relativ_solids_df = pd.DataFrame(relativ_solids, columns=['x', 'y'])
-        self.solid_df = pd.DataFrame(solid, columns=['x', 'y'])
+        self.velocity_counter = 0
+        self.velocity_counter2 = 0
+        self.sliding_frame_counter = self.max_sliding_frames = 50
+        map_dir = "\\".join(str(self.directory).split('\\')[:-3])
+        self.weapon_path = {
+            weapon.WeaponType.Fist.name: map_dir + f"\\waffen\\faeuste\\animation\\fists_{self.get_color(self.directory)}_animation",
+            weapon.WeaponType.Sword.name: map_dir + f"\\waffen\\schwert\\animation\\sword_hold_animation_{self.get_color(self.directory)}"}
+        # self.weapon = weapon.Weapon(weapon.WeaponType.Fist, [self.x, self.y],
+        #                             self.weapon_path[weapon.WeaponType.Fist.name])
+        self.weapon = weapon.Weapon(weapon.WeaponType.Sword, [self.x, self.y],
+                                    self.weapon_path[weapon.WeaponType.Sword.name])
+        self.death_animation = Animated(start=[0, 0],
+                                        directory=map_dir + f"\\player\\death_animation\\death_animation_{self.get_color(self.directory)}")
+        self.blood_animation = Animated(start=[0, 0], directory=map_dir + r"\\player\\blood_animation")
+        self.blood_animation.start_animation_in_direction(direction=1)
+        self.blood_animation.double_frames(factor=2)
+
+    def set_velocity(self, data=(1, 1, 0, 0)):
+        self.moving_velocity_on_ground = data[0]
+        self.moving_velocity_in_air = data[1]
+        self.velocity_jumping = self.max_jumping_speed = data[2]
+        self.velocity_counter = data[3]
+
+    def keep_sliding(self, func):
+        # if (self.landed or self.moving_on_edge) and \
+        #         not self.is_jumping and \
+        #         not self.is_falling and \
+        #         self.sliding_frame_counter > 1:
+        # landed for when landed and moving_on_edge for when player s sliding down hill on snowmap
+        if (self.landed or self.moving_on_edge) and \
+                not self.is_falling and \
+                self.sliding_frame_counter > 1:
+            if self.animation_direction == 0:
+                self.move(dirn=0,
+                          v=int(func(player=self, dirn=0, distance=int(self.current_moving_velocity)) *
+                                math.sqrt(self.sliding_frame_counter / self.max_sliding_frames)))
+                self.sliding_frame_counter -= 1
+            if self.animation_direction == 1:
+                self.move(dirn=1,
+                          v=int(func(player=self, dirn=1, distance=int(self.current_moving_velocity)) *
+                                math.sqrt(self.sliding_frame_counter / self.max_sliding_frames)))
+                self.sliding_frame_counter -= 1
+
+    def reset_sliding_counter(self):
+        self.sliding_frame_counter = self.max_sliding_frames
+
+    def stop_sliding(self):
+        self.sliding_frame_counter = 1
 
     def draw(self, g):
-        """
-        displays a player to the canvas
-        :param g: pygame canvas
-        """
-        # draw Player
-        player_rec = pygame.Rect(self.x, self.y, self.width, self.height)
-        if type(self.image) == pygame.Surface:
-            g.blit(self.image, player_rec)
-        else:
-            pygame.draw.rect(g, self.color, player_rec, 0)
+        if self.health > 0:
+            super(Player, self).draw(g=g)
 
-        # draw weapon
-        # ...wip...
+            # health bar
+            pygame.draw.line(surface=g,
+                             color=pygame.Color(231, 24, 55),
+                             start_pos=(self.x, self.y - 5),
+                             end_pos=(self.x + self.frame_width, self.y - 5),
+                             width=3)
+            if self.health > 0:
+                pygame.draw.line(surface=g,
+                                 color=pygame.Color(45, 175, 20),
+                                 start_pos=(self.x, self.y - 5),
+                                 end_pos=(self.x + (self.frame_width * (self.health / 100)), self.y - 5),
+                                 width=3)
+
+            # durability bar
+            pygame.draw.line(surface=g,
+                             color=pygame.Color(20, 20, 20),
+                             start_pos=(self.x, self.y - 10),
+                             end_pos=(self.x + self.frame_width, self.y - 10),
+                             width=3)
+            if self.weapon.durability > 0:
+                pygame.draw.line(surface=g,
+                                 color=pygame.Color(25, 25, 200),
+                                 start_pos=(self.x, self.y - 10),
+                                 end_pos=(self.x + (self.frame_width * (self.weapon.durability / 100)), self.y - 10),
+                                 width=3)
+
+            self.weapon.animation_direction = self.animation_direction
+            self.weapon.draw(g=g, x=self.x, y=self.y, width=self.frame_width, height=self.frame_height)
+
+            # bloodsplash animation
+            if self.weapon.hitted_me or self.blood_animation.current_frame > 0:
+                self.blood_animation.set_pos(self.x - 47, self.y + 15)
+                self.blood_animation.draw_animation_once(g=g, reset=True)
+
+        # death animation
+        else:
+            self.death_animation.set_pos(self.x, self.y)
+            self.death_animation.draw_animation_once(g=g)
 
     @staticmethod
     def shift_df(df, dirn, n):
@@ -103,17 +160,24 @@ class Player():
         :return: None
         """
         if v == -99:
-            v = self.velocity
+            v = self.current_moving_velocity
 
         if dirn == 0:
+            self.animation_direction = 0
             self.x += v
+            self.weapon.x += v
         elif dirn == 1:
+            self.animation_direction = 1
             self.x -= v
+            self.weapon.x -= v
         elif dirn == 2:
             self.y -= v
+            self.weapon.y -= v
         else:
             self.y += v
-        self.solid_df = Player.shift_df(self.solid_df, dirn, v)
+            self.weapon.y += v
+
+        self.solid_df = Player.shift_df(self.solid_df, dirn, v)  # type:ignore[has-type]
 
     def jump(self, func):
         """
@@ -123,6 +187,7 @@ class Player():
 
         # when player is not falling
         if not self.is_falling:
+            self.current_moving_velocity = self.moving_velocity_in_air
 
             # check is moving upwards is possible
             vel = func(player=self, dirn=2, distance=int(self.velocity_jumping))
@@ -134,14 +199,17 @@ class Player():
                 # is currently not jumping
                 if not self.is_jumping:
                     self.is_jumping = True
-                    # reset timer to current time
-                    self.jumping_time = datetime.datetime.now()
+                    self.landed = False
 
-                # after certain time, decrease jumping speed
-                elif datetime.datetime.now() - self.jumping_time > datetime.timedelta(milliseconds=self.velocity_time):
+                # after certain amount of frames, decrease jumping speed
+                if self.velocity_counter2 >= self.velocity_counter:
                     self.velocity_jumping -= 1
-                    # reset timer to current time
-                    self.jumping_time = datetime.datetime.now()
+                    # reset frame counter to 0
+                    self.velocity_counter2 = 0
+
+                # otherwise just increase frame counter
+                else:
+                    self.velocity_counter2 += 1
 
                 # jump with speed calculated in func()
                 self.move(2, vel)
@@ -150,19 +218,6 @@ class Player():
             if vel <= 0:
                 self.is_jumping = False
                 self.velocity_jumping = self.max_jumping_speed
-
-    def beaten(self, weapon_enemy):
-        """
-        player was beaten
-        player is subtracted the damage of the weapon and it is checked if the player died during the attack
-        :param weapon_enemy The weapon with which the player was hit
-        :return None
-        """
-        self.health -= weapon_enemy.damage
-        if self.health <= 0:
-            print("Player died")
-            # TODO: Anzeige auf Screen und Spieler ausblenden?
-            self.health = 0
 
     def is_alive(self):
         """
@@ -182,6 +237,7 @@ class Player():
         moves player downwards when possible
         :param func: function to check if there is no collision while falling
         """
+        moving_factor = int(self.current_moving_velocity * 2)
         # when player is not jumping
         if not self.is_jumping:
 
@@ -190,27 +246,30 @@ class Player():
 
             # if able to fall
             if vel > 0:
+                self.stop_sliding()
+                self.current_moving_velocity = self.moving_velocity_in_air
 
                 # initialize falling when the player is currently not falling
                 if not self.is_falling:
                     self.is_falling = True
                     self.landed = False
-                    # reset timer to current time
-                    self.falling_time = datetime.datetime.now()
 
-                # after certain time increase the falling speed until it's maximum
-                elif datetime.datetime.now() - self.falling_time > datetime.timedelta(milliseconds=self.velocity_time):
+                # after certain amount of frames, decrease jumping speed
+                elif self.velocity_counter2 >= self.velocity_counter:
                     self.velocity_gravity += 1
-                    # reset timer to current time
-                    self.falling_time = datetime.datetime.now()
+                    self.velocity_counter2 = 0
 
                     # limit the falling speed to it's maximum
                     if self.velocity_gravity > self.max_jumping_speed:
                         self.velocity_gravity = self.max_jumping_speed
 
+                else:
+                    self.velocity_counter2 += 1
+
                 # move player down with speed calculated in func()
                 self.move(dirn=3, v=int(vel))
-                self.block_x_axis = False
+                if vel > 5:
+                    self.block_x_axis = False
 
             # otherwise check if the player is really landed or may standing/hanging on an edge
             elif vel <= 0:
@@ -219,30 +278,51 @@ class Player():
                     # shift players df to the right and check if falling would then be possible
                     # in addition block the movement on x-axis for the player (for the keyboard)
                     self.block_x_axis = True
-                    self.shift_df(df=self.solid_df, dirn=0, n=self.velocity * 2)
-                    vel = func(player=self, dirn=3, distance=int(self.velocity_gravity * 2))
+                    self.shift_df(df=self.solid_df, dirn=0, n=moving_factor)
+                    vel = func(player=self, dirn=3, distance=int(self.velocity_gravity))
 
                     # if falling is then possible
                     if vel > 0:
                         # shift back the df and move to the right so in next cycle the player will continue to fall
-                        self.shift_df(df=self.solid_df, dirn=1, n=self.velocity * 2)
-                        self.move(dirn=0, v=int(self.velocity * 2))
+                        self.shift_df(df=self.solid_df, dirn=1, n=moving_factor)
+                        self.move(dirn=0, v=int(moving_factor))
+                        self.move(dirn=3, v=int(vel))
+                        # to be able to slide on snowmap after ending the hill
+                        self.moving_on_edge = True
+                        self.reset_sliding_counter()
 
                     else:
                         # try the same for direction left
-                        self.shift_df(df=self.solid_df, dirn=1, n=self.velocity * 4)
+                        self.shift_df(df=self.solid_df, dirn=1, n=moving_factor * 2)
                         vel = func(player=self, dirn=3, distance=int(self.velocity_gravity))
 
                         # if falling is possible after shifting to left, shift df back to original position and move left
                         if vel > 0:
-                            self.shift_df(df=self.solid_df, dirn=0, n=self.velocity * 2)
-                            self.move(dirn=1, v=int(self.velocity * 2))
+                            self.shift_df(df=self.solid_df, dirn=0, n=moving_factor)
+                            self.move(dirn=1, v=int(moving_factor))
+                            self.move(dirn=3, v=int(vel))
+                            # to be able to slide on snowmap after ending the hill
+                            self.moving_on_edge = True
+                            self.reset_sliding_counter()
 
                         # otherwise it means that the player is standing on its feet, so he is landed correctly
                         # so stop falling and reset the parameters
                         else:
-                            self.shift_df(df=self.solid_df, dirn=0, n=self.velocity * 2)
+                            self.shift_df(df=self.solid_df, dirn=0, n=moving_factor)
                             self.landed = True
                             self.block_x_axis = False
                             self.is_falling = False
+                            self.moving_on_edge = False
                             self.velocity_gravity = 1
+                            self.current_moving_velocity = self.moving_velocity_on_ground
+
+    @staticmethod
+    def get_color(p):
+        if p.__contains__("magenta"):
+            return "magenta"
+        elif p.__contains__("orange"):
+            return "orange"
+        elif p.__contains__("purple"):
+            return "purple"
+        else:
+            return "turquoise"
