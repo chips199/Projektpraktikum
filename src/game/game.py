@@ -68,6 +68,8 @@ class Game:
         self.time_total = 0
         self.new_fps_timer = datetime.datetime.now()
         self.show_scoreboard = False
+        self.start_time = datetime.datetime.strptime(self.data["metadata"]["start"], "%d/%m/%Y, %H:%M:%S")
+        self.end_time = datetime.datetime.strptime(self.data["metadata"]["end"], "%d/%m/%Y, %H:%M:%S")
 
     def run(self):
         """
@@ -75,6 +77,11 @@ class Game:
         """
         # pygame stuff
         # clock = pygame.time.Clock()
+        while datetime.datetime.now() < self.start_time:
+            self.canvas.get_canvas().fill((32, 32, 32))
+            self.canvas.draw_text(self.canvas.get_canvas(), str((self.start_time - datetime.datetime.now()).seconds),
+                                  300, (255, 255, 255), 700, 300)
+            self.canvas.update()
         run = True
 
         # just for comfort
@@ -211,7 +218,7 @@ class Game:
                     continue
                 p.refresh_solids()
 
-            #sync items
+            # sync items
             print(self.data["metadata"]["spawnpoints"]["items"])
             self.map.setitems(self.data["metadata"]["spawnpoints"]["items"])
             # print("Handling pos parsing:", datetime.datetime.now() - timer)

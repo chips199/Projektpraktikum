@@ -105,12 +105,21 @@ def reset_games():
 
 def game_server(game_id, this_gid):
     global game_data_dict
+    while not players_connected[this_gid].__contains__(3):
+        pass
+    game_data_dict[game_id]["metadata"]["start"] = (datetime.datetime.now() + datetime.timedelta(seconds=10)).strftime(
+        "%d/%m/%Y, %H:%M:%S")
+    game_data_dict[game_id]["metadata"]["end"] = (datetime.datetime.now() + datetime.timedelta(seconds=310)).strftime(
+        "%d/%m/%Y, %H:%M:%S")
+    print(game_data_dict[game_id]["metadata"]["start"], game_data_dict[game_id]["metadata"]["end"])
+    exit(0)
     items = game_data_dict[game_id]["metadata"]["spawnpoints"]["items"]
     last_w_of_p = [None] * number_of_players_per_game
     last_spawn_check = None
     while players_connected[this_gid] != [0] * number_of_players_per_game:
         w_of_p = copy(list(map(lambda x: x[1]["weapon_data"][3],
-                          filter(lambda y: ["0", "1", "2", "3"].__contains__(y[0]), game_data_dict[game_id].items()))))
+                               filter(lambda y: ["0", "1", "2", "3"].__contains__(y[0]),
+                                      game_data_dict[game_id].items()))))
         for ip, wp in enumerate(w_of_p):
             p_pos = game_data_dict[game_id][str(ip)]["position"]
             if last_w_of_p[ip] != wp:
@@ -126,6 +135,7 @@ def game_server(game_id, this_gid):
                     if random.random() < v:
                         game_data_dict[game_id]["metadata"]["spawnpoints"]["items"][k].append(point)
                         break
+
 
 def threaded_client(conn):
     global game_data_dict, players_connected, maps_dict
