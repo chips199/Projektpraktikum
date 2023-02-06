@@ -32,7 +32,7 @@ pygame.font.init()
 class Game:
 
     def __init__(self, w, h, conn, process):
-        self.kills_to_win = 5
+        self.kills_to_win = 2
         self.counter = 0
         self.conn = conn
         self.process = process
@@ -250,7 +250,8 @@ class Game:
                 can.blit(scoreboard, (100, 100))
 
             # Draw Endscreen
-            kills_per_player = list(map(lambda x: x[0], self.data["metadata"]["scoreboard"].values()))
+            kills_per_player = list(
+                map(lambda x: x[0], self.data["metadata"]["scoreboard"].values()))  # type:ignore[no-any-return]
             print(kills_per_player)
             mvp = kills_per_player.index(max(kills_per_player))
             if datetime.datetime.now() > self.end_time or max(kills_per_player) >= self.kills_to_win:

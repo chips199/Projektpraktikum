@@ -83,9 +83,9 @@ def game_server(game_id, this_gid):
     while not players_connected[this_gid].__contains__(3) and players_connected[this_gid].count(
             0) != number_of_players_per_game:
         pass
-    game_data_dict[game_id]["metadata"]["start"] = (datetime.datetime.now() + datetime.timedelta(seconds=15)).strftime(
+    game_data_dict[game_id]["metadata"]["start"] = (datetime.datetime.now() + datetime.timedelta(seconds=10)).strftime(
         "%d/%m/%Y, %H:%M:%S")
-    game_data_dict[game_id]["metadata"]["end"] = (datetime.datetime.now() + datetime.timedelta(seconds=315)).strftime(
+    game_data_dict[game_id]["metadata"]["end"] = (datetime.datetime.now() + datetime.timedelta(seconds=310)).strftime(
         "%d/%m/%Y, %H:%M:%S")
     print(game_data_dict[game_id]["metadata"]["start"], game_data_dict[game_id]["metadata"]["end"])
     exit(0)
