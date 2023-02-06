@@ -124,12 +124,6 @@ class Animated:
         self.solid_df = pd.DataFrame(self.solid, columns=['x', 'y'])
         return images_right, images_left
 
-    def get_relativ_dataframe(self, firstFrame=False):
-        if firstFrame:
-            return self.relativ_frame_dfs[0]
-        else:
-            return self.relativ_frame_dfs[self.current_frame]
-
     def load_dfs(self):
         rel_l = list()
         rel_r = list()
