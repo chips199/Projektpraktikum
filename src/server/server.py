@@ -78,6 +78,18 @@ for _ in range(number_of_games_at_a_time):
 maps_dict = dict(zip(game_data_dict.keys(), repeat("none")))
 
 
+def game_server(game_id, this_gid):
+    global game_data_dict
+    while not players_connected[this_gid].__contains__(3):
+        pass
+    game_data_dict[game_id]["metadata"]["start"] = (datetime.datetime.now() + datetime.timedelta(seconds=15)).strftime(
+        "%d/%m/%Y, %H:%M:%S")
+    game_data_dict[game_id]["metadata"]["end"] = (datetime.datetime.now() + datetime.timedelta(seconds=315)).strftime(
+        "%d/%m/%Y, %H:%M:%S")
+    print(game_data_dict[game_id]["metadata"]["start"], game_data_dict[game_id]["metadata"]["end"])
+    exit(0)
+
+
 def reset_games():
     """
         checks each game if a game has been used and rests them after it isn't used anymore
@@ -174,6 +186,7 @@ def threaded_client(conn):
             exit(1)
         # get real game_id
         game_id = list(game_data_dict.keys())[this_gid]
+        start_new_thread(game_server, (game_id, this_gid,))
         game_data_dict[game_id]["metadata"]["map"] = start_msg
         game_data_dict[game_id]["metadata"]["spawnpoints"] = this_spawn_points
         maps_dict[game_id] = start_msg

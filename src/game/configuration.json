@@ -36,6 +36,8 @@
     "killed_by": [0, 0, 0, 0, 0]
   },
   "metadata": {
+    "start": "",
+    "end": "",
     "map": "basicmap",
     "spawnpoints": {
       "0" : [0,0],
