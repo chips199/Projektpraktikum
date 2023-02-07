@@ -2,7 +2,7 @@
 
 # Stick Wars - Clash of Champions
 
-Stick Wars - Clash of Champions was developed as part of the module "Project Internship" at the Provadis School of International Management & Technology AG.
+Stick Wars - Clash of Champions was developed as part of the module "Projektpraktikum" at the Provadis School of International Management & Technology AG.
 
 It is a multiplayer PvP game. The implementation is done in Python using Pygame.
 
