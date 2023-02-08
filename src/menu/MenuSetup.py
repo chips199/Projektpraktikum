@@ -110,6 +110,9 @@ class MenuSetup:
 
     def load_main_frame(self):
         # -------------------------------------------  MainFrame  -------------------------------------------
+        """
+               Load the main frame for the game window
+        """
         # Game Name Label
         game_name_image = tk.CTkImage(dark_image=Image.open(wrk_dir + r"\..\stick_wars_schriftzug.png"),
                                       size=(int(1225 * self.sizing_width * 0.9), int(164 * self.sizing_height * 0.9)))
