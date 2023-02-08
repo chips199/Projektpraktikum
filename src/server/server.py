@@ -79,6 +79,40 @@ for _ in range(number_of_games_at_a_time):
 maps_dict = dict(zip(game_data_dict.keys(), repeat("none")))
 
 
+def game_server(game_id, this_gid):
+    global game_data_dict
+    while not players_connected[this_gid].__contains__(3) and players_connected[this_gid].count(
+            0) != number_of_players_per_game:
+        pass
+    game_data_dict[game_id]["metadata"]["start"] = (datetime.datetime.now() + datetime.timedelta(seconds=10)).strftime(
+        "%d/%m/%Y, %H:%M:%S")
+    game_data_dict[game_id]["metadata"]["end"] = (datetime.datetime.now() + datetime.timedelta(seconds=310)).strftime(
+        "%d/%m/%Y, %H:%M:%S")
+    print(game_data_dict[game_id]["metadata"]["start"], game_data_dict[game_id]["metadata"]["end"])
+    # exit(0)
+    last_w_of_p = [None] * number_of_players_per_game
+    last_spawn_check = None
+    while players_connected[this_gid] != [0] * number_of_players_per_game:
+        w_of_p = copy(list(map(lambda x: x[1]["weapon_data"][3],
+                               filter(lambda y: ["0", "1", "2", "3"].__contains__(y[0]),
+                                      game_data_dict[game_id].items()))))
+        for ip, wp in enumerate(w_of_p):
+            p_pos = game_data_dict[game_id][str(ip)]["position"]
+            if last_w_of_p[ip] != wp:
+                last_w_of_p[ip] = wp
+                if wp != "Fist":
+                    potential_items = game_data_dict[game_id]["metadata"]["spawnpoints"]["items"][wp]
+                    i = potential_items.index(min(list(map(lambda x: math.dist(p_pos, x), potential_items))))
+                    game_data_dict[game_id]["metadata"]["spawnpoints"]["items"][wp].pop(i)
+        if last_spawn_check is None or datetime.datetime.now() - last_spawn_check > datetime.timedelta(seconds=20):
+            last_spawn_check = datetime.datetime.now()
+            for point in spawn_points[maps_dict[game_id]]["item_spawnpoints"]:
+                for k, v in spawn_points[maps_dict[game_id]]["item-odds"].items():
+                    if random.random() < v:
+                        game_data_dict[game_id]["metadata"]["spawnpoints"]["items"][k].append(point)
+                        break
+
+
 def reset_games():
     """
         checks each game if a game has been used and rests them after it isn't used anymore
@@ -101,40 +135,6 @@ def reset_games():
                 game_data_dict[game_id][str(n)]["connected"] = False
                 game_data_dict[game_id][str(n)]["killed_by"] = [0, 0, 0, 0]
             print(f"{list(game_data_dict.keys())[i]} reset, because no player was there anymore")
-
-
-def game_server(game_id, this_gid):
-    global game_data_dict
-    while not players_connected[this_gid].__contains__(3):
-        pass
-    game_data_dict[game_id]["metadata"]["start"] = (datetime.datetime.now() + datetime.timedelta(seconds=15)).strftime(
-        "%d/%m/%Y, %H:%M:%S")
-    game_data_dict[game_id]["metadata"]["end"] = (datetime.datetime.now() + datetime.timedelta(seconds=315)).strftime(
-        "%d/%m/%Y, %H:%M:%S")
-    print(game_data_dict[game_id]["metadata"]["start"], game_data_dict[game_id]["metadata"]["end"])
-    exit(0)
-    items = game_data_dict[game_id]["metadata"]["spawnpoints"]["items"]
-    last_w_of_p = [None] * number_of_players_per_game
-    last_spawn_check = None
-    while players_connected[this_gid] != [0] * number_of_players_per_game:
-        w_of_p = copy(list(map(lambda x: x[1]["weapon_data"][3],
-                               filter(lambda y: ["0", "1", "2", "3"].__contains__(y[0]),
-                                      game_data_dict[game_id].items()))))
-        for ip, wp in enumerate(w_of_p):
-            p_pos = game_data_dict[game_id][str(ip)]["position"]
-            if last_w_of_p[ip] != wp:
-                last_w_of_p[ip] = wp
-                if wp != "Fist":
-                    potential_items = items[wp]
-                    i = potential_items.index(min(list(map(lambda x: math.dist(p_pos, x), potential_items))))
-                    game_data_dict[game_id]["metadata"]["spawnpoints"]["items"][wp].pop(i)
-        if last_spawn_check is None or datetime.datetime.now() - last_spawn_check > datetime.timedelta(seconds=20):
-            last_spawn_check = datetime.datetime.now()
-            for point in spawn_points[maps_dict[game_id]]["item_spawnpoints"]:
-                for k, v in spawn_points[maps_dict[game_id]]["item-odds"].items():
-                    if random.random() < v:
-                        game_data_dict[game_id]["metadata"]["spawnpoints"]["items"][k].append(point)
-                        break
 
 
 def threaded_client(conn):

@@ -59,7 +59,7 @@ class Player(Animated):
         self.blood_animation.start_animation_in_direction(direction=1)
         self.blood_animation.double_frames(factor=2)
 
-    def set_velocity(self, data=(1, 1, 0)):
+    def set_velocity(self, data=(1, 1, 0, 0)):
         self.moving_velocity_on_ground = data[0]
         self.moving_velocity_in_air = data[1]
         self.velocity_jumping = self.max_jumping_speed = data[2]
@@ -122,7 +122,6 @@ class Player(Animated):
                                  width=3)
 
             self.weapon.animation_direction = self.animation_direction
-            self.weapon.draw(g=g, x=self.x, y=self.y, width=self.frame_width, height=self.frame_height)
             self.weapon.draw(g=g, x=self.x, y=self.y, width=self.frame_width, height=self.frame_height)
 
             # bloodsplash animation
