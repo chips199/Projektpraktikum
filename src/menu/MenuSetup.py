@@ -192,6 +192,7 @@ class MenuSetup:
         # button_play.place(
         #     x=int((self.entry_session_id.winfo_x() + self.entry_session_id.winfo_width() + 10) * self.sizing_width),
         #     y=int(self.entry_session_id.winfo_y() * self.sizing_height))
+
         button_play.place(relx=0.597,
                           rely=0.1,
                           anchor='n')
