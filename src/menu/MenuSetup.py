@@ -389,7 +389,7 @@ class MenuSetup:
             self.root.after(1500, lambda: self.check_if_game_started())
 
     def clear_frame_sliding(self,
-                            widget: ['MyLabel|tk.CTkButton|MyFrame'],
+                            widget: ['MyLabel|tk.CTkButton|MyFrame'],  # type:ignore[valid-type]
                             direction: str,
                             stepsize: int = 8,
                             after_time: int = 2000,
