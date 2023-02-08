@@ -102,15 +102,16 @@ def game_server(game_id, this_gid):
                 last_w_of_p[ip] = wp
                 if wp != "Fist":
                     potential_items = game_data_dict[game_id]["metadata"]["spawnpoints"]["items"][wp]
-                    i = potential_items.index(min(list(map(lambda x: math.dist(p_pos, x), potential_items))))
+                    potential_items_distances = list(map(lambda x: math.dist(p_pos, x), potential_items))
+                    i = potential_items_distances.index(min(potential_items_distances))
                     game_data_dict[game_id]["metadata"]["spawnpoints"]["items"][wp].pop(i)
-        if last_spawn_check is None or datetime.datetime.now() - last_spawn_check > datetime.timedelta(seconds=20):
-            last_spawn_check = datetime.datetime.now()
-            for point in spawn_points[maps_dict[game_id]]["item_spawnpoints"]:
-                for k, v in spawn_points[maps_dict[game_id]]["item-odds"].items():
-                    if random.random() < v:
-                        game_data_dict[game_id]["metadata"]["spawnpoints"]["items"][k].append(point)
-                        break
+        # if last_spawn_check is None or datetime.datetime.now() - last_spawn_check > datetime.timedelta(seconds=20):
+        #     last_spawn_check = datetime.datetime.now()
+        #     for point in spawn_points[maps_dict[game_id]]["item_spawnpoints"]:
+        #         for k, v in spawn_points[maps_dict[game_id]]["item-odds"].items():
+        #             if random.random() < v:
+        #                 game_data_dict[game_id]["metadata"]["spawnpoints"]["items"][k].append(point)
+        #                 break
 
 
 def reset_games():
