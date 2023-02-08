@@ -105,7 +105,7 @@ class Game:
                                                                self.playerList[id].weapon_path[
                                                                    weapon.WeaponType.Fist.name])
                 Weapon.Weapon.check_hit(self.playerList[id], self.playerList[:self.id] + self.playerList[self.id + 1:],
-                                        self.map.solid_df)
+                                        self.map.solid_df, self.canvas.get_canvas())
                 if self.playerList[id].y > self.height:
                     self.playerList[id].health = 0
                     self.playerList[id].death_time = datetime.datetime.now()
@@ -123,6 +123,13 @@ class Game:
                     self.show_scoreboard = True
                 else:
                     self.show_scoreboard = False
+
+                # blocking
+                if keys[pygame.K_m]:
+                    self.playerList[id].start_blocking()
+                else:
+                    self.playerList[id].stop_blocking()
+
                 # Hit
                 if keys[pygame.K_s]:
                     # Check if Player can use his weapon

@@ -1,6 +1,7 @@
 import datetime
 import inspect
 import os
+from tkinter import messagebox
 from time import sleep
 from typing import Optional, Callable, Union, Type
 
@@ -46,6 +47,7 @@ class MenuSetup:
         self.amount_player = 0
         self.game_started = False
         self.player = []
+        self.lobby_owner = False
         self.data = {
             "id": 1,
             "s_id": 2984,
@@ -201,9 +203,9 @@ class MenuSetup:
         # Create 'New Session Button'
         button_new_session = tk.CTkButton(master=self.interaction_frame,
                                           text="Create New Session",
-                                          width=int((button_play.winfo_x() - self.entry_session_id.winfo_x() +
-                                                     button_play.winfo_width()) * self.sizing_width),
-                                          height=int(self.h / 2 * self.sizing_height),
+                                          width=int((button_play.winfo_x() + button_play.winfo_width()
+                                                     - self.entry_session_id.winfo_x()) * self.sizing_width),
+                                          height=int(self.h / 2),
                                           command=self.start_new_session,
                                           corner_radius=int(self.h / 3),
                                           font=("None", self.h * 0.4))
@@ -376,12 +378,12 @@ class MenuSetup:
                                  func=lambda: self.load_choose_map_frame())
 
     def create_lobby(self, map_name):
+        self.lobby_owner = True
         self.start_network(argument=map_name,
                            update_func=lambda: self.update_background_process(),
                            success_func=lambda: self.clear_frame_sliding(
                                widget=self.choose_map_frame,
                                direction="down",
-                               # stepsize=7,
                                after_time=1200,
                                func=lambda: self.load_lobby_frame(),
                                func2=lambda: self.check_if_game_started(),
@@ -410,14 +412,20 @@ class MenuSetup:
         g.run()
 
     def back_to_start(self):
-        self.main_frame.destroy()
-        self.load_main_frame()
-        self.load_interaction_frame()
-        self.back_button.place_forget()
-        if self.process is not None:
-            self.process.kill()
-            self.amount_player = 0
-            self.lobby_frame.destroy()
+        response = "yes"
+        if self.lobby_owner:
+            response = messagebox.askquestion(title="",
+                                              message="Your are the owner of this lobby. Leaving will quit the whole lobby. Continue?")
+
+        if response == "yes":
+            self.main_frame.destroy()
+            self.load_main_frame()
+            self.load_interaction_frame()
+            self.back_button.place_forget()
+            if self.process is not None:
+                self.process.kill()
+                self.amount_player = 0
+                self.lobby_frame.destroy()
 
     # __________________other Functions__________________
 
@@ -430,7 +438,7 @@ class MenuSetup:
     def clear_frame_sliding(self,
                             widget: ['MyLabel|tk.CTkButton|MyFrame'],  # type:ignore[valid-type]
                             direction: str,
-                            stepsize: int = 8,
+                            stepsize: int = 9,
                             after_time: int = 2000,
                             func: Optional[Union[Callable, None]] = None,  # type:ignore[type-arg]
                             **kwargs: Optional[Union[Callable, None]]) -> None:  # type:ignore[type-arg]

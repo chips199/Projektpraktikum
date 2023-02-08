@@ -36,6 +36,7 @@ class Player(Animated):
         self.is_jumping = False
         self.is_falling = True
         self.block_x_axis = False
+        self.is_blocking = False
         self.moving_on_edge = False
         self.cut_frames(2)
         self.killed_by = killed_by
@@ -218,6 +219,14 @@ class Player(Animated):
             if vel <= 0:
                 self.is_jumping = False
                 self.velocity_jumping = self.max_jumping_speed
+
+    def start_blocking(self):
+        self.is_blocking = True
+        self.block_x_axis = True
+
+    def stop_blocking(self):
+        self.is_blocking = False
+        self.block_x_axis = False
 
     def is_alive(self):
         """
