@@ -34,6 +34,7 @@ class MenuSetup:
         self.entry_session_id = None
         self.label_error = None
         self.label_game_name = None
+        self.back_button = None
         # self.net = None
         self.w = 300
         self.h = 60
@@ -89,8 +90,9 @@ class MenuSetup:
         self.root.geometry("{}x{}+{}+{}".format(self.window_width, self.window_height, self.x, self.y))
         self.root.resizable(False, False)
 
-        self.main_frame = MyFrame(master=self.root, width=self.window_width, height=self.window_height)
-        self.main_frame.place(anchor='center', relx=0.5, rely=0.5)
+        # self.main_frame = MyFrame(master=self.root, width=self.window_width, height=self.window_height)
+        # self.main_frame.place(anchor='center', relx=0.5, rely=0.5)
+        self.main_frame = None
         self.interaction_frame = None
         self.lobby_frame = None
         self.choose_map_frame = None
@@ -113,6 +115,10 @@ class MenuSetup:
         """
                Load the main frame for the game window
         """
+
+        self.main_frame = MyFrame(master=self.root, width=self.window_width, height=self.window_height)
+        self.main_frame.place(anchor='center', relx=0.5, rely=0.5)
+
         # Game Name Label
         game_name_image = tk.CTkImage(dark_image=Image.open(wrk_dir + r"\..\stick_wars_schriftzug.png"),
                                       size=(int(1225 * self.sizing_width * 0.9), int(164 * self.sizing_height * 0.9)))
@@ -120,9 +126,12 @@ class MenuSetup:
                                        text=None,
                                        image=game_name_image,
                                        fg_color="#212121")
-        self.label_game_name.place(x=int(self.window_width / 2),
-                                   y=int(164 * self.sizing_height),
-                                   anchor='s')
+        # self.label_game_name.place(x=int(self.window_width / 2),
+        #                            y=int(164 * self.sizing_height),
+        #                            anchor='s')
+        self.label_game_name.place(relx=0.5,
+                                   rely=0.02,
+                                   anchor='n')
 
         # Session ID not found Fehlermeldung
         self.label_error = MyLabel(master=self.main_frame,
@@ -135,10 +144,19 @@ class MenuSetup:
                                    anchor="w",
                                    justify='left')
 
+        self.back_button = tk.CTkButton(master=self.main_frame,
+                                        text="Back",
+                                        width=int(self.h),
+                                        height=int(self.h),
+                                        font=("None", self.h * 0.4),
+                                        corner_radius=int(self.h / 3),
+                                        command=self.back_to_start)
+
     def load_interaction_frame(self):
-        self.interaction_frame = MyFrame(master=self.root,
+        self.interaction_frame = MyFrame(master=self.main_frame,
                                          width=self.root.window_width,
-                                         height=int(710 * self.sizing_height),
+                                         # height=int(710 * self.sizing_height),
+                                         height=self.window_height * 0.79,
                                          fg_color="#212121")
         self.interaction_frame.place(anchor='sw', x=0, y=self.window_height)
 
@@ -158,8 +176,9 @@ class MenuSetup:
                                             height=self.h,
                                             font=("None", self.h * 0.5),
                                             corner_radius=int(self.h / 3))
-        self.entry_session_id.place(relx=0.47, rely=0.1, anchor='n')
-        self.root.update()
+        self.entry_session_id.place(relx=0.47,
+                                    rely=0.1,
+                                    anchor='n')
 
         # Create 'Play/Start Button'
         button_play = tk.CTkButton(master=self.interaction_frame,
@@ -170,9 +189,12 @@ class MenuSetup:
                                    corner_radius=int(self.h / 3),
                                    command=self.join_lobby)
 
-        button_play.place(
-            x=int((self.entry_session_id.winfo_x() + self.entry_session_id.winfo_width() + 10) * self.sizing_width),
-            y=int(self.entry_session_id.winfo_y() * self.sizing_height))
+        # button_play.place(
+        #     x=int((self.entry_session_id.winfo_x() + self.entry_session_id.winfo_width() + 10) * self.sizing_width),
+        #     y=int(self.entry_session_id.winfo_y() * self.sizing_height))
+        button_play.place(relx=0.597,
+                          rely=0.1,
+                          anchor='n')
         self.root.update()
 
         # Create 'New Session Button'
@@ -184,92 +206,94 @@ class MenuSetup:
                                           command=self.start_new_session,
                                           corner_radius=int(self.h / 3),
                                           font=("None", self.h * 0.4))
-        button_new_session.place(x=int(self.entry_session_id.winfo_x() * self.sizing_width),
-                                 y=int((self.entry_session_id.winfo_y() + self.entry_session_id.winfo_height() + 15) *
-                                       self.sizing_height))
+        button_new_session.place(relx=0.5,
+                                 rely=0.2,
+                                 anchor='n')
 
     def load_choose_map_frame(self):
         self.interaction_frame.destroy()  # type:ignore[union-attr]
 
-        self.choose_map_frame = MyFrame(master=self.root, width=int(self.window_width),
+        self.choose_map_frame = MyFrame(master=self.main_frame, width=int(self.window_width),
                                         height=int(400 * self.sizing_height),
                                         fg_color="#212121")
         self.choose_map_frame.place(anchor='n', x=self.window_width / 2, y=self.window_height * 0.3)
 
-        # load space map
-        space_map_platforms = tk.CTkImage(
-            dark_image=Image.open(wrk_dir + r"\..\menu\maps\space_map.png"),
-            size=(int(444 * self.sizing_width),
-                  int(250 * self.sizing_height)))
-        map2 = MyLabel(master=self.choose_map_frame,
-                       text=None,
-                       image=space_map_platforms,
-                       fg_color='#252525'
-                       )
-        map2.place(relx=0.5,
-                   y=int(170 * self.sizing_height),
-                   anchor='center')
+        self.back_button.place(relx=0.05,
+                               rely=0.1)
 
-        self.root.update()
+        width = int(444 * self.sizing_width)
+        height = int(250 * self.sizing_height)
 
         # load basic map
         basic_map_structures = tk.CTkImage(
             dark_image=Image.open(wrk_dir + r"\..\menu\maps\basic_map.png"),
-            size=(int(map2.winfo_width() * self.sizing_width),
-                  int(map2.winfo_height() * self.sizing_height)))
+            size=(width, height))
         map1 = MyLabel(master=self.choose_map_frame,
                        text=None,
                        image=basic_map_structures)
-        map1.place(x=int((map2.winfo_x() - map2.winfo_width() - 20) * self.sizing_width),
-                   y=map2.winfo_y() * self.sizing_height)
-
-        self.root.update()
+        map1.place(relx=0.21,
+                   rely=0.5,
+                   anchor='center')
 
         # load space map
+        space_map_platforms = tk.CTkImage(
+            dark_image=Image.open(wrk_dir + r"\..\menu\maps\space_map.png"),
+            size=(width, height))
+        map2 = MyLabel(master=self.choose_map_frame,
+                       text=None,
+                       image=space_map_platforms
+                       )
+        map2.place(relx=0.5,
+                   rely=0.5,
+                   anchor='center')
+
+        # load snow map
         schnee_map_platforms = tk.CTkImage(
             dark_image=Image.open(wrk_dir + r"\..\menu\maps\schnee_map.png"),
-            size=(int(map2.winfo_width() * self.sizing_width),
-                  int(map2.winfo_height() * self.sizing_height)))
+            size=(width, height))
         map3 = MyLabel(master=self.choose_map_frame,
                        text=None,
-                       image=schnee_map_platforms,
-                       fg_color='#252525'
+                       image=schnee_map_platforms
                        )
-        map3.place(x=int((map2.winfo_x() + map2.winfo_width() + 20) * self.sizing_width),
-                   y=map2.winfo_y() * self.sizing_height)
+        map3.place(relx=0.79,
+                   rely=0.5,
+                   anchor='center')
 
         self.root.update()
 
         # add buttons to choose a map
         button_start = tk.CTkButton(master=self.choose_map_frame,
                                     text="Basicmap",
-                                    width=int(map1.winfo_width() * self.sizing_width),
+                                    width=width,
                                     height=int(self.h * 0.3),
                                     font=("None", self.h * 0.4),
                                     corner_radius=int(self.h / 3),
                                     command=lambda: self.create_lobby(map_name='basicmap'))
-        button_start.place(x=int(map1.winfo_x() * self.sizing_width),
-                           y=int((map1.winfo_y() + map1.winfo_height() + 20) * self.sizing_height))
+        button_start.place(relx=0.21,
+                           rely=0.9,
+                           anchor='center')
 
         button_start2 = tk.CTkButton(master=self.choose_map_frame,
                                      text="Space Map",
-                                     width=int(map2.winfo_width() * self.sizing_width),
+                                     width=width,
                                      height=int(self.h * 0.3),
                                      font=("None", self.h * 0.4),
                                      corner_radius=int(self.h / 3),
                                      command=lambda: self.create_lobby(map_name='platformmap'))
-        button_start2.place(x=int(map2.winfo_x() * self.sizing_width),
-                            y=int((map2.winfo_y() + map2.winfo_height() + 20) * self.sizing_height))
+        button_start2.place(relx=0.5,
+                            rely=0.9,
+                            anchor='center')
 
         button_start3 = tk.CTkButton(master=self.choose_map_frame,
                                      text="Snow Map",
-                                     width=int(map3.winfo_width() * self.sizing_width),
+                                     width=width,
                                      height=int(self.h * 0.3),
                                      font=("None", self.h * 0.4),
                                      corner_radius=int(self.h / 3),
                                      command=lambda: self.create_lobby(map_name='schneemap'))
-        button_start3.place(x=int(map3.winfo_x() * self.sizing_width),
-                            y=int((map3.winfo_y() + map3.winfo_height() + 20) * self.sizing_height))
+        button_start3.place(relx=0.79,
+                            rely=0.9,
+                            anchor='center')
 
     def load_lobby_frame(self):
         self.lobby_frame = MyFrame(master=self.root,
@@ -278,6 +302,10 @@ class MenuSetup:
         self.lobby_frame.configure(width=self.window_width,
                                    height=150 * self.sizing_height)  # type:ignore[union-attr]
         self.lobby_frame.place(x=0, y=250 * self.sizing_height)  # type:ignore[union-attr]
+
+        self.back_button.configure(text="Leave Lobby")
+        self.back_button.place(relx=0.02,
+                               rely=0.1)
 
         self.root.update()
 
@@ -379,6 +407,16 @@ class MenuSetup:
         sleep(2)
         g = game.Game(w=1600, h=900, conn=self.conn1, process=self.process)
         g.run()
+
+    def back_to_start(self):
+        self.main_frame.destroy()
+        self.load_main_frame()
+        self.load_interaction_frame()
+        self.back_button.place_forget()
+        if self.process is not None:
+            self.process.kill()
+            self.amount_player = 0
+            self.lobby_frame.destroy()
 
     # __________________other Functions__________________
 
