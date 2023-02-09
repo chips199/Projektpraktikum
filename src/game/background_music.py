@@ -6,24 +6,31 @@ from pygame import mixer
 
 class Music:
 
-    def __init__(self, sound_file, volume):
+    def __init__(self, sound_path, volume):
         mixer.init()
-        self.music = pygame.mixer.Sound(sound_file)
-        self.music.set_volume(volume)
+        # Adds all songs from the music folder to the playlist
+        for i, sound_file in enumerate(os.listdir(sound_path)):
+            if i == 0:
+                # First song will be loaded directly into the music player
+                pygame.mixer.music.load(f"{sound_path}/{sound_file}")
+                pygame.mixer.music.set_volume(volume)
+            else:
+                # Other songs added to the queue
+                pygame.mixer.music.queue(f"{sound_path}/{sound_file}")
 
     def play(self, loops=0):
         """
         Plays a sound
         :return: None
         """
-        pygame.mixer.Sound.play(self.music, loops=loops)
+        pygame.mixer.music.play(loops=loops)
 
     def stop(self):
         """
         Stops the music
         :return:
         """
-        self.music.stop()
+        pygame.mixer.music.stop()
 
     def fadeout(self, time):
         """
@@ -31,4 +38,4 @@ class Music:
         :param time: time in ms
         :return: None
         """
-        self.music.fadeout(time)
+        pygame.mixer.music.fadeout(time)
