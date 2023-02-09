@@ -19,11 +19,30 @@ class MyLabel(tk.CTkLabel):
         self.current_rely = 0.0
         self.current_relx = 0.0
 
-    def set_rel_positions(self, x, y):
+    def set_rel_positions(self,
+                          x: float,
+                          y: float) -> None:
+        """
+        Set the relative positions for the widget
+
+        :param x: The x position of the widget, as a float between 0 and 1
+        :param y: The y position of the widget, as a float between 0 and 1
+        :return: None
+        """
         self.current_relx = x
         self.current_rely = y
 
-    def set_sizing(self, sizing_width, sizing_height):
+    def set_sizing(self,
+                   sizing_width: float,
+                   sizing_height: float) -> None:
+        """
+        Set the scaling factor for the width and height of the window.
+
+        :param sizing_width: Scaling factor for width
+        :param sizing_height: Scaling factor for height
+
+        :return: None
+        """
         self.sizing_width = sizing_width
         self.sizing_height = sizing_height
 
@@ -60,6 +79,17 @@ class MyLabel(tk.CTkLabel):
                        delay: int = 15,
                        ending_function: Optional[Union[Callable, None]] = None) -> None:  # type:ignore[type-arg]
 
+        """
+        Move self (Label) to the given relativ y pos
+
+        :param direction: direction in which to move, either 0 for right or 1 for left
+        :param rely: relative y-coordinate to move to. 1.0 is 100% 0.0 is 0% of screensize
+        :param stepsize: stepsize per frame in percent, 1.0 means 100% of screen, default is 0.0028, so 0.28% per frame
+        :param delay: Delay time in milliseconds before the next move, default is 15
+        :param ending_function: A function that will be called once the rely coordinate is reached, default is None
+        :return: None
+        """
+
         if rely == round(self.current_rely, 2):
             if ending_function is not None:
                 ending_function()
@@ -73,65 +103,6 @@ class MyLabel(tk.CTkLabel):
 
         self.after(delay, lambda: self.move_on_y_axis(direction, rely, stepsize, delay, ending_function))
 
-    def move_to(self,
-                x: int = 0,
-                y: int = 0,
-                stepsize: int = 5,
-                delay: int = 25,
-                ending_function: Optional[Union[Callable, None]] = None) -> None:  # type:ignore[type-arg]
-
-        """
-        Move self (Label) to the given x and y coordinate
-
-        :param x: x-coordinate to move to
-        :param y: y-coordinate to move to
-        :param stepsize: Number of pixels the widget should be moved each time, default is 5
-        :param delay: Delay time in milliseconds before the next move, default is 25
-        :param ending_function: A function that will be called once the x and y coordinates are reached, default is None
-        :return: None
-        """
-        x_sized = round(x * self.sizing_width)
-        y_sized = round(y * self.sizing_height)
-        stepsize_sized = round(stepsize * self.sizing_height)
-
-        # get the current x and y position of the widget
-        widget_x = round(self.winfo_x() * self.sizing_width)
-        widget_y = round(self.winfo_y() * self.sizing_height)
-
-        # calculate the difference from current and desired position
-        x_diff = abs(widget_x - x_sized)
-        y_diff = abs(widget_y - y_sized)
-
-        # set new x-coordinate
-        if x_diff > stepsize_sized:
-            if widget_x < x_sized:
-                new_x = widget_x + stepsize_sized
-            else:
-                new_x = widget_x - stepsize_sized
-        else:
-            new_x = x_sized
-
-        # set new y-coordinate
-        if y_diff > stepsize_sized:
-            if widget_y < y_sized:
-                new_y = widget_y + stepsize_sized
-            else:
-                new_y = widget_y - stepsize_sized
-        else:
-            new_y = y_sized
-
-        # move the widget to new position
-        self.place(x=new_x, y=new_y)
-
-        # if there is a difference in either x or y coordinate, enter a recursion after the given delay time
-        if x_diff > stepsize_sized or y_diff > stepsize_sized:
-            self.after(delay, lambda: self.move_to(x, y, stepsize, delay, ending_function))
-
-        # otherwise the position is reached, so call the ending_function if it is handed over
-        else:
-            if ending_function is not None:
-                ending_function()
-
     def idle_animation_on_y_axis(self,
                                  upper_y: float = 0.0,
                                  lower_y: float = 0.0,
@@ -142,11 +113,11 @@ class MyLabel(tk.CTkLabel):
         """
         Perform an idle animation by alternating between two positions.
 
-        :param pos_one: The first position to move to (x, y). Default is (0, 0).
-        :param pos_two: The second position to move to (x, y). Default is (0, 0).
-        :param next_pos: The next position to move to. Either "one" or "two". Default is "two".
-        :param delay: Delay time in milliseconds before the next move. Default is 35.
-        :param stepsize: Number of pixels the widget should be moved each time. Default is 1.
+        :param upper_y: The upper rely position to move to
+        :param lower_y: The lower rely position to move to
+        :param next_pos: The next position to move to. Either "one" or "two". Default is "one".
+        :param delay: Delay time in milliseconds before the next move. Default is 25.
+        :param stepsize: stepsize per frame in percent, 1.0 means 100% of screen, default is 0.004, so 0.4% per frame
         :return: None
         """
 

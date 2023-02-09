@@ -191,10 +191,6 @@ class MenuSetup:
                                    corner_radius=int(self.h / 3),
                                    command=self.join_lobby)
 
-        # button_play.place(
-        #     x=int((self.entry_session_id.winfo_x() + self.entry_session_id.winfo_width() + 10) * self.sizing_width),
-        #     y=int(self.entry_session_id.winfo_y() * self.sizing_height))
-
         button_play.place(relx=0.597,
                           rely=0.1,
                           anchor='n')
@@ -335,44 +331,81 @@ class MenuSetup:
 
     # __________________Player Functions__________________
 
-    def load_player(self, rel_x_pos, path):
+    def load_player(self,
+                    rel_x_pos: float,
+                    path: str) -> None:
+        """
+        Loads a player into the main frame at the specified position.
+
+        :param rel_x_pos: The x-position of the player in the main frame, specified as a relative value (0.0-1.0)
+        :param path: The file path to the player image
+        :return: None
+        """
+        # Load the player image from the specified file path
         player_image = tk.CTkImage(dark_image=Image.open(path),
                                    size=(int(49 * self.sizing_width), int(142 * self.sizing_height)))
+
+        # Create a label to display the player image
         label_image = MyLabel(master=self.main_frame,
                               text=None,
                               image=player_image)
+
+        # Place the label at the specified relative position
         label_image.place(relx=rel_x_pos, rely=0.28)
+
+        # Set the relative position of the label
         label_image.set_rel_positions(x=rel_x_pos, y=0.28)
+
+        # Set the sizing of the label
         label_image.set_sizing(self.sizing_width, self.sizing_height)
 
+        # Add the player label to the list of players
         self.player.append(label_image)
 
+        # Update the GUI
         self.root.update()
 
+        # Animate the player
         label_image.move_on_y_axis(direction=1,
                                    rely=0.6,
                                    ending_function=lambda: label_image.idle_animation_on_y_axis(upper_y=0.58,
                                                                                                 lower_y=0.6,
                                                                                                 stepsize=0.0008))
 
-    def update_player(self):
-        server_amount_player = int(self.data["amount_player"])  # type:ignore[union-attr]
-        # print(server_amount_player)
+    def update_player(self) -> None:
+        """
+        Update the players in the game by extracting the amount of players from server handed over in the self.data
+        """
+        server_amount_player = int(self.data["amount_player"])  # type: ignore[union-attr]
+
+        # Loop over the absolute difference between the number of players in the game and the number of players on the server
         for i in range(abs(server_amount_player - self.amount_player)):
+            # If the number of players in the game is less than the number of players on the server
             if self.amount_player < server_amount_player:
+                # Load the new player
                 self.load_player(path=self.player_dict[str(self.amount_player)][0],
                                  rel_x_pos=self.player_dict[str(self.amount_player)][1])
                 self.amount_player += 1
+
+            # If the number of players in the game is greater than the number of players on the server
             else:
+                # Remove the last player in the game
                 player_to_remove = self.player.pop()
                 player_to_remove.destroy()
                 self.amount_player -= 1
-        if self.root.run:  # and self.net is not None:
+
+        # If the game is running
+        if self.root.run:
+            # Call the update player method again after 1000ms
             self.main_frame.after(1000, lambda: self.update_player())
 
     # __________________command: Functions__________________
 
     def start_new_session(self):
+        """
+        Clears the interaction frame and loads the choose map frame.
+        """
+        # Clear the interaction frame
         self.clear_frame_sliding(widget=self.interaction_frame,
                                  direction="down",
                                  after_time=1500,
@@ -438,39 +471,70 @@ class MenuSetup:
             self.root.after(1500, lambda: self.check_if_game_started())
 
     def clear_frame_sliding(self,
-                            widget: ['MyLabel|tk.CTkButton|MyFrame'],  # type:ignore[valid-type]
+                            widget: Union['MyLabel', 'tk.CTkButton', 'MyFrame'],
                             direction: str,
                             stepsize: int = 9,
                             after_time: int = 2000,
-                            func: Optional[Union[Callable, None]] = None,  # type:ignore[type-arg]
-                            **kwargs: Optional[Union[Callable, None]]) -> None:  # type:ignore[type-arg]
+                            func: Optional[Callable] = None,
+                            **kwargs: Optional[Callable]) -> None:
+        """
+        Clear the widget out of the window in a sliding animation.
+        :param widget: widget to be cleared
+        :param direction: direction in which the widget is cleared
+        :param stepsize: stepsize of the animation
+        :param after_time: time after which the func() function is performed
+        :param func: function that is called with delay given in after_time
+        :param kwargs: functions that are called without delay
+        :return: None
+        """
+        # Perform the sliding animation
         self.root.move_out_of_window(widget=widget,
                                      direction=direction,
                                      stepsize=stepsize)
+
+        # If a function was provided, call it after the sliding animation
         if func is not None:
             self.main_frame.after(after_time, lambda: func())
+
+        # Loop over the provided functions and call them after the sliding animation
         for key, value in kwargs.items():
             if inspect.isfunction(value):
                 value()
 
-    def start_network(self, argument: str, update_func, success_func):
+    def start_network(self,
+                      argument: str,
+                      update_func: Callable,
+                      success_func: Callable) -> None:
+        """
+        Start the network by passing the `argument` to the `backgroundProzess` function.
+        :param argument: the argument passed to the `backgroundProzess` function.
+        :param update_func: the function to call after updating the network.
+        :param success_func: the function to call after successfully starting the network.
+        """
         try:
             if argument != "":
+                # Set up connection between main process and background process
                 self.conn1, self.conn2 = multiprocessing.Pipe(duplex=True)
+                # Start the background process
                 self.process = multiprocessing.Process(target=backgroundProzess, args=(argument, self.conn2))
                 self.process.start()
                 self.root.set_process(self.process)
+                # Wait for the first message from the background process
                 while not self.conn1.poll():
-                    # waiting for the first message of background process
                     sleep(0.1)
+                # Store the current time
                 self.timer = datetime.datetime.now()
+                # Call update function
                 update_func()
 
+            # When session id is empty or 5 (means invalid)
             if argument == "" or self.data["id"] == "5":  # type:ignore[comparison-overlap]
                 if argument == "":
                     msg = "Enter Session ID"
                 else:
                     msg = str(self.data["s_id"])
+
+                # Show error message
                 self.label_error.label_hide_show(  # type:ignore[union-attr]
                     x=int(self.window_width / 2),
                     y=int((self.label_game_name.winfo_y() +  # type:ignore[union-attr]
@@ -478,13 +542,17 @@ class MenuSetup:
                            15) * self.sizing_height),
                     time=3000,
                     message=msg)
-                # kill process (network) if session_id is invalid, in future we should be able to update the network
+
+                # Also kill the background process
                 if self.process is not None:
                     self.process.kill()
-                # stop the after call from update_background_process
+
+                # Cancel the after call from update_background_process
                 if self.update_background_after_id is not None:
                     self.main_frame.after_cancel(self.update_background_after_id)
+
             else:
+                # Call the success function if the session ID is valid
                 success_func()
 
         except ConnectionRefusedError:
