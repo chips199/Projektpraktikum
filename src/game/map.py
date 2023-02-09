@@ -4,6 +4,8 @@ import pygame
 from typing import List
 from pandas import DataFrame
 
+from src.game.background_music import Music
+
 
 class Map():
     solid_df: DataFrame
@@ -92,6 +94,11 @@ class Map():
             for image in comb_images:
                 self.static_objects_img.blit(image, (0, 0))
             self.static_objects_img = self.static_objects_img.convert_alpha()
+
+        # Load Music
+        self.music = Music(uri + r"\music", 1.0)
+        # Start Music
+        self.music.play()
 
     def draw(self, screen):
         """

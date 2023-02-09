@@ -7,6 +7,7 @@ from pygame import mixer
 class Music:
 
     def __init__(self, sound_path, volume):
+        # Initialize mixer
         mixer.init()
         # Adds all songs from the music folder to the playlist
         for i, sound_file in enumerate(os.listdir(sound_path)):

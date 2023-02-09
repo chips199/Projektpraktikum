@@ -107,6 +107,9 @@ class Game:
                 if event.type == pygame.K_ESCAPE:
                     run = False
 
+            # Music:
+            #self.map.music.
+
             if self.playerList[id].is_alive():
                 # check if weapon is destroyed and give player fists if true
                 if self.playerList[id].weapon.destroyed:
