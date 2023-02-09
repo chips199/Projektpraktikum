@@ -300,7 +300,7 @@ class MenuSetup:
 
     def load_lobby_frame(self):
         self.lobby_frame = MyFrame(master=self.main_frame,
-                                   fg_color="#212100")
+                                   fg_color="#212121")
 
         self.lobby_frame.configure(width=self.window_width,
                                    height=150 * self.sizing_height)  # type:ignore[union-attr]
