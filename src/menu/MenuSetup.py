@@ -9,6 +9,7 @@ from PIL import Image
 
 from src.game import game
 from src.game.backgroundProzess import backgroundProzess
+from src.game.background_music import Music
 
 from src.menu.MyFrame import MyFrame
 from src.menu.MyLabel import MyLabel
@@ -50,6 +51,10 @@ class MenuSetup:
             "s_id": 2984,
             "amount_player": 2
         }
+
+        # -------------------------------------------  Music  -------------------------------------------
+        self.music = Music(r"music", 1.0)
+        self.music.play(99)
 
         self.player_dict = {
             "0": [wrk_dir + r"\..\basicmap\player\basic_player_magenta.png", 175],
@@ -373,6 +378,7 @@ class MenuSetup:
         self.root.destroy()
         # important sleep, don't remove!!! Neccessary for the background task to realize that the game
         # has started, to send correct data to the game
+        self.music.fadeout(2000)
         sleep(2)
         g = game.Game(w=1600, h=900, conn=self.conn1, process=self.process)
         g.run()

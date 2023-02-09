@@ -1,3 +1,5 @@
+import os
+
 import pygame.mixer
 from pygame import mixer
 
@@ -9,12 +11,12 @@ class Music:
         self.music = pygame.mixer.Sound(sound_file)
         self.music.set_volume(volume)
 
-    def play(self):
+    def play(self, loops=0):
         """
         Plays a sound
         :return: None
         """
-        pygame.mixer.Sound.play(self.music)
+        pygame.mixer.Sound.play(self.music, loops=loops)
 
     def stop(self):
         """
