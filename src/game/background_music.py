@@ -9,6 +9,13 @@ class Music:
     def __init__(self, sound_path, volume):
         # Initialize mixer
         mixer.init()
+
+        # define new type of event
+        self.MUSIC_END = pygame.USEREVENT + 1
+
+        # assign event to `endevent`
+        pygame.mixer.music.set_endevent(self.MUSIC_END)
+
         # Adds all songs from the music folder to the playlist
         for i, sound_file in enumerate(os.listdir(sound_path)):
             if i == 0:

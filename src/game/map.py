@@ -7,7 +7,7 @@ from pandas import DataFrame
 from src.game.background_music import Music
 
 
-class Map():
+class Map:
     solid_df: DataFrame
     staticimages = list()  # type: List[pygame.surface.Surface]
     player_uris = list()  # type: List[str]
@@ -15,6 +15,8 @@ class Map():
     def __init__(self, game, uri):
         self.game = game
         self.directory = uri
+        self.music = None
+        self.music_load()
 
         # load background
         try:
@@ -95,11 +97,6 @@ class Map():
                 self.static_objects_img.blit(image, (0, 0))
             self.static_objects_img = self.static_objects_img.convert_alpha()
 
-        # Load Music
-        self.music = Music(uri + r"\music", 1.0)
-        # Start Music
-        self.music.play()
-
     def draw(self, screen):
         """
         displays all map objects to the canvas
@@ -113,3 +110,13 @@ class Map():
 
         else:
             screen.fill((41, 41, 41))
+
+    def music_load(self):
+        """
+        Loads the music from the folder and starts playing it
+        :return:
+        """
+        # Load Music
+        self.music = Music(self.directory + r"\music", 1.0)
+        # Start Music
+        self.music.play()
