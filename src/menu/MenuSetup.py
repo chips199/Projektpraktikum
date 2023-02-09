@@ -299,7 +299,7 @@ class MenuSetup:
                             anchor='center')
 
     def load_lobby_frame(self):
-        self.lobby_frame = MyFrame(master=self.main_frame,
+        self.lobby_frame = MyFrame(master=self.root,
                                    fg_color="#212121")
 
         self.lobby_frame.configure(width=self.window_width,
