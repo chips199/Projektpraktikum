@@ -16,6 +16,12 @@ class MyLabel(tk.CTkLabel):
         self.sizing_height = 1
         self.sizing_width = 1
         self.after_id = None
+        self.current_rely = 0.0
+        self.current_relx = 0.0
+
+    def set_rel_positions(self, x, y):
+        self.current_relx = x
+        self.current_rely = y
 
     def set_sizing(self, sizing_width, sizing_height):
         self.sizing_width = sizing_width
@@ -46,6 +52,26 @@ class MyLabel(tk.CTkLabel):
 
         # schedule an event to hide label after a certain amount of time
         self.after_id = self.after(time, lambda: self.place_forget())
+
+    def move_on_y_axis(self,
+                       direction: int = 0,
+                       rely: float = 0.0,
+                       stepsize: float = 0.0028,
+                       delay: int = 15,
+                       ending_function: Optional[Union[Callable, None]] = None) -> None:  # type:ignore[type-arg]
+
+        if rely == round(self.current_rely, 2):
+            if ending_function is not None:
+                ending_function()
+            return
+        elif direction == 0:
+            self.current_rely -= stepsize
+        elif direction == 1:
+            self.current_rely += stepsize
+
+        self.place(relx=self.current_relx, rely=self.current_rely)
+
+        self.after(delay, lambda: self.move_on_y_axis(direction, rely, stepsize, delay, ending_function))
 
     def move_to(self,
                 x: int = 0,
@@ -106,12 +132,12 @@ class MyLabel(tk.CTkLabel):
             if ending_function is not None:
                 ending_function()
 
-    def idle_animation(self,
-                       pos_one: tuple[int, int] = (0, 0),
-                       pos_two: tuple[int, int] = (0, 0),
-                       next_pos: str = "two",
-                       delay: int = 35,
-                       stepsize: int = 1) -> None:
+    def idle_animation_on_y_axis(self,
+                                 upper_y: float = 0.0,
+                                 lower_y: float = 0.0,
+                                 next_pos: str = "one",
+                                 delay: int = 25,
+                                 stepsize: float = 0.004) -> None:
 
         """
         Perform an idle animation by alternating between two positions.
@@ -126,20 +152,21 @@ class MyLabel(tk.CTkLabel):
 
         # move the label to position one
         if next_pos == "one":
-            self.move_to(x=pos_one[0],
-                         y=pos_one[1],
-                         stepsize=stepsize,
-                         delay=delay,
-                         ending_function=lambda: self.idle_animation(pos_one,
-                                                                     pos_two,
-                                                                     next_pos="two")
-                         )
+            self.move_on_y_axis(direction=0,
+                                rely=upper_y,
+                                stepsize=stepsize,
+                                delay=delay,
+                                ending_function=lambda: self.idle_animation_on_y_axis(upper_y,
+                                                                                      lower_y,
+                                                                                      next_pos="two",
+                                                                                      stepsize=stepsize))
         # move the label to position two
         elif next_pos == "two":
-            self.move_to(x=pos_two[0],
-                         y=pos_two[1],
-                         stepsize=stepsize,
-                         delay=delay,
-                         ending_function=lambda: self.idle_animation(pos_one,
-                                                                     pos_two,
-                                                                     next_pos="one"))
+            self.move_on_y_axis(direction=1,
+                                rely=lower_y,
+                                stepsize=stepsize,
+                                delay=delay,
+                                ending_function=lambda: self.idle_animation_on_y_axis(upper_y,
+                                                                                      lower_y,
+                                                                                      next_pos="one",
+                                                                                      stepsize=stepsize))

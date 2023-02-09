@@ -55,10 +55,10 @@ class MenuSetup:
         }
 
         self.player_dict = {
-            "0": [wrk_dir + r"\..\basicmap\player\basic_player_magenta.png", 175],
-            "1": [wrk_dir + r"\..\basicmap\player\basic_player_orange.png", 575],
-            "2": [wrk_dir + r"\..\basicmap\player\basic_player_purple.png", 975],
-            "3": [wrk_dir + r"\..\basicmap\player\basic_player_turquoise.png", 1375]
+            "0": [wrk_dir + r"\..\basicmap\player\basic_player_magenta.png", 0.14],
+            "0": [wrk_dir + r"\..\basicmap\player\basic_player_orange.png", 0.37],
+            "2": [wrk_dir + r"\..\basicmap\player\basic_player_purple.png", 0.6],
+            "3": [wrk_dir + r"\..\basicmap\player\basic_player_turquoise.png", 0.83]
         }
 
         # -------------------------------------------  Window  -------------------------------------------
@@ -299,8 +299,8 @@ class MenuSetup:
                             anchor='center')
 
     def load_lobby_frame(self):
-        self.lobby_frame = MyFrame(master=self.root,
-                                   fg_color="#212121")
+        self.lobby_frame = MyFrame(master=self.main_frame,
+                                   fg_color="#212100")
 
         self.lobby_frame.configure(width=self.window_width,
                                    height=150 * self.sizing_height)  # type:ignore[union-attr]
@@ -335,24 +335,25 @@ class MenuSetup:
 
     # __________________Player Functions__________________
 
-    def load_player(self, x_pos, path):
+    def load_player(self, rel_x_pos, path):
         player_image = tk.CTkImage(dark_image=Image.open(path),
                                    size=(int(49 * self.sizing_width), int(142 * self.sizing_height)))
         label_image = MyLabel(master=self.main_frame,
                               text=None,
                               image=player_image)
-        label_image.place(x=int(x_pos * self.sizing_width), y=int(250 * self.sizing_height))
+        label_image.place(relx=rel_x_pos, rely=0.28)
+        label_image.set_rel_positions(x=rel_x_pos, y=0.28)
         label_image.set_sizing(self.sizing_width, self.sizing_height)
 
         self.player.append(label_image)
 
         self.root.update()
 
-        label_image.move_to(x_pos,
-                            500,
-                            ending_function=lambda: label_image.idle_animation(pos_one=(x_pos, 500),
-                                                                               pos_two=(x_pos, 485),
-                                                                               next_pos="two"))
+        label_image.move_on_y_axis(direction=1,
+                                   rely=0.6,
+                                   ending_function=lambda: label_image.idle_animation_on_y_axis(upper_y=0.58,
+                                                                                                lower_y=0.6,
+                                                                                                stepsize=0.0008))
 
     def update_player(self):
         server_amount_player = int(self.data["amount_player"])  # type:ignore[union-attr]
@@ -360,7 +361,7 @@ class MenuSetup:
         for i in range(abs(server_amount_player - self.amount_player)):
             if self.amount_player < server_amount_player:
                 self.load_player(path=self.player_dict[str(self.amount_player)][0],
-                                 x_pos=self.player_dict[str(self.amount_player)][1])
+                                 rel_x_pos=self.player_dict[str(self.amount_player)][1])
                 self.amount_player += 1
             else:
                 player_to_remove = self.player.pop()
@@ -418,6 +419,7 @@ class MenuSetup:
                                               message="Your are the owner of this lobby. Leaving will quit the whole lobby. Continue?")
 
         if response == "yes":
+            self.lobby_owner = False
             self.main_frame.destroy()
             self.load_main_frame()
             self.load_interaction_frame()
