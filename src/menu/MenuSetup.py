@@ -56,7 +56,7 @@ class MenuSetup:
 
         self.player_dict = {
             "0": [wrk_dir + r"\..\basicmap\player\basic_player_magenta.png", 0.14],
-            "0": [wrk_dir + r"\..\basicmap\player\basic_player_orange.png", 0.37],
+            "1": [wrk_dir + r"\..\basicmap\player\basic_player_orange.png", 0.37],
             "2": [wrk_dir + r"\..\basicmap\player\basic_player_purple.png", 0.6],
             "3": [wrk_dir + r"\..\basicmap\player\basic_player_turquoise.png", 0.83]
         }
