@@ -7,6 +7,9 @@ from pygame import mixer
 class Sounds:
 
     def __init__(self, sound_file, volume):
+        """
+        Initialize the class Sounds
+        """
         mixer.init()
         self.sound = pygame.mixer.Sound(sound_file)
         self.sound.set_volume(volume)

@@ -5,6 +5,7 @@ from enum import Enum
 import pandas as pd
 
 from src.game.animated import Animated
+from src.game.sounds import Sounds
 
 
 class WeaponType(Enum):
@@ -35,6 +36,8 @@ class Weapon(Animated):
         self.hitted_me = False
         self.durability = 100
         self.abs_l, self.abs_r, self.rel_l, self.rel_r = self.load_dfs()
+        # Loads the sound of the weapon
+        self.sounds = Sounds("path to weapon", 1.0)
 
     def get_dataframe(self, frame=-99):
         try:
@@ -93,6 +96,8 @@ class Weapon(Animated):
         self.durability -= self.weapon_type.value["damage_to_weapon_per_hit"]
         self.last_hit = int(round(datetime.now().timestamp()))
         self.destroyed = self.durability <= 0
+        # Play the sound of the weapon
+        self.sounds.play()
 
     @staticmethod
     def check_hit(pl, players, map_df):

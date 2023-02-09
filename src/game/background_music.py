@@ -7,6 +7,9 @@ from pygame import mixer
 class Music:
 
     def __init__(self, sound_path, volume):
+        """
+        Initialize the class Music
+        """
         # Initialize mixer
         mixer.init()
 
