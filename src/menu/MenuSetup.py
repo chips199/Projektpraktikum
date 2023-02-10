@@ -54,7 +54,7 @@ class MenuSetup:
 
         # -------------------------------------------  Music  -------------------------------------------
         self.music = Music(r"music", 1.0)
-        self.music.play(99)
+        self.music.play(-1)
 
         self.player_dict = {
             "0": [wrk_dir + r"\..\basicmap\player\basic_player_magenta.png", 175],
