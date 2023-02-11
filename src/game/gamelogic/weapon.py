@@ -4,7 +4,7 @@ from enum import Enum
 
 import pandas as pd
 
-from src.game.animated import Animated
+from src.game.gamelogic.animated import Animated
 
 
 class WeaponType(Enum):

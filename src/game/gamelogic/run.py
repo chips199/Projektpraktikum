@@ -1,5 +1,4 @@
-from src.game import game
-from src.game.network import Network
+from src.game.gamelogic import game
 
 if __name__ == "__main__":
     # net = Network()

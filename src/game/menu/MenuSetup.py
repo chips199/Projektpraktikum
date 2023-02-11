@@ -7,12 +7,12 @@ from typing import Optional, Callable, Union, Type
 import customtkinter as tk
 from PIL import Image
 
-from src.game import game
-from src.game.backgroundProzess import backgroundProzess
+from src.game.gamelogic import game
+from src.game.gamelogic.backgroundProzess import backgroundProzess
 
-from src.menu.MyFrame import MyFrame
-from src.menu.MyLabel import MyLabel
-from src.menu.MyWindow import MyWindow
+from src.game.menu.MyFrame import MyFrame
+from src.game.menu.MyLabel import MyLabel
+from src.game.menu.MyWindow import MyWindow
 
 import multiprocessing
 from multiprocessing.connection import Connection
