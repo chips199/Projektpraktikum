@@ -1,10 +1,9 @@
 from multiprocessing import Process
 
 import customtkinter as tk
-from tkinter import messagebox
 
-from src.menu.MyFrame import MyFrame
-from src.menu.MyLabel import MyLabel
+from src.game.menu.MyFrame import MyFrame
+from src.game.menu.MyLabel import MyLabel
 
 
 class MyWindow(tk.CTk):
