@@ -503,8 +503,8 @@ class MenuSetup:
 
     def start_network(self,
                       argument: str,
-                      update_func: Callable,  # type: ignore[assignment]
-                      success_func: Callable) -> None:  # type: ignore[assignment]
+                      update_func: Callable,  # type: ignore[type-arg]
+                      success_func: Callable) -> None:  # type: ignore[type-arg]
         """
         Start the network by passing the `argument` to the `backgroundProzess` function.
         :param argument: the argument passed to the `backgroundProzess` function.
