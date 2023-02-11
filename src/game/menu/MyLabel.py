@@ -16,8 +16,33 @@ class MyLabel(tk.CTkLabel):
         self.sizing_height = 1
         self.sizing_width = 1
         self.after_id = None
+        self.current_rely = 0.0
+        self.current_relx = 0.0
 
-    def set_sizing(self, sizing_width, sizing_height):
+    def set_rel_positions(self,
+                          x: float,
+                          y: float) -> None:
+        """
+        Set the relative positions for the widget
+
+        :param x: The x position of the widget, as a float between 0 and 1
+        :param y: The y position of the widget, as a float between 0 and 1
+        :return: None
+        """
+        self.current_relx = x
+        self.current_rely = y
+
+    def set_sizing(self,
+                   sizing_width: float,
+                   sizing_height: float) -> None:
+        """
+        Set the scaling factor for the width and height of the window.
+
+        :param sizing_width: Scaling factor for width
+        :param sizing_height: Scaling factor for height
+
+        :return: None
+        """
         self.sizing_width = sizing_width
         self.sizing_height = sizing_height
 
@@ -47,99 +72,72 @@ class MyLabel(tk.CTkLabel):
         # schedule an event to hide label after a certain amount of time
         self.after_id = self.after(time, lambda: self.place_forget())
 
-    def move_to(self,
-                x: int = 0,
-                y: int = 0,
-                stepsize: int = 5,
-                delay: int = 25,
-                ending_function: Optional[Union[Callable, None]] = None) -> None:  # type:ignore[type-arg]
+    def move_on_y_axis(self,
+                       direction: int = 0,
+                       rely: float = 0.0,
+                       stepsize: float = 0.0028,
+                       delay: int = 15,
+                       ending_function: Optional[Union[Callable, None]] = None) -> None:  # type:ignore[type-arg]
 
         """
-        Move self (Label) to the given x and y coordinate
+        Move self (Label) to the given relativ y pos
 
-        :param x: x-coordinate to move to
-        :param y: y-coordinate to move to
-        :param stepsize: Number of pixels the widget should be moved each time, default is 5
-        :param delay: Delay time in milliseconds before the next move, default is 25
-        :param ending_function: A function that will be called once the x and y coordinates are reached, default is None
+        :param direction: direction in which to move, either 0 for right or 1 for left
+        :param rely: relative y-coordinate to move to. 1.0 is 100% 0.0 is 0% of screensize
+        :param stepsize: stepsize per frame in percent, 1.0 means 100% of screen, default is 0.0028, so 0.28% per frame
+        :param delay: Delay time in milliseconds before the next move, default is 15
+        :param ending_function: A function that will be called once the rely coordinate is reached, default is None
         :return: None
         """
-        x_sized = round(x * self.sizing_width)
-        y_sized = round(y * self.sizing_height)
-        stepsize_sized = round(stepsize * self.sizing_height)
 
-        # get the current x and y position of the widget
-        widget_x = round(self.winfo_x() * self.sizing_width)
-        widget_y = round(self.winfo_y() * self.sizing_height)
-
-        # calculate the difference from current and desired position
-        x_diff = abs(widget_x - x_sized)
-        y_diff = abs(widget_y - y_sized)
-
-        # set new x-coordinate
-        if x_diff > stepsize_sized:
-            if widget_x < x_sized:
-                new_x = widget_x + stepsize_sized
-            else:
-                new_x = widget_x - stepsize_sized
-        else:
-            new_x = x_sized
-
-        # set new y-coordinate
-        if y_diff > stepsize_sized:
-            if widget_y < y_sized:
-                new_y = widget_y + stepsize_sized
-            else:
-                new_y = widget_y - stepsize_sized
-        else:
-            new_y = y_sized
-
-        # move the widget to new position
-        self.place(x=new_x, y=new_y)
-
-        # if there is a difference in either x or y coordinate, enter a recursion after the given delay time
-        if x_diff > stepsize_sized or y_diff > stepsize_sized:
-            self.after(delay, lambda: self.move_to(x, y, stepsize, delay, ending_function))
-
-        # otherwise the position is reached, so call the ending_function if it is handed over
-        else:
+        if rely == round(self.current_rely, 2):
             if ending_function is not None:
                 ending_function()
+            return
+        elif direction == 0:
+            self.current_rely -= stepsize
+        elif direction == 1:
+            self.current_rely += stepsize
 
-    def idle_animation(self,
-                       pos_one: tuple[int, int] = (0, 0),
-                       pos_two: tuple[int, int] = (0, 0),
-                       next_pos: str = "two",
-                       delay: int = 35,
-                       stepsize: int = 1) -> None:
+        self.place(relx=self.current_relx, rely=self.current_rely)
+
+        self.after(delay, lambda: self.move_on_y_axis(direction, rely, stepsize, delay, ending_function))
+
+    def idle_animation_on_y_axis(self,
+                                 upper_y: float = 0.0,
+                                 lower_y: float = 0.0,
+                                 next_pos: str = "one",
+                                 delay: int = 25,
+                                 stepsize: float = 0.004) -> None:
 
         """
         Perform an idle animation by alternating between two positions.
 
-        :param pos_one: The first position to move to (x, y). Default is (0, 0).
-        :param pos_two: The second position to move to (x, y). Default is (0, 0).
-        :param next_pos: The next position to move to. Either "one" or "two". Default is "two".
-        :param delay: Delay time in milliseconds before the next move. Default is 35.
-        :param stepsize: Number of pixels the widget should be moved each time. Default is 1.
+        :param upper_y: The upper rely position to move to
+        :param lower_y: The lower rely position to move to
+        :param next_pos: The next position to move to. Either "one" or "two". Default is "one".
+        :param delay: Delay time in milliseconds before the next move. Default is 25.
+        :param stepsize: stepsize per frame in percent, 1.0 means 100% of screen, default is 0.004, so 0.4% per frame
         :return: None
         """
 
         # move the label to position one
         if next_pos == "one":
-            self.move_to(x=pos_one[0],
-                         y=pos_one[1],
-                         stepsize=stepsize,
-                         delay=delay,
-                         ending_function=lambda: self.idle_animation(pos_one,
-                                                                     pos_two,
-                                                                     next_pos="two")
-                         )
+            self.move_on_y_axis(direction=0,
+                                rely=upper_y,
+                                stepsize=stepsize,
+                                delay=delay,
+                                ending_function=lambda: self.idle_animation_on_y_axis(upper_y,
+                                                                                      lower_y,
+                                                                                      next_pos="two",
+                                                                                      stepsize=stepsize))
         # move the label to position two
         elif next_pos == "two":
-            self.move_to(x=pos_two[0],
-                         y=pos_two[1],
-                         stepsize=stepsize,
-                         delay=delay,
-                         ending_function=lambda: self.idle_animation(pos_one,
-                                                                     pos_two,
-                                                                     next_pos="one"))
+            self.move_on_y_axis(direction=1,
+                                rely=lower_y,
+                                stepsize=stepsize,
+                                delay=delay,
+                                ending_function=lambda: self.idle_animation_on_y_axis(upper_y,
+                                                                                      lower_y,
+                                                                                      next_pos="one",
+                                                                                      stepsize=stepsize))

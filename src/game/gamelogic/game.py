@@ -1,15 +1,20 @@
 import json
 import os
+import time
 from copy import copy
 import datetime
 
 import pandas as pd
 import pygame
 
-from src.game.gamelogic.canvas import Canvas
-import src.game.gamelogic.player as player
-from src.game.gamelogic import canvas, weapon
-from src.game.gamelogic.map import Map
+import multiprocessing
+
+from src.game.canvas import Canvas
+
+from src.game import canvas, weapon
+from src.game.map import Map
+from src.game import player as Player
+from src.game import weapon as Weapon
 
 wrk_dir = os.path.abspath(os.path.dirname(__file__))
 config_file = wrk_dir + r'\configuration.json'
@@ -27,7 +32,6 @@ pygame.font.init()
 class Game:
 
     def __init__(self, w, h, conn, process):
-        self.kills_to_win = 2
         self.counter = 0
         self.conn = conn
         self.process = process
@@ -53,10 +57,10 @@ class Game:
         self.weapon_frames = [[0, False, 1], [0, False, 1], [0, False, 1], [0, False, 1]]
         self.printLoading(0.5)
         self.playerList = [
-            player.Player(0, self.data["metadata"]["spawnpoints"]["0"], directory=self.map.player_uris[0]),
-            player.Player(1, self.data["metadata"]["spawnpoints"]["1"], directory=self.map.player_uris[1]),
-            player.Player(2, self.data["metadata"]["spawnpoints"]["2"], directory=self.map.player_uris[2]),
-            player.Player(3, self.data["metadata"]["spawnpoints"]["3"], directory=self.map.player_uris[3])]
+            Player.Player(0, self.data["metadata"]["spawnpoints"]["0"], directory=self.map.player_uris[0]),
+            Player.Player(1, self.data["metadata"]["spawnpoints"]["1"], directory=self.map.player_uris[1]),
+            Player.Player(2, self.data["metadata"]["spawnpoints"]["2"], directory=self.map.player_uris[2]),
+            Player.Player(3, self.data["metadata"]["spawnpoints"]["3"], directory=self.map.player_uris[3])]
         self.playerList[self.id].set_velocity(self.data["metadata"]["spawnpoints"]["velocity"])
         self.printLoading(0.7)
         self.min_timer = 0
@@ -65,8 +69,6 @@ class Game:
         self.time_total = 0
         self.new_fps_timer = datetime.datetime.now()
         self.show_scoreboard = False
-        self.start_time = datetime.datetime.strptime(self.data["metadata"]["start"], "%d/%m/%Y, %H:%M:%S")
-        self.end_time = datetime.datetime.strptime(self.data["metadata"]["end"], "%d/%m/%Y, %H:%M:%S")
 
     def run(self):
         """
@@ -74,13 +76,6 @@ class Game:
         """
         # pygame stuff
         # clock = pygame.time.Clock()
-
-        # Draw countdown
-        while datetime.datetime.now() < self.start_time:
-            self.canvas.get_canvas().fill((32, 32, 32))
-            self.canvas.draw_text(self.canvas.get_canvas(), str((self.start_time - datetime.datetime.now()).seconds),
-                                  300, (255, 255, 255), 700, 300)
-            self.canvas.update()
         run = True
 
         # just for comfort
@@ -109,7 +104,7 @@ class Game:
                                                                [self.playerList[id].x, self.playerList[id].y],
                                                                self.playerList[id].weapon_path[
                                                                    weapon.WeaponType.Fist.name])
-                weapon.Weapon.check_hit(self.playerList[id], self.playerList[:self.id] + self.playerList[self.id + 1:],
+                Weapon.Weapon.check_hit(self.playerList[id], self.playerList[:self.id] + self.playerList[self.id + 1:],
                                         self.map.solid_df)
                 if self.playerList[id].y > self.height:
                     self.playerList[id].health = 0
@@ -167,7 +162,7 @@ class Game:
             else:
                 # if player is dead, respawn
                 if datetime.datetime.now() - self.playerList[id].death_time > datetime.timedelta(seconds=3):
-                    self.playerList[id] = player.Player(int(id), self.data["metadata"]["spawnpoints"][str(id)],
+                    self.playerList[id] = Player.Player(int(id), self.data["metadata"]["spawnpoints"][str(id)],
                                                         killed_by=self.playerList[id].killed_by,
                                                         directory=self.map.player_uris[int(id)])
                     self.playerList[self.id].set_velocity(self.data["metadata"]["spawnpoints"]["velocity"])
@@ -243,15 +238,6 @@ class Game:
                                  165)
                 # Draw the Scoreboard
                 can.blit(scoreboard, (100, 100))
-
-            # Draw Endscreen
-            kills_per_player = list(
-                map(lambda x: x[0], self.data["metadata"]["scoreboard"].values()))  # type:ignore[no-any-return]
-            mvp = kills_per_player.index(max(kills_per_player))
-            if datetime.datetime.now() > self.end_time or max(kills_per_player) >= self.kills_to_win:
-                self.canvas.get_canvas().fill((32, 32, 32))
-                self.canvas.draw_text(self.canvas.get_canvas(), f"Player {mvp} has won",
-                                      200, (255, 255, 255), 200, 350)
             # Update Canvas
             self.canvas.update()
             # print("Handling redraw:", datetime.datetime.now() - timer)
@@ -417,15 +403,15 @@ class Game:
         simulated_player = copy(player.solid_df)
         erg = 0
 
-        player.Player.shift_df(simulated_player, dirn, distance)
+        Player.Player.shift_df(simulated_player, dirn, distance)
         if pd.merge(simulated_player, solid_pixels_df, how='inner', on=['x', 'y']).empty:
             erg = distance
             return erg
-        player.Player.shift_df(simulated_player, dirn, -distance)
+        Player.Player.shift_df(simulated_player, dirn, -distance)
 
         # checking for each pixel if a move ment would cause a collision
         for _ in range(distance):
-            player.Player.shift_df(simulated_player, dirn, 1)
+            Player.Player.shift_df(simulated_player, dirn, 1)
             if not pd.merge(simulated_player, solid_pixels_df, how='inner', on=['x', 'y']).empty:
                 return erg
             erg += 1

@@ -95,14 +95,20 @@ class Weapon(Animated):
         self.destroyed = self.durability <= 0
 
     @staticmethod
-    def check_hit(pl, players, map_df):
+    def check_hit(pl, players, map_df, g):
         pldf = pl.solid_df
         # check if player is hitting me
         for p in players:
             if p.weapon.animation_running:
                 if not p.weapon.hitted_me and not pd.merge(p.weapon.get_dataframe(), pldf, how='inner',
                                                            on=['x', 'y']).empty:
-                    pl.health -= p.weapon.weapon_type.value["Damage"]
+                    if pl.is_blocking:
+                        print("blocked")
+                        pl.health -= (p.weapon.weapon_type.value["Damage"] / 2)
+                        pl.blood_animation.set_pos(pl.x - 47, pl.y + 15)
+                        pl.blood_animation.draw_animation_once(g=g, reset=True)
+                    else:
+                        pl.health -= p.weapon.weapon_type.value["Damage"]
                     p.weapon.hitted_me = True
                     if not pl.is_alive():
                         pl.killed_by[int(p.id)] += 1
@@ -113,7 +119,12 @@ class Weapon(Animated):
         if pl.weapon.animation_running:
             if not pl.weapon.hitted_me and not pd.merge(pl.weapon.get_dataframe(), map_df, how='inner',
                                                         on=['x', 'y']).empty:
-                pl.health -= pl.weapon.weapon_type.value["Damage"]
+                if pl.is_blocking:
+                    pl.health -= (p.weapon.weapon_type.value["Damage"] / 2)
+                    pl.blood_animation.set_pos(pl.x - 47, pl.y + 15)
+                    pl.blood_animation.draw_animation_once(g=g, reset=True)
+                else:
+                    pl.health -= p.weapon.weapon_type.value["Damage"]
                 pl.weapon.hitted_me = True
                 if not pl.is_alive():
                     pl.killed_by[4] += 1
