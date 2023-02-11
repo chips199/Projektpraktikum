@@ -383,8 +383,8 @@ class MenuSetup:
             # If the number of players in the game is less than the number of players on the server
             if self.amount_player < server_amount_player:
                 # Load the new player
-                self.load_player(path=self.player_dict[str(self.amount_player)][0],
-                                 rel_x_pos=self.player_dict[str(self.amount_player)][1])
+                self.load_player(path=self.player_dict[str(self.amount_player)][0],  # type: ignore[arg-type]
+                                 rel_x_pos=self.player_dict[str(self.amount_player)][1])  # type: ignore[arg-type]
                 self.amount_player += 1
 
             # If the number of players in the game is greater than the number of players on the server
@@ -475,8 +475,8 @@ class MenuSetup:
                             direction: str,
                             stepsize: int = 9,
                             after_time: int = 2000,
-                            func: Optional[Callable] = None,
-                            **kwargs: Optional[Callable]) -> None:
+                            func: Optional[Callable] = None, # type: ignore[type-arg]
+                            **kwargs: Optional[Callable]) -> None: # type: ignore[type-arg]
         """
         Clear the widget out of the window in a sliding animation.
         :param widget: widget to be cleared
@@ -503,8 +503,8 @@ class MenuSetup:
 
     def start_network(self,
                       argument: str,
-                      update_func: Callable,
-                      success_func: Callable) -> None:
+                      update_func: Callable,  # type: ignore[assignment]
+                      success_func: Callable) -> None:  # type: ignore[assignment]
         """
         Start the network by passing the `argument` to the `backgroundProzess` function.
         :param argument: the argument passed to the `backgroundProzess` function.

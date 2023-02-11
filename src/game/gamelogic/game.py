@@ -11,7 +11,7 @@ import multiprocessing
 
 from src.game.gamelogic.canvas import Canvas
 
-from src.game.gamelogic import canvas, weapon
+from src.game.gamelogic import canvas
 from src.game.gamelogic.map import Map
 from src.game.gamelogic import player as player
 from src.game.gamelogic import weapon as weapon

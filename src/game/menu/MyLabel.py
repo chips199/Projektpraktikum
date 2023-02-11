@@ -43,8 +43,8 @@ class MyLabel(tk.CTkLabel):
 
         :return: None
         """
-        self.sizing_width = sizing_width
-        self.sizing_height = sizing_height
+        self.sizing_width = sizing_width  # type: ignore[assignment]
+        self.sizing_height = sizing_height  # type: ignore[assignment]
 
     def label_hide_show(self,
                         x: int,
