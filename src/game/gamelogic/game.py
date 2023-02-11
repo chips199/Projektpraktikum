@@ -99,7 +99,7 @@ class Game:
 
             if self.playerList[id].is_alive():
                 # check if weapon is destroyed and give player fists if true
-                if self.playerList[id].weapon.destroyed:
+                if self.playerList[id].weapon.destroyed and not self.playerList[id].weapon.animation_running:
                     self.playerList[id].weapon = weapon.Weapon(weapon.WeaponType.Fist,
                                                                [self.playerList[id].x, self.playerList[id].y],
                                                                self.playerList[id].weapon_path[
