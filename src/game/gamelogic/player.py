@@ -4,8 +4,8 @@ from copy import copy
 
 import pygame.draw
 
-from src.game import weapon
-from src.game.animated import Animated
+from src.game.gamelogic import weapon
+from src.game.gamelogic.animated import Animated
 
 
 class Player(Animated):
