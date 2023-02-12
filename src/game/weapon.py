@@ -22,9 +22,11 @@ class WeaponType(Enum):
 
 class Weapon(Animated):
 
-    def __init__(self, waepon_type, *args, **kwargs):
+    def __init__(self, waepon_type, impact_sound_path, impact_sound_path_volume, *args, **kwargs):
         """
         Initialize the class weapon
+        :param impact_sound_path: Path to the sound-file
+        :param impact_sound_path_volume: Volume of the sound: Range: [0:1]
         """
         super(Weapon, self).__init__(*args, **kwargs)
         self.destroyed = False
@@ -37,7 +39,7 @@ class Weapon(Animated):
         self.durability = 100
         self.abs_l, self.abs_r, self.rel_l, self.rel_r = self.load_dfs()
         # Loads the sound of the weapon
-        self.sounds = Sounds("path to weapon", 1.0)
+        self.sounds = Sounds(impact_sound_path, impact_sound_path_volume)
 
     def get_dataframe(self, frame=-99):
         try:

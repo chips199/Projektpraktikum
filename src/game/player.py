@@ -46,14 +46,18 @@ class Player(Animated):
         self.velocity_counter2 = 0
         self.sliding_frame_counter = self.max_sliding_frames = 50
         map_dir = "\\".join(str(self.directory).split('\\')[:-3])
+
+        # Start Weapon
         self.weapon_path = {
             weapon.WeaponType.Fist.name: map_dir + f"\\waffen\\faeuste\\animation\\fists_{self.get_color(self.directory)}_animation",
             weapon.WeaponType.Sword.name: map_dir + f"\\waffen\\schwert\\animation\\sword_hold_animation_{self.get_color(self.directory)}"
         }
         # self.weapon = weapon.Weapon(weapon.WeaponType.Fist, [self.x, self.y],
         #                             self.weapon_path[weapon.WeaponType.Fist.name])
-        self.weapon = weapon.Weapon(weapon.WeaponType.Sword, [self.x, self.y],
+        weapon_sound_file = map_dir + r"\waffen\schwert\sound.mp3"
+        self.weapon = weapon.Weapon(weapon.WeaponType.Sword, weapon_sound_file, 1.0, [self.x, self.y],
                                     self.weapon_path[weapon.WeaponType.Sword.name])
+
         self.death_animation = Animated(start=[0, 0],
                                         directory=map_dir + f"\\player\\death_animation\\death_animation_{self.get_color(self.directory)}")
         self.blood_animation = Animated(start=[0, 0], directory=map_dir + r"\player\blood_animation")
