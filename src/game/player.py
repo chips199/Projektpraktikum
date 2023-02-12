@@ -69,7 +69,7 @@ class Player(Animated):
         # Load sound effect die
         self.sound_hurt = Sounds(map_dir + r"\sounds\hurt_sound.mp3", 1.0)
         # Load sound effect hurt
-        self.sound_die = Sounds(map_dir + r"\sounds\die_sound.mp3", 0.8)
+        self.sound_die = Sounds(map_dir + r"\sounds\die_sound.mp3", 0.5)
 
     def set_velocity(self, data=(1, 1, 0, 0)):
         self.moving_velocity_on_ground = data[0]
