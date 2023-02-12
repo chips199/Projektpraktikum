@@ -4,7 +4,7 @@ import pygame
 from typing import List
 from pandas import DataFrame
 
-from src.game.background_music import Music
+from src.game.gamelogic.background_music import Music
 
 
 class Map:

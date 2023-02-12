@@ -6,7 +6,7 @@ import pygame.draw
 
 from src.game.gamelogic import weapon
 from src.game.gamelogic.animated import Animated
-from src.game.sounds import Sounds
+from src.game.gamelogic.sounds import Sounds
 
 
 class Player(Animated):

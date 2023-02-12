@@ -1,13 +1,10 @@
 import json
 import os
-import time
 from copy import copy
 import datetime
 
 import pandas as pd
 import pygame
-
-import multiprocessing
 
 from src.game.gamelogic.canvas import Canvas
 
@@ -15,7 +12,7 @@ from src.game.gamelogic import canvas
 from src.game.gamelogic.map import Map
 from src.game.gamelogic import player as player
 from src.game.gamelogic import weapon as weapon
-from src.game.sounds import Sounds
+from src.game.gamelogic.sounds import Sounds
 
 wrk_dir = os.path.abspath(os.path.dirname(__file__))
 config_file = wrk_dir + r'\configuration.json'

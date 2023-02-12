@@ -5,7 +5,7 @@ from enum import Enum
 import pandas as pd
 
 from src.game.gamelogic.animated import Animated
-from src.game.sounds import Sounds
+from src.game.gamelogic.sounds import Sounds
 
 class WeaponType(Enum):
     Fist = {"Damage": 10, "damage_to_weapon_per_hit": 0, "Cooldown": 1, "IsShortRange": True}
