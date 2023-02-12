@@ -6,6 +6,7 @@ import pygame.draw
 
 from src.game.gamelogic import weapon
 from src.game.gamelogic.animated import Animated
+from src.game.gamelogic.sounds import Sounds
 
 
 class Player(Animated):
@@ -47,18 +48,29 @@ class Player(Animated):
         self.velocity_counter2 = 0
         self.sliding_frame_counter = self.max_sliding_frames = 50
         map_dir = "\\".join(str(self.directory).split('\\')[:-3])
+
+        # Start Weapon
         self.weapon_path = {
             weapon.WeaponType.Fist.name: map_dir + f"\\waffen\\faeuste\\animation\\fists_{self.get_color(self.directory)}_animation",
-            weapon.WeaponType.Sword.name: map_dir + f"\\waffen\\schwert\\animation\\sword_hold_animation_{self.get_color(self.directory)}"}
+            weapon.WeaponType.Sword.name: map_dir + f"\\waffen\\schwert\\animation\\sword_hold_animation_{self.get_color(self.directory)}"
+        }
         # self.weapon = weapon.Weapon(weapon.WeaponType.Fist, [self.x, self.y],
         #                             self.weapon_path[weapon.WeaponType.Fist.name])
-        self.weapon = weapon.Weapon(weapon.WeaponType.Sword, [self.x, self.y],
+        weapon_sound_file = map_dir + r"\waffen\schwert"
+        self.weapon = weapon.Weapon(weapon.WeaponType.Sword, weapon_sound_file, 0.9, [self.x, self.y],
                                     self.weapon_path[weapon.WeaponType.Sword.name])
+
         self.death_animation = Animated(start=[0, 0],
                                         directory=map_dir + f"\\player\\death_animation\\death_animation_{self.get_color(self.directory)}")
-        self.blood_animation = Animated(start=[0, 0], directory=map_dir + r"\\player\\blood_animation")
+        self.blood_animation = Animated(start=[0, 0], directory=map_dir + r"\player\blood_animation")
         self.blood_animation.start_animation_in_direction(direction=1)
         self.blood_animation.double_frames(factor=2)
+
+        # Sound effects:
+        # Load sound effect die
+        self.sound_hurt = Sounds(map_dir + r"\sounds\hurt_sound.mp3", 1.0)
+        # Load sound effect hurt
+        self.sound_die = Sounds(map_dir + r"\sounds\die_sound.mp3", 0.5)
 
     def set_velocity(self, data=(1, 1, 0, 0)):
         self.moving_velocity_on_ground = data[0]
@@ -125,7 +137,7 @@ class Player(Animated):
             self.weapon.animation_direction = self.animation_direction
             self.weapon.draw(g=g, x=self.x, y=self.y, width=self.frame_width, height=self.frame_height)
 
-            # bloodsplash animation
+            # bloods plash animation
             if self.weapon.hitted_me or self.blood_animation.current_frame > 0:
                 self.blood_animation.set_pos(self.x - 47, self.y + 15)
                 self.blood_animation.draw_animation_once(g=g, reset=True)
