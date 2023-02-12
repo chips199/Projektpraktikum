@@ -105,7 +105,6 @@ class Weapon(Animated):
         else:
             self.sound_hit.play()
 
-
     @staticmethod
     def check_hit(pl, players, map_df):
         pldf = pl.solid_df
