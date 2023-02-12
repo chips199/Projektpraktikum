@@ -114,7 +114,7 @@ class Game:
             if self.playerList[id].is_alive():
                 # check if weapon is destroyed and give player fists if true
                 if self.playerList[id].weapon.destroyed:
-                    self.playerList[id].weapon = weapon.Weapon(weapon.WeaponType.Fist, self.map.directory + r"\waffen\faeuste\sound.mp3", 1.0,
+                    self.playerList[id].weapon = weapon.Weapon(weapon.WeaponType.Fist, self.map.directory + r"\waffen\faeuste", 1.0,
                                                                [self.playerList[id].x, self.playerList[id].y],
                                                                self.playerList[id].weapon_path[
                                                                    weapon.WeaponType.Fist.name])

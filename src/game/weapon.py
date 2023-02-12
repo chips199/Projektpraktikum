@@ -39,7 +39,8 @@ class Weapon(Animated):
         self.durability = 100
         self.abs_l, self.abs_r, self.rel_l, self.rel_r = self.load_dfs()
         # Loads the sound of the weapon
-        self.sounds = Sounds(impact_sound_path, impact_sound_path_volume)
+        self.sound_hit = Sounds(impact_sound_path + r"\sound_effects\sound_hit.mp3", impact_sound_path_volume)
+        self.sound_destroy = Sounds(impact_sound_path + r"\sound_effects\sound_destroy.mp3", impact_sound_path_volume)
 
     def get_dataframe(self, frame=-99):
         try:
@@ -97,9 +98,13 @@ class Weapon(Animated):
         """
         self.durability -= self.weapon_type.value["damage_to_weapon_per_hit"]
         self.last_hit = int(round(datetime.now().timestamp()))
-        self.destroyed = self.durability <= 0
         # Play the sound of the weapon
-        self.sounds.play()
+        if self.durability <= 0:
+            self.destroyed = True
+            self.sound_destroy.play()
+        else:
+            self.sound_hit.play()
+
 
     @staticmethod
     def check_hit(pl, players, map_df):

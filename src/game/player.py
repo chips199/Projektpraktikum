@@ -54,7 +54,7 @@ class Player(Animated):
         }
         # self.weapon = weapon.Weapon(weapon.WeaponType.Fist, [self.x, self.y],
         #                             self.weapon_path[weapon.WeaponType.Fist.name])
-        weapon_sound_file = map_dir + r"\waffen\schwert\sound.mp3"
+        weapon_sound_file = map_dir + r"\waffen\schwert"
         self.weapon = weapon.Weapon(weapon.WeaponType.Sword, weapon_sound_file, 1.0, [self.x, self.y],
                                     self.weapon_path[weapon.WeaponType.Sword.name])
 
