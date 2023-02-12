@@ -30,6 +30,8 @@ pygame.font.init()
 class Game:
 
     def __init__(self, w, h, conn, process):
+        self.kills_to_win = 1
+
         self.counter = 0
         self.conn = conn
         self.process = process
@@ -67,6 +69,9 @@ class Game:
         self.time_total = 0
         self.new_fps_timer = datetime.datetime.now()
         self.show_scoreboard = False
+
+        self.end_time = datetime.datetime.strptime(self.data["metadata"]["end"], "%d/%m/%Y, %H:%M:%S")
+        print(self.end_time)
 
         # Sound effects
         self.lost_sound_effect = Sounds(self.map.directory + r"\sounds\lost_sound.mp3", 1.0)
@@ -268,6 +273,7 @@ class Game:
                     else:
                         # Play lose sound
                         self.lost_sound_effect.play()
+
             # Update Canvas
             self.canvas.update()
             # print("Handling redraw:", datetime.datetime.now() - timer)
