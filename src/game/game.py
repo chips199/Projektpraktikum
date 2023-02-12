@@ -33,7 +33,7 @@ pygame.font.init()
 class Game:
 
     def __init__(self, w, h, conn, process):
-        self.kills_to_win = 2
+        self.kills_to_win = 0
         self.counter = 0
         self.conn = conn
         self.process = process
@@ -78,6 +78,9 @@ class Game:
         self.lost_sound_effect = Sounds(self.map.directory + r"\sounds\lost_sound.mp3", 1.0)
         self.win_sound_effect = Sounds(self.map.directory + r"\sounds\win_sound.mp3", 1.0)
 
+        # Status of the music
+        self.music_on = True
+
     def run(self):
         """
         the core method of the game containing the game loop
@@ -113,7 +116,7 @@ class Game:
                     run = False
 
                 # Restarts the music, when all songs were played
-                if event.type == self.map.music.MUSIC_END:
+                if event.type == self.map.music.MUSIC_END and self.music_on:
                     self.map.music_load()
 
             if self.playerList[id].is_alive():
@@ -202,7 +205,7 @@ class Game:
                 self.playerList[i].animation_running = data_player[1]
                 self.playerList[i].animation_direction = data_player[2]
                 if self.playerList[i].weapon.weapon_type != weapon.WeaponType.getObj(data_weapon[3]):
-                    self.playerList[i].weapon = weapon.Weapon(weapon.WeaponType.getObj(data_weapon[3]),
+                    self.playerList[i].weapon = weapon.Weapon(weapon.WeaponType.getObj(data_weapon[3]), self.map.directory + r"\waffen\faeuste", 1.0,
                                                               [self.playerList[i].x, self.playerList[i].y],
                                                               self.playerList[i].weapon_path[
                                                                   weapon.WeaponType.getObj(data_weapon[3]).name])
@@ -268,15 +271,16 @@ class Game:
                 self.canvas.get_canvas().fill((32, 32, 32))
                 self.canvas.draw_text(self.canvas.get_canvas(), f"Player {mvp} has won",
                                       200, (255, 255, 255), 200, 350)
-
-                # Stop Music
-                self.map.music.fadeout(1000)
-                if id == mvp:
-                    # Play win sound
-                    self.win_sound_effect.play()
-                else:
-                    # Play lose sound
-                    self.lost_sound_effect.play()
+                if self.music_on:
+                    # Stop Music
+                    self.map.music.fadeout(1000)
+                    self.music_on = False
+                    if id == mvp:
+                        # Play win sound
+                        self.win_sound_effect.play()
+                    else:
+                        # Play lose sound
+                        self.lost_sound_effect.play()
             # Update Canvas
             self.canvas.update()
             # print("Handling redraw:", datetime.datetime.now() - timer)
