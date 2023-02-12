@@ -15,6 +15,7 @@ from src.game import canvas, weapon
 from src.game.map import Map
 from src.game import player as Player
 from src.game import weapon as Weapon
+from src.game.sounds import Sounds
 
 wrk_dir = os.path.abspath(os.path.dirname(__file__))
 config_file = wrk_dir + r'\configuration.json'
@@ -72,6 +73,10 @@ class Game:
         self.show_scoreboard = False
         self.start_time = datetime.datetime.strptime(self.data["metadata"]["start"], "%d/%m/%Y, %H:%M:%S")
         self.end_time = datetime.datetime.strptime(self.data["metadata"]["end"], "%d/%m/%Y, %H:%M:%S")
+
+        # Sound effects
+        self.lost_sound_effect = Sounds(self.map.directory + r"\sounds\lost_sound.mp3")
+        self.win_sound_effect = Sounds(self.map.directory + r"\sounds\win_sound.mp3")
 
     def run(self):
         """
@@ -261,6 +266,12 @@ class Game:
                 self.canvas.get_canvas().fill((32, 32, 32))
                 self.canvas.draw_text(self.canvas.get_canvas(), f"Player {mvp} has won",
                                       200, (255, 255, 255), 200, 350)
+                if id == mvp:
+                    # Play win sound
+                    self.win_sound_effect.play()
+                else:
+                    # Play lose sound
+                    self.lost_sound_effect.play()
             # Update Canvas
             self.canvas.update()
             # print("Handling redraw:", datetime.datetime.now() - timer)
