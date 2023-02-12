@@ -44,10 +44,10 @@ class Game:
         self.width = w
         self.height = h
         self.canvas = canvas.Canvas(self.width, self.height, str(self.id) + "Stick  Wars")
-        self.printLoading(0.1)
+        self.print_loading(0.1)
         # self.map = Map(self, map_names_dict[self.data['map_name']])
         self.map = Map(self, map_names_dict[self.data["metadata"]["map"]])
-        self.printLoading(0.2)
+        self.print_loading(0.2)
         print("MAP:", self.data["metadata"]["map"])
         print("SPAWNPOINTS:", self.data["metadata"]["spawnpoints"])
         self.online = [False, False, False, False]
@@ -55,14 +55,14 @@ class Game:
         self.pos = [[100, 100], [200, 100], [300, 100], [400, 100]]
         self.player_frames = [[0, False, 1], [0, False, 1], [0, False, 1], [0, False, 1]]
         self.weapon_frames = [[0, False, 1], [0, False, 1], [0, False, 1], [0, False, 1]]
-        self.printLoading(0.5)
+        self.print_loading(0.5)
         self.playerList = [
             player.Player(0, self.data["metadata"]["spawnpoints"]["0"], directory=self.map.player_uris[0]),
             player.Player(1, self.data["metadata"]["spawnpoints"]["1"], directory=self.map.player_uris[1]),
             player.Player(2, self.data["metadata"]["spawnpoints"]["2"], directory=self.map.player_uris[2]),
             player.Player(3, self.data["metadata"]["spawnpoints"]["3"], directory=self.map.player_uris[3])]
         self.playerList[self.id].set_velocity(self.data["metadata"]["spawnpoints"]["velocity"])
-        self.printLoading(0.7)
+        self.print_loading(0.7)
         self.min_timer = 0
         self.max_timer = 0
         self.counter_reset_timer = 0
@@ -70,8 +70,8 @@ class Game:
         self.new_fps_timer = datetime.datetime.now()
         self.show_scoreboard = False
 
+        # Sets the end_time of the game
         self.end_time = datetime.datetime.strptime(self.data["metadata"]["end"], "%d/%m/%Y, %H:%M:%S")
-        print(self.end_time)
 
         # Sound effects
         self.lost_sound_effect = Sounds(self.map.directory + r"\sounds\lost_sound.mp3", 1.0)
@@ -148,28 +148,28 @@ class Game:
                 if keys[pygame.K_d] and not self.playerList[id].block_x_axis:
                     if self.playerList[id].landed:
                         self.playerList[id].start_animation_in_direction(0)
-                    self.playerList[id].move(0, self.nextToSolid(self.playerList[id], 0,
-                                                                 self.playerList[id].current_moving_velocity))
+                    self.playerList[id].move(0, self.next_to_solid(self.playerList[id], 0,
+                                                                   self.playerList[id].current_moving_velocity))
                     self.playerList[id].reset_sliding_counter()
 
                 elif keys[pygame.K_a] and not self.playerList[id].block_x_axis:
                     if self.playerList[id].landed:
                         self.playerList[id].start_animation_in_direction(1)
-                    self.playerList[id].move(1, self.nextToSolid(self.playerList[id], 1,
-                                                                 self.playerList[id].current_moving_velocity))
+                    self.playerList[id].move(1, self.next_to_solid(self.playerList[id], 1,
+                                                                   self.playerList[id].current_moving_velocity))
                     self.playerList[id].reset_sliding_counter()
 
                 elif self.data["metadata"]["map"] == "schneemap":
-                    self.playerList[id].keep_sliding(func=self.nextToSolid)
+                    self.playerList[id].keep_sliding(func=self.next_to_solid)
 
                 # Jump
                 if keys[pygame.K_SPACE] or self.playerList[id].is_jumping or keys[pygame.K_w]:
                     self.playerList[id].stop_sliding()
                     self.playerList[id].stop_animation()
-                    self.playerList[id].jump(func=self.nextToSolid)
+                    self.playerList[id].jump(func=self.next_to_solid)
 
                 # gravity
-                self.playerList[id].gravity(func=self.nextToSolid)
+                self.playerList[id].gravity(func=self.next_to_solid)
 
                 # print("Handling Keys:", datetime.datetime.now() - timer)
                 # timer = datetime.datetime.now()
@@ -255,10 +255,11 @@ class Game:
                 # Draw the Scoreboard
                 can.blit(scoreboard, (100, 100))
 
-            # Draw Endscreen
+            # Draw End screen
             kills_per_player = list(
                 map(lambda x: x[0], self.data["metadata"]["scoreboard"].values()))  # type:ignore[no-any-return]
             mvp = kills_per_player.index(max(kills_per_player))
+            # Show the end screen when time is up or a player has enough kills
             if datetime.datetime.now() > self.end_time or max(kills_per_player) >= self.kills_to_win:
                 self.canvas.get_canvas().fill((32, 32, 32))
                 self.canvas.draw_text(self.canvas.get_canvas(), f"Player {mvp} has won",
@@ -311,7 +312,7 @@ class Game:
         self.process.kill()  # muss noch übergeben werden
         pygame.quit()
 
-    def printLoading(self, percent):
+    def print_loading(self, percent):
         """
         displayes a loading screen
         :param percent: percetige to display
@@ -422,7 +423,7 @@ class Game:
                 continue
         return erg_player, erg_weapon, erg_health, erg_killed_by, erg_pos, erg_con
 
-    def nextToSolid(self, player, dirn, distance):
+    def next_to_solid(self, player, dirn, distance):
         """
         calculates the distance to the nearest object in one direction in a range
         :param player: the current player
