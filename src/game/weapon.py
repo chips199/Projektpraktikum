@@ -118,6 +118,8 @@ class Weapon(Animated):
                     if not pl.is_alive():
                         pl.killed_by[int(p.id)] += 1
                         pl.death_time = datetime.now()
+                    else:
+                        pl.sound_hurt.play()
             else:
                 p.weapon.hitted_me = False
         # hitting wall
@@ -129,5 +131,7 @@ class Weapon(Animated):
                 if not pl.is_alive():
                     pl.killed_by[4] += 1
                     pl.death_time = datetime.now()
+                else:
+                    pl.sound_hurt.play()
         else:
             pl.weapon.hitted_me = False

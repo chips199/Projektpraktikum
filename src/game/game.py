@@ -75,8 +75,8 @@ class Game:
         self.end_time = datetime.datetime.strptime(self.data["metadata"]["end"], "%d/%m/%Y, %H:%M:%S")
 
         # Sound effects
-        self.lost_sound_effect = Sounds(self.map.directory + r"\sounds\lost_sound.mp3")
-        self.win_sound_effect = Sounds(self.map.directory + r"\sounds\win_sound.mp3")
+        self.lost_sound_effect = Sounds(self.map.directory + r"\sounds\lost_sound.mp3", 1.0)
+        self.win_sound_effect = Sounds(self.map.directory + r"\sounds\win_sound.mp3", 1.0)
 
     def run(self):
         """
@@ -231,6 +231,8 @@ class Game:
             if not self.playerList[id].is_alive():
                 # Draw Death-screen
                 self.canvas.get_canvas().blit(pygame.image.load(wrk_dir + '\\wasted.png').convert_alpha(), (0, 0))
+                # Play sound effect die
+                self.playerList[id].sound_die.play()
             if self.show_scoreboard:
                 # Generate Scoreboard
                 can = self.canvas.get_canvas()
@@ -266,6 +268,9 @@ class Game:
                 self.canvas.get_canvas().fill((32, 32, 32))
                 self.canvas.draw_text(self.canvas.get_canvas(), f"Player {mvp} has won",
                                       200, (255, 255, 255), 200, 350)
+
+                # Stop Music
+                self.map.music.fadeout(1000)
                 if id == mvp:
                     # Play win sound
                     self.win_sound_effect.play()

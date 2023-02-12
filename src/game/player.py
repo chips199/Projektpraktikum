@@ -6,6 +6,7 @@ import pygame.draw
 
 from src.game import weapon
 from src.game.animated import Animated
+from src.game.sounds import Sounds
 
 
 class Player(Animated):
@@ -55,7 +56,7 @@ class Player(Animated):
         # self.weapon = weapon.Weapon(weapon.WeaponType.Fist, [self.x, self.y],
         #                             self.weapon_path[weapon.WeaponType.Fist.name])
         weapon_sound_file = map_dir + r"\waffen\schwert"
-        self.weapon = weapon.Weapon(weapon.WeaponType.Sword, weapon_sound_file, 1.0, [self.x, self.y],
+        self.weapon = weapon.Weapon(weapon.WeaponType.Sword, weapon_sound_file, 0.9, [self.x, self.y],
                                     self.weapon_path[weapon.WeaponType.Sword.name])
 
         self.death_animation = Animated(start=[0, 0],
@@ -63,6 +64,12 @@ class Player(Animated):
         self.blood_animation = Animated(start=[0, 0], directory=map_dir + r"\player\blood_animation")
         self.blood_animation.start_animation_in_direction(direction=1)
         self.blood_animation.double_frames(factor=2)
+
+        # Sound effects:
+        # Load sound effect die
+        self.sound_hurt = Sounds(map_dir + r"\sounds\hurt_sound.mp3", 1.0)
+        # Load sound effect hurt
+        self.sound_die = Sounds(map_dir + r"\sounds\die_sound.mp3", 0.8)
 
     def set_velocity(self, data=(1, 1, 0, 0)):
         self.moving_velocity_on_ground = data[0]
