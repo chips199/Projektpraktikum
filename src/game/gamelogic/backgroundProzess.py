@@ -3,7 +3,7 @@ import os
 import json
 import time
 
-from src.game.network import Network
+from src.game.gamelogic.network import Network
 from multiprocessing.connection import Connection
 
 wrk_dir = os.path.abspath(os.path.dirname(__file__))
