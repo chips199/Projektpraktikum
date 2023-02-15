@@ -105,4 +105,4 @@ class Map():
                 screen.blit(self.static_objects_img, canvas_rec)
 
         else:
-            screen.fill((41, 41, 41))
+            screen.fill((41, 41, 41))  # type:ignore[unreachable]
