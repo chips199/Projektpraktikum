@@ -92,8 +92,8 @@ class MyWindow(tk.CTk):
         """
         Move widget out of the window via a given direction
 
-        :param widget: A widget beeing an MyFrame or MyLabel objects that needs to be moved
-        :param direction: directions inwhich the widgets should leave the window.
+        :param widget: A widget being an MyFrame or MyLabel objects that needs to be moved
+        :param direction: directions in which the widgets should leave the window.
                           The direction should be one of 'down', 'up', 'left', 'right'
         :param delay: Delay time in milliseconds before the next move, default is 17
         :param stepsize: Number of pixels the widget should be moved each time, default is 1

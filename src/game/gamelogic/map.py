@@ -107,7 +107,6 @@ class Map:
             screen.blit(self.background, canvas_rec)
             if len(self.staticimages) != 0:
                 screen.blit(self.static_objects_img, canvas_rec)
-
         else:
             screen.fill((41, 41, 41))  # type:ignore[unreachable]
 
