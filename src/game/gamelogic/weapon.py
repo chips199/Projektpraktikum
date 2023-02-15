@@ -7,6 +7,7 @@ import pandas as pd
 from src.game.gamelogic.animated import Animated
 from src.game.gamelogic.sounds import Sounds
 
+
 class WeaponType(Enum):
     Fist = {"Damage": 10, "damage_to_weapon_per_hit": 0, "Cooldown": 1, "IsShortRange": True}
     Sword = {"Damage": 20, "damage_to_weapon_per_hit": 10, "Cooldown": 2, "IsShortRange": True}
@@ -21,7 +22,7 @@ class WeaponType(Enum):
 
 class Weapon(Animated):
 
-    def __init__(self, waepon_type, impact_sound_path, impact_sound_path_volume, *args, **kwargs):
+    def __init__(self, weapon_type, impact_sound_path, impact_sound_path_volume, *args, **kwargs):
         """
         Initialize the class weapon
         :param impact_sound_path: Path to the sound-file
@@ -29,7 +30,7 @@ class Weapon(Animated):
         """
         super(Weapon, self).__init__(*args, **kwargs)
         self.destroyed = False
-        self.weapon_type = waepon_type
+        self.weapon_type = weapon_type
         if self.weapon_type == WeaponType.Fist:
             self.cut_frames(2)
         self.last_hit = int(round(datetime.now().timestamp()))
