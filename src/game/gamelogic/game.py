@@ -226,8 +226,6 @@ class Game:
             if not self.playerList[id].is_alive():
                 # Draw Death-screen
                 self.canvas.get_canvas().blit(pygame.image.load(wrk_dir + '\\wasted.png').convert_alpha(), (0, 0))
-                # Play sound effect die
-                self.playerList[id].sound_die.play()
             if self.show_scoreboard:
                 # Generate Scoreboard
                 can = self.canvas.get_canvas()

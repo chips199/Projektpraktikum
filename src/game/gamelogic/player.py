@@ -67,9 +67,10 @@ class Player(Animated):
         self.blood_animation.double_frames(factor=2)
 
         # Sound effects:
-        # Load sound effect die
-        self.sound_hurt = Sounds(map_dir + r"\sounds\hurt_sound.mp3", 1.0)
         # Load sound effect hurt
+        self.sound_hurt = Sounds(map_dir + r"\sounds\hurt_sound.mp3", 1.0)
+        # Load sound effect die
+        self.sound_die_played = False
         self.sound_die = Sounds(map_dir + r"\sounds\die_sound.mp3", 0.5)
 
     def set_velocity(self, data=(1, 1, 0, 0)):
@@ -146,6 +147,10 @@ class Player(Animated):
         else:
             self.death_animation.set_pos(self.x, self.y)
             self.death_animation.draw_animation_once(g=g)
+            # Play sound effect die
+            if not self.sound_die_played:
+                self.sound_die.play()
+                self.sound_die_played = True
 
     @staticmethod
     def shift_df(df, dirn, n):
