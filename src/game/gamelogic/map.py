@@ -108,7 +108,7 @@ class Map:
             if len(self.staticimages) != 0:
                 screen.blit(self.static_objects_img, canvas_rec)
         else:
-            screen.fill((41, 41, 41))  # type:ignore[valid-type]
+            screen.fill((41, 41, 41))  # type:ignore[unreachable]
 
     def music_load(self):
         """
