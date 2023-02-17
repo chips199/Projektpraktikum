@@ -1,12 +1,14 @@
 import src.game.menu.MenuSetup as menu
-import src.game.menu.MyFrame as frame
 import pytest
-from unittest.mock import Mock, MagicMock
+from xvfbwrapper import Xvfb
 
 
 @pytest.fixture
 def setup():
     test_menu = menu.MenuSetup()
+
+    vdisplay = Xvfb()
+    vdisplay.start()
     return test_menu
 
 
