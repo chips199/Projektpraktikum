@@ -5,10 +5,10 @@ from xvfbwrapper import Xvfb
 
 @pytest.fixture
 def setup():
-    test_menu = menu.MenuSetup()
-
     vdisplay = Xvfb()
     vdisplay.start()
+    test_menu = menu.MenuSetup()
+
     return test_menu
 
 
