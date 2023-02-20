@@ -12,7 +12,7 @@ class Sounds:
         """
         mixer.init()
         self.sound = pygame.mixer.Sound(sound_file)
-        self.sound.set_volume(volume)
+        self.sound.set_volume(volume*0.5)
 
     def play(self):
         """
