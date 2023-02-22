@@ -9,9 +9,13 @@ import os
 def setup():
     wrk_dir = wrk_dir = os.path.abspath(os.path.dirname(__file__))
     basicmap = "\\".join(str(wrk_dir).split("\\")[:-1]) + r"\src\game\basicmap"
-    test_weapon1 = weapon.Weapon(type.Fist, basicmap + r"\music\Corinna-Basic_Map_Music.mp3", 0, [0, 0],
+    # test_weapon1 = weapon.Weapon(type.Fist, basicmap + r"\music\Corinna-Basic_Map_Music.mp3", 0, [0, 0],
+    #                              basicmap + r"\waffen\faeuste\animation\fists_magenta_animation")
+    test_weapon1 = weapon.Weapon(type.Fist, basicmap + r"\waffen\feuste", 0, [0, 0],
                                  basicmap + r"\waffen\faeuste\animation\fists_magenta_animation")
-    test_weapon2 = weapon.Weapon(type.Sword, basicmap + r"\music\Corinna-Basic_Map_Music.mp3", 1, [1, 1],
+    # test_weapon2 = weapon.Weapon(type.Sword, basicmap + r"\music\Corinna-Basic_Map_Music.mp3", 1, [1, 1],
+    #                              basicmap + r"\waffen\schwert\animation\sword_hold_animation_magenta")
+    test_weapon2 = weapon.Weapon(type.Sword, basicmap + r"\waffen\schwert", 1, [1, 1],
                                  basicmap + r"\waffen\schwert\animation\sword_hold_animation_magenta")
     return test_weapon1, test_weapon2
 
