@@ -39,7 +39,7 @@ class Player(Animated):
         self.block_x_axis = False
         self.is_blocking = False
         self.moving_on_edge = False
-        self.cut_frames(2)
+        # self.cut_frames(2)
         self.killed_by = killed_by
         self.death_time = datetime.datetime.now()
         # self.color = color
