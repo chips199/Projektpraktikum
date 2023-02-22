@@ -39,7 +39,7 @@ class Weapon(Animated):
         self.durability = 100
         self.abs_l, self.abs_r, self.rel_l, self.rel_r = self.load_dfs()
         # Loads the sound of the weapon
-        self.sound_hit = Sounds(impact_sound_path + r"\sound_effects\sound_hit.mp3", impact_sound_path_volume)
+        self.sound_hit = Sounds(impact_sound_path + r"\sound_effects\sound_hit.mp3", impact_sound_path_volume*1.25)
         self.sound_destroy = Sounds(impact_sound_path + r"\sound_effects\sound_destroy.mp3", impact_sound_path_volume)
 
     def get_dataframe(self, frame=-99):
