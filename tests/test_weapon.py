@@ -10,11 +10,17 @@ def setup():
     wrk_dir = os.path.abspath(os.path.dirname(__file__))
     basicmap = str(wrk_dir) + r"/basicmap"
 
-    test_weapon1 = weapon.Weapon(type.Fist, basicmap + r"/waffen/feuste/sound_effects/sound_destroy.mp3", 0, [0, 0],
-                                 basicmap + r"/waffen/faeuste/animation/fists_magenta_animation")
+    # test_weapon1 = weapon.Weapon(type.Fist, basicmap + r"/waffen/feuste/sound_effects/sound_destroy.mp3", 0, [0, 0],
+    #                              basicmap + r"/waffen/faeuste/animation/fists_magenta_animation")
+    #
+    # test_weapon2 = weapon.Weapon(type.Sword, basicmap + r"/waffen/schwert/sound_effects/sound_destroy.mp3", 1, [1, 1],
+    #                              basicmap + r"/waffen/schwert/animation/sword_hold_animation_magenta")
 
-    test_weapon2 = weapon.Weapon(type.Sword, basicmap + r"/waffen/schwert/sound_effects/sound_destroy.mp3", 1, [1, 1],
-                                 basicmap + r"/waffen/schwert/animation/sword_hold_animation_magenta")
+    test_weapon1 = weapon.Weapon(type.Fist, "/home/runner/work/Projektpraktikum/Projektpraktikum/basicmap/waffen/feuste/sound_effects/sound_destroy.mp3", 0, [0, 0],
+                                 basicmap + "/home/runner/work/Projektpraktikum/Projektpraktikum/basicmap/waffen/faeuste/animation/fists_magenta_animation")
+
+    test_weapon2 = weapon.Weapon(type.Sword, basicmap + "/home/runner/work/Projektpraktikum/Projektpraktikum/basicmap/waffen/schwert/sound_effects/sound_destroy.mp3", 1, [1, 1],
+                                 basicmap + "/home/runner/work/Projektpraktikum/Projektpraktikum/basicmap/waffen/schwert/animation/sword_hold_animation_magenta")
     return test_weapon1, test_weapon2
 
 
