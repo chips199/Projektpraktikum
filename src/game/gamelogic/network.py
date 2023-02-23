@@ -39,7 +39,6 @@ class Network:
         pid, msg = rply.split(",")
         return pid, msg
 
-
     def send(self, data):
         """
         :param data: str

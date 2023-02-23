@@ -67,9 +67,9 @@ def test_stop_sliding(p_setup):
 
 
 def test_draw(p_setup):
-    c= canvas.Canvas()
+    c = canvas.Canvas()
     p_setup.health = 0
-    assert  p_setup.draw(c) is None
+    assert p_setup.draw(c) is None
     p_setup.health = -1
     assert p_setup.draw(c) is None
     p_setup.health = 100
