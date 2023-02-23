@@ -39,11 +39,6 @@ class Network:
         pid, msg = rply.split(",")
         return pid, msg
 
-    def connect(self):
-        self.client.connect(self.addr)
-        msg = self.client.recv(2048).decode()
-        gid, pid = msg.split(',')
-        return gid, pid
 
     def send(self, data):
         """
@@ -64,9 +59,6 @@ class Network:
         self.spawnpoints = json.loads(self.send("get_spawnpoints"))
         # print(self.spawnpoints)
         return self.send("ready")
-
-    def getSpawnpoint(self, id):
-        return self.spawnpoints[str(id)]
 
     def get_max_number_of_players(self):
         return self.send("get max players")

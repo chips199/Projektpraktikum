@@ -31,10 +31,6 @@ def test_connect_lobby(setup):
     assert setup.connect_lobby(con3) == "5,No connection possible"
 
 
-def test_connect(setup):
-    assert isinstance(setup.connect(), (int, int))
-
-
 def test_lobby_check(setup):
     assert setup.check_lobby() is not None
 
@@ -45,13 +41,6 @@ def test_send(setup):
 
 def test_start_game(setup):
     assert setup.start_game() == setup.send("ready")
-
-
-def test_get_spawnpoint(setup):
-    assert setup.getSpawnpoint(1) == [0, 0]
-    assert setup.getSpawnpoint(2) == [0, 0]
-    assert setup.getSpawnpoint(3) == [0, 0]
-    assert setup.getSpawnpoint(4) == [0, 0]
 
 
 def test_get_max_players(setup):
