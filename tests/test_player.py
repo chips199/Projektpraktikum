@@ -2,7 +2,7 @@ import pytest
 import src.game.gamelogic.player as player
 from unittest.mock import MagicMock
 import math
-import import src.game.gamelogic.canvas as canvas
+import src.game.gamelogic.canvas as canvas
 
 
 @pytest.fixture
