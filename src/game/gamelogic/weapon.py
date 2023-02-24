@@ -5,6 +5,7 @@ from enum import Enum
 import pandas as pd
 
 from src.game.gamelogic.animated import Animated
+from src.game.gamelogic.sounds import Sounds
 
 
 class WeaponType(Enum):
@@ -21,13 +22,15 @@ class WeaponType(Enum):
 
 class Weapon(Animated):
 
-    def __init__(self, waepon_type, *args, **kwargs):
+    def __init__(self, weapon_type, impact_sound_path, impact_sound_path_volume, *args, **kwargs):
         """
         Initialize the class weapon
+        :param impact_sound_path: Path to the sound-file
+        :param impact_sound_path_volume: Volume of the sound: Range: [0:1]
         """
         super(Weapon, self).__init__(*args, **kwargs)
         self.destroyed = False
-        self.weapon_type = waepon_type
+        self.weapon_type = weapon_type
         if self.weapon_type == WeaponType.Fist:
             self.cut_frames(2)
         self.last_hit = int(round(datetime.now().timestamp()))
@@ -35,6 +38,9 @@ class Weapon(Animated):
         self.hitted_me = False
         self.durability = 100
         self.abs_l, self.abs_r, self.rel_l, self.rel_r = self.load_dfs()
+        # Loads the sound of the weapon
+        self.sound_hit = Sounds(impact_sound_path + r"\sound_effects\sound_hit.mp3", impact_sound_path_volume)
+        self.sound_destroy = Sounds(impact_sound_path + r"\sound_effects\sound_destroy.mp3", impact_sound_path_volume)
 
     def get_dataframe(self, frame=-99):
         try:
@@ -92,7 +98,12 @@ class Weapon(Animated):
         """
         self.durability -= self.weapon_type.value["damage_to_weapon_per_hit"]
         self.last_hit = int(round(datetime.now().timestamp()))
-        self.destroyed = self.durability <= 0
+        # Play the sound of the weapon
+        if self.durability <= 0:
+            self.destroyed = True
+            self.sound_destroy.play()
+        else:
+            self.sound_hit.play()
 
     @staticmethod
     def check_hit(pl, players, map_df, g):
@@ -113,6 +124,8 @@ class Weapon(Animated):
                     if not pl.is_alive():
                         pl.killed_by[int(p.id)] += 1
                         pl.death_time = datetime.now()
+                    else:
+                        pl.sound_hurt.play()
             else:
                 p.weapon.hitted_me = False
         # hitting wall
@@ -129,5 +142,7 @@ class Weapon(Animated):
                 if not pl.is_alive():
                     pl.killed_by[4] += 1
                     pl.death_time = datetime.now()
+                else:
+                    pl.sound_hurt.play()
         else:
             pl.weapon.hitted_me = False

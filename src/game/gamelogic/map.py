@@ -4,8 +4,10 @@ import pygame
 from typing import List
 from pandas import DataFrame
 
+from src.game.gamelogic.background_music import Music
 
-class Map():
+
+class Map:
     solid_df: DataFrame
     staticimages = list()  # type: List[pygame.surface.Surface]
     player_uris = list()  # type: List[str]
@@ -13,6 +15,8 @@ class Map():
     def __init__(self, game, uri):
         self.game = game
         self.directory = uri
+        self.music = None
+        self.music_load()
 
         # load background
         try:
@@ -103,6 +107,15 @@ class Map():
             screen.blit(self.background, canvas_rec)
             if len(self.staticimages) != 0:
                 screen.blit(self.static_objects_img, canvas_rec)
-
         else:
             screen.fill((41, 41, 41))  # type:ignore[unreachable]
+
+    def music_load(self):
+        """
+        Loads the music from the folder and starts playing it
+        :return:
+        """
+        # Load Music
+        self.music = Music(self.directory + r"\music", 1.0)
+        # Start Music
+        self.music.play()
