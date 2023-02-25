@@ -3,15 +3,19 @@ import src.game.gamelogic.player as player
 from unittest.mock import MagicMock
 import math
 import src.game.gamelogic.canvas as canvas
+import pandas as pd
 
 
 @pytest.fixture
 def p_setup():
-    player.Player(1, 1)
-    player.Player(1, 2)
-    player.Player(1, 3)
-    player.Player(1, 4)
-    return player.Player(1)
+    basicmap = str(wrk_dir)
+    player.Player(1, 1, [0, 0], basicmap + r"/player/animation")
+    player.Player(1, 2, [0, 0], basicmap + r"/player/animation")
+    player.Player(1, 3, [0, 0], basicmap + r"/player/animation")
+    player.Player(1, 4, [0, 0], basicmap + r"/player/animation")
+    test_player = player.Playerplayer.Player(1, [0, 0], directory=basicmap + r"/player/animation")
+    test_player.solid_df = pd.DataFrame([(1, 2), (3, 4), (4, 5)], columns=['x', 'y'])
+    return test_player
 
 
 def test_velocity(p_setup):
@@ -74,3 +78,40 @@ def test_draw(p_setup):
     assert p_setup.draw(c) is None
     p_setup.health = 100
     assert p_setup.draw(c) is None
+
+
+def test_shift_df(p_setup):
+    p_setup.shift_df(p_setup.solid_df, 0, 1)
+    assert p_setup.solid_df["x"] == 3
+    p_setup.shift_df(p_setup.solid_df, 0, -1)
+    assert p_setup.solid_df["x"] == 1
+    p_setup.shift_df(p_setup.solid_df, 0, 1)
+    p_setup.shift_df(p_setup.solid_df, 1, 1)
+    assert p_setup.solid_df["x"] == 1
+    p_setup.shift_df(p_setup.solid_df, 1, -1)
+    assert p_setup.solid_df["x"] == 3
+    p_setup.shift_df(p_setup.solid_df, 2, 1)
+    assert p_setup.solid_df["y"] == 4
+    p_setup.shift_df(p_setup.solid_df, 2, -1)
+    assert p_setup.solid_df["y"] == 2
+    p_setup.shift_df(p_setup.solid_df, 3, -1)
+    assert p_setup.solid_df["y"] == 6
+    p_setup.shift_df(p_setup.solid_df, 3, 1)
+    assert p_setup.solid_df["y"] == 4
+
+
+def test_move(p_setup):
+    assert p_setup.move(0) is None
+    assert p_setup.move(1) is None
+    assert p_setup.move(2) is None
+    assert p_setup.move(3) is None
+    p_setup.x = 0
+    p_setup.y = 0
+    p_setup.move(0, 1)
+    assert p_setup.x == 1
+    p_setup.move(1, 1)
+    assert p_setup.x == 0
+    p_setup.move(2, 1)
+    assert p_setup.y == 1
+    p_setup.move(3, 1)
+    assert p_setup.y == 0

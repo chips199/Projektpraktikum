@@ -3,25 +3,24 @@ from src.game.gamelogic.weapon import WeaponType as type
 import pytest
 from unittest.mock import MagicMock
 import os
+import pygame
+
 
 
 @pytest.fixture()
 def setup():
     wrk_dir = os.path.abspath(os.path.dirname(__file__))
     basicmap = str(wrk_dir) + r"/basicmap"
+    screen = pygame.display.set_mode((50, 50))
 
-    # test_weapon1 = weapon.Weapon(type.Fist, basicmap + r"/waffen/feuste/sound_effects/sound_destroy.mp3", 0, [0, 0],
-    #                              basicmap + r"/waffen/faeuste/animation/fists_magenta_animation")
-    #
-    # test_weapon2 = weapon.Weapon(type.Sword, basicmap + r"/waffen/schwert/sound_effects/sound_destroy.mp3", 1, [1, 1],
-    #                              basicmap + r"/waffen/schwert/animation/sword_hold_animation_magenta")
 
-    test_weapon1 = weapon.Weapon(type.Fist, "/home/runner/work/Projektpraktikum/Projektpraktikum/src/game/basicmap/waffen/feuste/sound_effects/sound_destroy.mp3", 0, [0, 0],
-                                 "/home/runner/work/Projektpraktikum/Projektpraktikum/src/game/basicmap/waffen/faeuste/animation/fists_magenta_animation")
+     test_weapon1 = weapon.Weapon(type.Fist, basicmap + r"/waffen/feuste/sound_effects/sound_destroy.mp3", 0, [0, 0],
+                                  basicmap + r"/waffen/faeuste/animation/fists_magenta_animation")
 
-    test_weapon2 = weapon.Weapon(type.Sword, "/home/runner/work/Projektpraktikum/Projektpraktikum/src/game/basicmap/waffen/schwert/sound_effects/sound_destroy.mp3", 1, [1, 1],
-                                 "/home/runner/work/Projektpraktikum/Projektpraktikum/src/game/basicmap/waffen/schwert/animation/sword_hold_animation_magenta")
-    return test_weapon1, test_weapon2
+     test_weapon2 = weapon.Weapon(type.Sword, basicmap + r"/waffen/schwert/sound_effects/sound_destroy.mp3", 1, [1, 1],
+                                  basicmap + r"/waffen/schwert/animation/sword_hold_animation_magenta")
+
+     return test_weapon1, test_weapon2
 
 
 def test_get_dataframe(setup):
