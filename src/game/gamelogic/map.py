@@ -15,7 +15,9 @@ class Map:
     def __init__(self, game, uri):
         self.game = game
         self.directory = uri
+        # Background Music
         self.music = None
+        self.music_on = False
         self.music_load()
 
         # load background
@@ -115,7 +117,9 @@ class Map:
         Loads the music from the folder and starts playing it
         :return:
         """
-        # Load Music
-        self.music = Music(self.directory + r"\music", 1.0)
-        # Start Music
-        self.music.play()
+        if not self.music_on:
+            # Load Music
+            self.music = Music(self.directory + r"\music", 1.0)
+            # Start Music
+            self.music.play()
+            self.music_on = True

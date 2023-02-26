@@ -77,9 +77,6 @@ class Game:
         self.lost_sound_effect = Sounds(self.map.directory + r"\sounds\lost_sound.mp3", 1.0)
         self.win_sound_effect = Sounds(self.map.directory + r"\sounds\win_sound.mp3", 1.0)
 
-        # Status of the music
-        self.music_on = True
-
     def run(self):
         """
         the core method of the game containing the game loop
@@ -108,7 +105,7 @@ class Game:
                     run = False
 
                 # Restarts the music, when all songs were played
-                if event.type == self.map.music.MUSIC_END and self.music_on:
+                if event.type == self.map.music.MUSIC_END and self.map.music_on:
                     self.map.music_load()
 
             if self.playerList[id].is_alive():
@@ -262,10 +259,10 @@ class Game:
                 self.canvas.get_canvas().fill((32, 32, 32))
                 self.canvas.draw_text(self.canvas.get_canvas(), f"Player {mvp} has won",
                                       200, (255, 255, 255), 200, 350)
-                if self.music_on:
+                if self.map.music_on:
                     # Stop Music
                     self.map.music.fadeout(1000)
-                    self.music_on = False
+                    self.map.music_on = False
                     if id == mvp:
                         # Play win sound
                         self.win_sound_effect.play()
