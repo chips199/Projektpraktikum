@@ -1,17 +1,12 @@
 import pytest
 import src.game.gamelogic.player as player
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 import math
 import src.game.gamelogic.canvas as canvas
 import pandas as pd
 import src.game.gamelogic.game as game
 import os
 import pygame
-
-
-@patch('game.next_to_solid')
-def test_func(self, get_next_to_solid_mock):
-    get_next_to_solid_mock.return_value = 7
 
 
 @pytest.fixture
@@ -23,6 +18,7 @@ def p_setup():
     test_player.relative_solid_df = pd.DataFrame([(1, 1)], columns=["x", "y"])
     return test_player
 
+
 @pytest.fixture
 def setup():
     basicmap = str(os.path.abspath(os.path.dirname(__file__)))
@@ -31,6 +27,7 @@ def setup():
     t3 = player.Player(3, [0, 0], basicmap + r"/player/animation")
     t4 = player.Player(4, [0, 0], basicmap + r"/player/animation")
     return t1, t2, t3, t4
+
 
 def test_velocity(p_setup):
     p_setup.set_velocity()
@@ -85,7 +82,7 @@ def test_stop_sliding(p_setup):
 
 
 def test_draw(p_setup):
-    c = canvas.Canvas()
+    c = canvas.Canvas(50, 50)
     p_setup.health = 0
     assert p_setup.draw(c) is None
     p_setup.health = -1
@@ -139,12 +136,16 @@ def test_jump(p_setup):
 
 
 def test_start_blocking(p_setup):
+    p_setup.is_blocking = False
+    p_setup.block_x_axis = False
     p_setup.start_blocking()
     assert p_setup.is_blocking is True
     assert p_setup.block_x_axis is True
 
 
 def test_stop_blocking(p_setup):
+    p_setup.is_blocking = True
+    p_setup.block_x_axis = True
     p_setup.stop_blocking()
     assert p_setup.is_blocking is False
     assert p_setup.block_x_axis is False
@@ -163,7 +164,7 @@ def test_refresh_solids(p_setup):
     p_setup.x = 1
     p_setup.y = 1
     p_setup.refresh_solids()
-    assert p_setup.solid_df == pd.DataFrame([(2, 2)], columns= ["x", "y"])
+    assert p_setup.solid_df == pd.DataFrame([(2, 2)], columns=["x", "y"])
 
 
 def test_falling(p_setup):
