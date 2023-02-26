@@ -16,7 +16,7 @@ class Map:
         self.game = game
         self.directory = uri
         self.music = None
-        self.music_load()
+        #self.music_load()
 
         # load background
         try:

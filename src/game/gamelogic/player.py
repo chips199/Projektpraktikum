@@ -52,13 +52,14 @@ class Player(Animated):
         # Start Weapon
         self.weapon_path = {
             weapon.WeaponType.Fist.name: map_dir + f"\\waffen\\faeuste\\animation\\fists_{self.get_color(self.directory)}_animation",
-            weapon.WeaponType.Sword.name: map_dir + f"\\waffen\\schwert\\animation\\sword_hold_animation_{self.get_color(self.directory)}"
+            weapon.WeaponType.Sword.name: map_dir + f"\\waffen\\schwert\\animation\\sword_hold_animation_{self.get_color(self.directory)}",
+            weapon.WeaponType.Laser.name: map_dir + f"\\waffen\\laser\\sword_hold_{self.get_color(self.directory)}"
         }
         # self.weapon = weapon.Weapon(weapon.WeaponType.Fist, [self.x, self.y],
         #                             self.weapon_path[weapon.WeaponType.Fist.name])
-        weapon_sound_file = map_dir + r"\waffen\schwert"
-        self.weapon = weapon.Weapon(weapon.WeaponType.Sword, weapon_sound_file, 0.9, [self.x, self.y],
-                                    self.weapon_path[weapon.WeaponType.Sword.name])
+        weapon_sound_file = map_dir + r"\waffen\laser"
+        self.weapon = weapon.Weapon(weapon.WeaponType.Laser, weapon_sound_file, 0.9, [self.x, self.y],
+                                    self.weapon_path[weapon.WeaponType.Laser.name])
 
         self.death_animation = Animated(start=[0, 0],
                                         directory=map_dir + f"\\player\\death_animation\\death_animation_{self.get_color(self.directory)}")
