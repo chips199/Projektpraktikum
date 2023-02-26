@@ -1,5 +1,6 @@
 import json
 import os
+import time
 from copy import copy
 import datetime
 
@@ -40,12 +41,12 @@ class Game:
         self.id = int(self.data['id'])
 
         # pygame.init()
+        time.sleep(0.5)
         pygame.display.set_icon(pygame.image.load(wrk_dir + r"\..\stick_wars_logo.png"))
         self.width = w
         self.height = h
         self.canvas = canvas.Canvas(self.width, self.height, str(self.id) + "Stick  Wars")
         self.print_loading(0.1)
-        # self.map = Map(self, map_names_dict[self.data['map_name']])
         self.map = Map(self, map_names_dict[self.data["metadata"]["map"]])
         self.print_loading(0.2)
         print("MAP:", self.data["metadata"]["map"])

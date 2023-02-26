@@ -590,3 +590,6 @@ class MenuSetup:
 if __name__ == "__main__":
     m = MenuSetup()
     m.run()
+
+    print(int(round(datetime.datetime.now().timestamp())))
+    print(datetime.datetime.now().timestamp())

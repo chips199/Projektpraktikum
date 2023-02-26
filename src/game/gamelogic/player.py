@@ -1,6 +1,7 @@
 import datetime
 import math
 from copy import copy
+from datetime import datetime
 
 import pygame.draw
 
@@ -10,7 +11,7 @@ from src.game.gamelogic.sounds import Sounds
 
 
 class Player(Animated):
-    last_jump = datetime.datetime.now()
+    last_jump = datetime.now()
     height_jump = 200
     status_jump = 0
     is_connected = False
@@ -22,10 +23,8 @@ class Player(Animated):
 
         if killed_by is None:
             killed_by = [0, 0, 0, 0, 0]
-        self.falling_time = datetime.datetime.now()
-        self.jumping_time = datetime.datetime.now()
-        # self.x = startx
-        # self.y = starty
+        self.falling_time = datetime.now()
+        self.jumping_time = datetime.now()
         self.id = pid
         self.velocity = 7
         self.current_moving_velocity = 7
@@ -41,7 +40,7 @@ class Player(Animated):
         self.moving_on_edge = False
         # self.cut_frames(2)
         self.killed_by = killed_by
-        self.death_time = datetime.datetime.now()
+        self.death_time = datetime.now()
         # self.color = color
         self.weapon = weapon
         self.velocity_counter = 0
@@ -67,6 +66,10 @@ class Player(Animated):
         self.blood_animation.double_frames(factor=2)
         self.shield_right = pygame.image.load(map_dir + r"\waffen\shield\shield.png").convert_alpha()
         self.shield_left = pygame.transform.flip(self.shield_right, True, False)
+        self.blocking_start_time = datetime.now().timestamp()
+        self.last_block = datetime.now().timestamp()
+        self.renew_shield_cooldown = 2
+        self.hold_shield_cooldown = 1
 
         # Sound effects:
         # Load sound effect hurt
@@ -82,7 +85,12 @@ class Player(Animated):
         self.velocity_counter = data[3]
 
     def keep_sliding(self, func):
-        # landed for when landed and moving_on_edge for when player s sliding down hill on snowmap
+        """
+        If the player has landed or is moving on the edge and not falling and still has sliding frames left,
+        moves the player in the current direction, with distance calculated in the handed over function
+        distance is calculated with math.sqrt to reach a quadratic behaviour instead of linear behaviour
+        """
+        # landed needed when player is landed, and moving_on_edge for when player is sliding down hill on snowmap
         if (self.landed or self.moving_on_edge) and \
                 not self.is_falling and \
                 self.sliding_frame_counter > 1:
@@ -98,9 +106,15 @@ class Player(Animated):
                 self.sliding_frame_counter -= 1
 
     def reset_sliding_counter(self):
+        """
+        Reset the sliding frame counter to the maximum sliding frames
+        """
         self.sliding_frame_counter = self.max_sliding_frames
 
     def stop_sliding(self):
+        """
+        Stop the sliding by setting the sliding frame counter to 1
+        """
         self.sliding_frame_counter = 1
 
     def draw(self, g):
@@ -248,10 +262,33 @@ class Player(Animated):
                 self.velocity_jumping = self.max_jumping_speed
 
     def start_blocking(self):
-        self.is_blocking = True
-        self.block_x_axis = True
+        """
+        Begin blocking if not already blocking and the renew shield cooldown is over.
+        Otherwise, stop blocking.
+        """
+        # If not already blocking and the renew shield cooldown is over, start blocking
+        if not self.is_blocking and datetime.now().timestamp() > self.last_block + self.renew_shield_cooldown:
+            self.blocking_start_time = datetime.now().timestamp()
+
+        # If still holding shield, set blocking to True and block player moving on x-axis
+        if datetime.now().timestamp() < self.blocking_start_time + self.hold_shield_cooldown:
+            self.is_blocking = True
+            self.block_x_axis = True
+
+        # Otherwise, stop blocking
+        else:
+            self.stop_blocking()
 
     def stop_blocking(self):
+        """
+        Stop the blocking state and reset relevant variables.
+        Set is_blocking to False and reset block_x_axis to False so player is allowed to move on x-axis again.
+        """
+        # If character is currently blocking, update last_block time to current time and subtract the
+        # hold_shield_cooldown from blocking_start_time to simulate that the max holding time is reached
+        if self.is_blocking:
+            self.last_block = datetime.now().timestamp()
+            self.blocking_start_time -= self.hold_shield_cooldown
         self.is_blocking = False
         self.block_x_axis = False
 
