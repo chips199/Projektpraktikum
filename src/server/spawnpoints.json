@@ -6,7 +6,7 @@
     "3" : [1350, 40],
     "velocity": [7, 7, 20, 0],
     "items": {
-      "Sword": []
+      "Sword": [[780, 400]]
     },
     "item_spawnpoints" : [[780, 380]],
     "item-odds" : {

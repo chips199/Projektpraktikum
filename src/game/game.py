@@ -348,7 +348,7 @@ class Game:
             "player_frame": [self.playerList[int(self.data['id'])].current_frame,
                              self.playerList[int(self.data['id'])].animation_running,
                              self.playerList[int(self.data['id'])].animation_direction],
-            "weapon_frame": [self.playerList[int(self.data['id'])].weapon.current_frame,
+            "weapon_data": [self.playerList[int(self.data['id'])].weapon.current_frame,
                              self.playerList[int(self.data['id'])].weapon.animation_running,
                              self.playerList[int(self.data['id'])].weapon.animation_direction,
                              self.playerList[int(self.data['id'])].weapon.weapon_type.name,
@@ -386,7 +386,7 @@ class Game:
                             erg_player.append([self.playerList[int(self.data["id"])].current_frame,
                                                self.playerList[int(self.data["id"])].animation_running,
                                                self.playerList[int(self.data["id"])].animation_direction])
-                    elif key2 == "weapon_frame":
+                    elif key2 == "weapon_data":
                         if key != str(self.id):
                             erg_weapon.append(value2)
                         else:
