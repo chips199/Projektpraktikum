@@ -53,7 +53,7 @@ class Player(Animated):
         self.weapon_path = {
             weapon.WeaponType.Fist.name: map_dir + f"\\waffen\\faeuste\\animation\\fists_{self.get_color(self.directory)}_animation",
             weapon.WeaponType.Sword.name: map_dir + f"\\waffen\\schwert\\animation\\sword_hold_animation_{self.get_color(self.directory)}",
-            weapon.WeaponType.Laser.name: map_dir + f"\\waffen\\laser\\sword_hold_{self.get_color(self.directory)}"
+            weapon.WeaponType.Laser.name: map_dir + f"\\waffen\\laser\\animation\\laser_hold_{self.get_color(self.directory)}"
         }
         # self.weapon = weapon.Weapon(weapon.WeaponType.Fist, [self.x, self.y],
         #                             self.weapon_path[weapon.WeaponType.Fist.name])
