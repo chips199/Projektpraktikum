@@ -11,6 +11,7 @@ from src.game.gamelogic.sounds import Sounds
 class WeaponType(Enum):
     Fist = {"Damage": 10, "damage_to_weapon_per_hit": 0, "Cooldown": 1, "IsShortRange": True}
     Sword = {"Damage": 20, "damage_to_weapon_per_hit": 10, "Cooldown": 2, "IsShortRange": True}
+    Laser = {"Damage": 20, "damage_to_weapon_per_hit": 10, "Cooldown": 2, "IsShortRange": False}
 
     @staticmethod
     def getObj(string):
