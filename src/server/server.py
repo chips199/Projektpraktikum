@@ -109,13 +109,13 @@ def game_server(game_id, this_gid):
                     potential_items_distances = list(map(lambda x: math.dist(p_pos, x), potential_items))
                     i = potential_items_distances.index(min(potential_items_distances))
                     game_data_dict[game_id]["metadata"]["spawnpoints"]["items"][wp].pop(i)
-        # if last_spawn_check is None or datetime.datetime.now() - last_spawn_check > datetime.timedelta(seconds=20):
-        #     last_spawn_check = datetime.datetime.now()
-        #     for point in spawn_points[maps_dict[game_id]]["item_spawnpoints"]:
-        #         for k, v in spawn_points[maps_dict[game_id]]["item-odds"].items():
-        #             if random.random() < v:
-        #                 game_data_dict[game_id]["metadata"]["spawnpoints"]["items"][k].append(point)
-        #                 break
+        if last_spawn_check is None or datetime.datetime.now() - last_spawn_check > datetime.timedelta(seconds=20):
+            last_spawn_check = datetime.datetime.now()
+            for point in spawn_points[maps_dict[game_id]]["item_spawnpoints"]:
+                for k, v in spawn_points[maps_dict[game_id]]["item-odds"].items():
+                    if random.random() < v:
+                        game_data_dict[game_id]["metadata"]["spawnpoints"]["items"][k].append(point)
+                        break
 
 
 def reset_games():
@@ -291,17 +291,17 @@ def threaded_client(conn):
             reply = data
             # if no data has been sent the connection has been closed
             if data:
-                print(reply)
+                # print(reply)
                 # parse the client data into the game_data Dictionary, and send the result back to the client
-                game_data_dict[game_id][this_pid] = json.loads(reply)
+                game_data_dict[game_id][str(this_pid)] = json.loads(reply)
                 # print(game_data_dict[game_id][this_pid])
-                deaths = game_data_dict[game_id][this_pid]["killed_by"]
+                deaths = game_data_dict[game_id][str(this_pid)]["killed_by"]
                 kills = list(map(lambda x: x[1]["killed_by"][:4],  # type: ignore[no-any-return]
                                  list(filter(lambda x: x[0] != "metadata", game_data_dict[game_id].items()))))
                 for k, v in enumerate(zip(*kills)):
                     game_data_dict[game_id]["metadata"]["scoreboard"][str(k)][0] = sum(v)
                 game_data_dict[game_id]["metadata"]["scoreboard"][str(this_pid)][1] = sum(deaths)
-                print(game_data_dict[game_id])
+                # print(game_data_dict[game_id])
                 conn.sendall(str.encode(json.dumps(game_data_dict[game_id])))
                 # to track how often the client sends a message track the time
                 last_msg = datetime.datetime.now()
