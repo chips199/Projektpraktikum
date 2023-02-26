@@ -74,7 +74,8 @@ class Animated:
             self.current_frame = 0
             self.animation_running = False
 
-    def draw_animation_once(self, g, reset=False):
+    def draw_animation_once(self, g, reset=False, direction=None):
+
         if self.current_frame < self.frame_count:
             self.animation_running = True
             self.draw(g=g)

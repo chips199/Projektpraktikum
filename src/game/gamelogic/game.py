@@ -145,6 +145,12 @@ class Game:
                         self.playerList[id].weapon.hit()
                         self.playerList[id].weapon.start_animation_in_direction(self.playerList[id].animation_direction)
 
+                # blocking
+                if keys[pygame.K_m]:
+                    self.playerList[id].start_blocking()
+                else:
+                    self.playerList[id].stop_blocking()
+
                 if keys[pygame.K_d] and not self.playerList[id].block_x_axis:
                     if self.playerList[id].landed:
                         self.playerList[id].start_animation_in_direction(0)

@@ -62,9 +62,11 @@ class Player(Animated):
 
         self.death_animation = Animated(start=[0, 0],
                                         directory=map_dir + f"\\player\\death_animation\\death_animation_{self.get_color(self.directory)}")
+        self.death_animation.double_frames(2)
         self.blood_animation = Animated(start=[0, 0], directory=map_dir + r"\player\blood_animation")
-        self.blood_animation.start_animation_in_direction(direction=1)
         self.blood_animation.double_frames(factor=2)
+        self.shield_right = pygame.image.load(map_dir + r"\waffen\shield\shield.png").convert_alpha()
+        self.shield_left = pygame.transform.flip(self.shield_right, True, False)
 
         # Sound effects:
         # Load sound effect hurt
@@ -80,10 +82,6 @@ class Player(Animated):
         self.velocity_counter = data[3]
 
     def keep_sliding(self, func):
-        # if (self.landed or self.moving_on_edge) and \
-        #         not self.is_jumping and \
-        #         not self.is_falling and \
-        #         self.sliding_frame_counter > 1:
         # landed for when landed and moving_on_edge for when player s sliding down hill on snowmap
         if (self.landed or self.moving_on_edge) and \
                 not self.is_falling and \
@@ -135,12 +133,24 @@ class Player(Animated):
                                  end_pos=(self.x + (self.frame_width * (self.weapon.durability / 100)), self.y - 10),
                                  width=3)
 
+            if self.is_blocking:
+                if self.animation_direction == 0:
+                    player_rec = pygame.Rect(self.x-1, self.y-3, self.frame_width, self.frame_height)
+                    g.blit(self.shield_right, player_rec)
+                else:
+                    player_rec = pygame.Rect(self.x-39, self.y-3, self.frame_width, self.frame_height)
+                    g.blit(self.shield_left, player_rec)
+
             self.weapon.animation_direction = self.animation_direction
             self.weapon.draw(g=g, x=self.x, y=self.y, width=self.frame_width, height=self.frame_height)
 
-            # bloods plash animation
+            # blood splash animation
             if self.weapon.hitted_me or self.blood_animation.current_frame > 0:
-                self.blood_animation.set_pos(self.x - 47, self.y + 15)
+                self.blood_animation.animation_direction = self.animation_direction
+                if self.animation_direction == 0:
+                    self.blood_animation.set_pos(self.x+4, self.y + 40)
+                else:
+                    self.blood_animation.set_pos(self.x+30, self.y + 40)
                 self.blood_animation.draw_animation_once(g=g, reset=True)
 
         # death animation
