@@ -4,31 +4,31 @@ import src.game.gamelogic.network as network
 
 @pytest.fixture
 def setup():
-    return network.Network("test")
+    con1 = network.Network("schneemap")
+    con2 = network.Network("basicmap")
+    con3 = network.Network("platformmap")
+    assert con1.id != "5"
+    assert con2.id != "5"
+    assert con3.id != "5"
+    network.Network(con1.session_id)
+    network.Network(con1.session_id)
+    network.Network(con1.session_id)
+    test = network.Network(con1.session_id)
+    assert test.session_id == " Session is full"
+    network.Network(con2.session_id)
+    network.Network(con2.session_id)
+    network.Network(con2.session_id)
+    test = network.Network(con2.session_id)
+    assert test.session_id == " Session is full"
+    network.Network(con3.session_id)
+    network.Network(con3.session_id)
+    network.Network(con3.session_id)
+    test = network.Network(con3.session_id)
+    assert test.session_id == " Session is full"
+    return con1
 
 
-def test_connect_lobby(setup):
-    con1 = setup.connect_lobby("schneemap")
-    con2 = setup.connect_lobby("basicmap")
-    con3 = setup.connect_lobby("platformmap")
-    assert isinstance(con1, str)
-    assert isinstance(con2, str)
-    assert isinstance(con3, str)
-    assert con1 != "5,No connection possible"
-    assert con2 != "5,No connection possible"
-    assert con3 != "5,No connection possible"
-    setup.connect_lobby(con1)
-    setup.connect_lobby(con1)
-    setup.connect_lobby(con1)
-    assert setup.connect_lobby(con1) == "5,No connection possible"
-    setup.connect_lobby(con2)
-    setup.connect_lobby(con2)
-    setup.connect_lobby(con2)
-    assert setup.connect_lobby(con2) == "5,No connection possible"
-    setup.connect_lobby(con3)
-    setup.connect_lobby(con3)
-    setup.connect_lobby(con3)
-    assert setup.connect_lobby(con3) == "5,No connection possible"
+# connect_lobby is tested in setup, because the function is only called in constructor of the Network class
 
 
 def test_lobby_check(setup):

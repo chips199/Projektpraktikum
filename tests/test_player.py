@@ -1,22 +1,36 @@
 import pytest
 import src.game.gamelogic.player as player
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 import math
 import src.game.gamelogic.canvas as canvas
 import pandas as pd
+import src.game.gamelogic.game as game
+import os
+import pygame
+
+
+@patch('game.next_to_solid')
+def test_func(self, get_next_to_solid_mock):
+    get_next_to_solid_mock.return_value = 7
 
 
 @pytest.fixture
 def p_setup():
-    basicmap = str(wrk_dir)
-    player.Player(1, 1, [0, 0], basicmap + r"/player/animation")
-    player.Player(1, 2, [0, 0], basicmap + r"/player/animation")
-    player.Player(1, 3, [0, 0], basicmap + r"/player/animation")
-    player.Player(1, 4, [0, 0], basicmap + r"/player/animation")
-    test_player = player.Playerplayer.Player(1, [0, 0], directory=basicmap + r"/player/animation")
+    pygame.display.set_mode((50, 50))
+    basicmap = str(os.path.abspath(os.path.dirname(__file__))) + "/basicmap"
+    test_player = player.Player(1, [0, 0], directory=basicmap + r"/player/animation")
     test_player.solid_df = pd.DataFrame([(1, 2), (3, 4), (4, 5)], columns=['x', 'y'])
+    test_player.relative_solid_df = pd.DataFrame([(1, 1)], columns=["x", "y"])
     return test_player
 
+@pytest.fixture
+def setup():
+    basicmap = str(os.path.abspath(os.path.dirname(__file__)))
+    t1 = player.Player(1, [0, 0], basicmap + r"/player/animation")
+    t2 = player.Player(2, [0, 0], basicmap + r"/player/animation")
+    t3 = player.Player(3, [0, 0], basicmap + r"/player/animation")
+    t4 = player.Player(4, [0, 0], basicmap + r"/player/animation")
+    return t1, t2, t3, t4
 
 def test_velocity(p_setup):
     p_setup.set_velocity()
@@ -115,3 +129,53 @@ def test_move(p_setup):
     assert p_setup.y == 1
     p_setup.move(3, 1)
     assert p_setup.y == 0
+
+
+def test_jump(p_setup):
+    p_setup.is_falling = False
+    assert p_setup.jump(game.next_to_solid()) is None
+    p_setup.is_falling = True
+    assert p_setup.jump(game.next_to_solid()) is None
+
+
+def test_start_blocking(p_setup):
+    p_setup.start_blocking()
+    assert p_setup.is_blocking is True
+    assert p_setup.block_x_axis is True
+
+
+def test_stop_blocking(p_setup):
+    p_setup.stop_blocking()
+    assert p_setup.is_blocking is False
+    assert p_setup.block_x_axis is False
+
+
+def test_is_alive(p_setup):
+    p_setup.health = 50
+    assert p_setup.is_alive() is True
+    p_setup.health = 0
+    assert p_setup.is_alive() is False
+    p_setup.health = -1
+    assert p_setup.is_alive() is False
+
+
+def test_refresh_solids(p_setup):
+    p_setup.x = 1
+    p_setup.y = 1
+    p_setup.refresh_solids()
+    assert p_setup.solid_df == pd.DataFrame([(2, 2)], columns= ["x", "y"])
+
+
+def test_falling(p_setup):
+    p_setup.is_jumping = False
+    assert p_setup.falling(game.next_to_solid()) is None
+    p_setup.is_jumping = True
+    assert p_setup.falling(game.next_to_solid()) is None
+
+
+def test_get_color(setup):
+    test = [setup[0].get_color(), setup[1].get_color(), setup[2].get_color(), setup[3].get_color()]
+    assert "magenta" in test
+    assert "orange" in test
+    assert "purple" in test
+    assert "turquoise" in test
