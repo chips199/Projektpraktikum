@@ -33,4 +33,4 @@ def test_set_sizing(setup):
 
 
 def test_label_hide_show(setup):
-    setup.label_hide_show(3, 4, 3, "test")
+    assert setup.label_hide_show(3, 4, 3, "test") is None

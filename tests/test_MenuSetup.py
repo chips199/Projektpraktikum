@@ -1,67 +1,64 @@
 import src.game.menu.MenuSetup as menu
 import pytest
-from xvfbwrapper import Xvfb
 
 
 @pytest.fixture
 def setup():
-    vdisplay = Xvfb()
-    vdisplay.start()
     test_menu = menu.MenuSetup()
 
     return test_menu
 
 
 def test_load_main_frame(setup):
-    setup.load_main_frame()
+    assert setup.load_main_frame() is None
 
 
 def test_load_interaction_frame(setup):
-    setup.load_interaction_frame()
+    assert setup.load_interaction_frame() is None
 
 
 def test_load_choose_map_frame(setup):
-    setup.load_choose_map_frame()
+    assert setup.load_choose_map_frame() is None
 
 
 def test_load_lobby_frame(setup):
-    setup.load_lobby_frame()
+    assert setup.load_lobby_frame() is None
 
 
 def test_load_player(setup):
-    setup.load_player(5.0, "mock_filestructure/player/placeholder.png")
-    setup.load_player(5, "mock_filestructure/player/placeholder.png")
-    setup.load_player(0, "mock_filestructure/player/placeholder.png")
-    setup.load_player(-5.0, "mock_filestructure/player/placeholder.png")
+    setup.load_player(5.0, "basicmap/player/basic_player_magenta.png")
+    setup.load_player(5, "basicmap/player/basic_player_magenta.png")
+    setup.load_player(0, "basicmap/player/basic_player_magenta.png")
+    setup.load_player(-5.0, "basicmap/player/basic_player_magenta.png")
 
 
 def test_update_player(setup):
-    setup.update_player()
+    assert setup.update_player() is None
 
 
 def test_start_new_session(setup):
-    setup.start_new_session()
+    assert setup.start_new_session() is None
 
 
 def test_create_lobby(setup):
-    setup.create_lobby()
+    assert setup.create_lobby() is None
 
 
 def test_start_network(setup):
-    setup.start_network()
+    assert setup.start_network() is None
 
 
 def test_start_game(setup):
-    setup.start_game()
+    assert setup.start_game() is None
 
 
 def test_join_lobby(setup):
-    setup.join_lobby()
+    assert setup.join_lobby() is None
 
 
 def test_back_to_start(setup):
-    setup.back_to_start()
+    assert setup.back_to_start() is None
 
 
 def test_if_game_started(setup):
-    setup.check_if_game_started()
+    assert setup.check_if_game_started() is None
