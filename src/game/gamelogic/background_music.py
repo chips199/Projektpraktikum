@@ -24,7 +24,7 @@ class Music:
             if i == 0:
                 # First song will be loaded directly into the music player
                 pygame.mixer.music.load(f"{sound_path}/{sound_file}")
-                pygame.mixer.music.set_volume(volume*0.5)
+                pygame.mixer.music.set_volume(volume*0.1)
             else:
                 # Other songs added to the queue
                 pygame.mixer.music.queue(f"{sound_path}/{sound_file}")
