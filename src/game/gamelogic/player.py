@@ -178,24 +178,26 @@ class Player(Animated):
         :param    v: velocity
         :return: None
         """
+        # set speed to current_moving_velocity value if v is -99
         if v == -99:
             v = self.current_moving_velocity
 
-        if dirn == 0:
+        if dirn == 0:  # Move right
             self.animation_direction = 0
             self.x += v
             self.weapon.x += v
-        elif dirn == 1:
+        elif dirn == 1:  # Move left
             self.animation_direction = 1
             self.x -= v
             self.weapon.x -= v
-        elif dirn == 2:
+        elif dirn == 2:  # Move up
             self.y -= v
             self.weapon.y -= v
-        else:
+        else:  # Move down
             self.y += v
             self.weapon.y += v
 
+        # Adjust dataframe of the player according to the movement
         self.solid_df = Player.shift_df(self.solid_df, dirn, v)  # type:ignore[has-type]
 
     def jump(self, func):

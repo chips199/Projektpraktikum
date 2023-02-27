@@ -11,7 +11,7 @@ class WeaponShot:
     def __init__(self, pos, velocity, color, direction):
         """
         pygame.Color(231, 24, 55)
-        param: direction: +1 --> left, -1 --> right
+        param: direction: +1, -1 (left, right)
         """
         self.x, self.y = pos
         self.velocity = velocity
@@ -37,7 +37,18 @@ class WeaponShot:
             df['x'] = df['x'].map(lambda x: x + self.x)
             df['y'] = df['y'].map(lambda y: y + self.y - self.height / 2)
 
-    def move(self):
+    def move(self, direction, velocity=-99):
+        """
+        Moves the shot object
+        param: direction: +1, -1 (left, right)
+        param: velocity: velocity of the shot
+        """
+        if velocity == -99:
+            velocity = self.velocity
+
+        self.x += direction * velocity
+
+        self.solid_df = player.shift_df(self.solid_df, direction, velocity)
 
     def draw(self, g):
         pygame.draw.line(surface=g,
