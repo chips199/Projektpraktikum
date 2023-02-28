@@ -80,7 +80,10 @@ class Weapon(Animated):
             self.x = kwargs["x"]
             super(Weapon, self).draw(g=kwargs["g"])
 
-    def get_position_weapon(self, **kwargs):
+    def get_position_weapon_shot(self, **kwargs):
+        """
+        Returns the position for the shot
+        """
         if self.animation_direction == 1:
             x_pos = kwargs["x"] + kwargs["width"] - self.frame_width - 5
         else:

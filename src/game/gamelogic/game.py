@@ -6,6 +6,7 @@ import datetime
 import pandas as pd
 import pygame
 
+from src.game.gamelogic.animated import Animated
 from src.game.gamelogic.canvas import Canvas
 
 from src.game.gamelogic import canvas
@@ -233,9 +234,8 @@ class Game:
                     # Draw Shots
                     for shot in p.weapon_shots:
                         if shot.is_active():
-                            print(shot)
                             shot.draw(self.canvas.get_canvas())
-                            shot.move()
+                            shot.move(self)
             if not self.playerList[id].is_alive():
                 # Draw Death-screen
                 self.canvas.get_canvas().blit(pygame.image.load(wrk_dir + '\\wasted.png').convert_alpha(), (0, 0))
@@ -442,25 +442,35 @@ class Game:
         :param distance: the range in which to check
         :return: integer representing the distance to the next object within the range
         """
+        return self.next_to_solid_df(player.solid_df, dirn, distance)
+
+    def next_to_solid_df(self, input_df, dirn, distance):
+        """
+        calculates the distance to the nearest object in one direction in a range
+        :param player: the current player
+        :param dirn: the direction
+        :param distance: the range in which to check
+        :return: integer representing the distance to the next object within the range
+        """
         # first combining all solid pixels in one dataframe
         # other_players = self.playerList[:self.id] + self.playerList[self.id + 1:]
         solid_pixels_df = copy(self.map.solid_df)
         # for op in other_players:
         #     solid_pixels_df = pd.concat([solid_pixels_df, op.solid_df])
-        # getting copy of the players solid dataframe
-        simulated_player = copy(player.solid_df)
+        # getting copy of the solid dataframe
+        df = copy(input_df)
         erg = 0
 
-        player.shift_df(simulated_player, dirn, distance)
-        if pd.merge(simulated_player, solid_pixels_df, how='inner', on=['x', 'y']).empty:
+        Animated.shift_df(df, dirn, distance)
+        if pd.merge(df, solid_pixels_df, how='inner', on=['x', 'y']).empty:
             erg = distance
             return erg
-        player.shift_df(simulated_player, dirn, -distance)
+        Animated.shift_df(df, dirn, -distance)
 
         # checking for each pixel if a move ment would cause a collision
         for _ in range(distance):
-            player.shift_df(simulated_player, dirn, 1)
-            if not pd.merge(simulated_player, solid_pixels_df, how='inner', on=['x', 'y']).empty:
+            Animated.shift_df(df, dirn, 1)
+            if not pd.merge(df, solid_pixels_df, how='inner', on=['x', 'y']).empty:
                 return erg
             erg += 1
         return erg

@@ -1,8 +1,9 @@
 from copy import copy
 
+import matplotlib.pyplot as plt
 import pandas as pd
 import pygame
-
+import matplotlib.pyplot as plt
 from src.game.gamelogic.animated import Animated
 
 
@@ -28,6 +29,8 @@ class WeaponShot:
             solid.append((self.width, y))
         self.solid_df = pd.DataFrame(solid, columns=["x", "y"])
 
+        self.active = True
+
     def get_dataframe(self):
         """
         returns the data frame of the shot
@@ -35,22 +38,30 @@ class WeaponShot:
         df = copy(self.solid_df)
         if self.direction == -1:
             df['x'] = df['x'].map(lambda x: x + self.x - self.width)
-            df['y'] = df['y'].map(lambda y: y + self.y - self.height / 2)
+            df['y'] = df['y'].map(lambda y: y + self.y - self.height)
         else:
             df['x'] = df['x'].map(lambda x: x + self.x)
-            df['y'] = df['y'].map(lambda y: y + self.y - self.height / 2)
+            df['y'] = df['y'].map(lambda y: y + self.y - self.height)
+        return df
 
-    def move(self, velocity=-99):
+    def move(self, game, velocity=-99):
         """
         Moves the shot object
         param: velocity: velocity of the shot
         """
         if velocity == -99:
             velocity = self.velocity
-
-        self.x += self.direction * velocity
-        # Shift dataframe
-        self.solid_df = Animated.shift_df(self.solid_df, self.direction, velocity)
+        if self.direction == 1:
+            dirn = 0
+        elif self.direction == -1:
+            dirn = 1
+        self.x += self.direction * game.next_to_solid_df(self.get_dataframe(), dirn, velocity)
+        # if game.next_to_solid_df(self.get_dataframe(), dirn, velocity) != 0 :
+        #     #self.x += self.direction
+        #     # Shift dataframe
+        #     #self.solid_df = Animated.shift_df(self.solid_df, dirn, velocity)
+        # else:
+        #     self.active = False
 
     def draw(self, g):
         """
@@ -70,4 +81,4 @@ class WeaponShot:
         """
         Returns whether the shot is still active or has already hit something
         """
-        return self.direction != 0
+        return self.direction != 0 and self.active
