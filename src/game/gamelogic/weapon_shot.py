@@ -1,10 +1,7 @@
 from copy import copy
 
-import matplotlib.pyplot as plt
 import pandas as pd
 import pygame
-import matplotlib.pyplot as plt
-from src.game.gamelogic.animated import Animated
 
 
 class WeaponShot:
