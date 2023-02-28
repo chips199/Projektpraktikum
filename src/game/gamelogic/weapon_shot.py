@@ -57,9 +57,14 @@ class WeaponShot:
         """
         Draws the shot as a line on the canvas
         """
+        # shift the shot when shooting to the left
+        direction_left_shift = 0
+        if self.direction == -1:
+            direction_left_shift = self.width
+        # Draw the shot
         pygame.draw.rect(surface=g,
                          color=self.color,
-                         rect=[self.x, self.y + self.height / 2, self.width, self.height],
+                         rect=[self.x - direction_left_shift, self.y + self.height / 2, self.width, self.height],
                          width=0)
 
     def is_active(self):

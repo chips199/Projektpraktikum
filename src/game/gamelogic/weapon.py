@@ -80,8 +80,13 @@ class Weapon(Animated):
             self.x = kwargs["x"]
             super(Weapon, self).draw(g=kwargs["g"])
 
-    # def position_weapon(self, pos):
-    #     x_pos, y_pos = pos
+    def get_position_weapon(self, **kwargs):
+        if self.animation_direction == 1:
+            x_pos = kwargs["x"] + kwargs["width"] - self.frame_width - 5
+        else:
+            x_pos = kwargs["x"] + self.frame_width - 5
+        y_pos = kwargs["y"] + kwargs["height"] - self.frame_height + 46
+        return x_pos, y_pos
 
     def can_hit(self):
         """
