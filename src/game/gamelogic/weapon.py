@@ -9,9 +9,9 @@ from src.game.gamelogic.sounds import Sounds
 
 
 class WeaponType(Enum):
-    Fist = {"Damage": 10, "damage_to_weapon_per_hit": 0, "Cooldown": 1, "IsShortRange": True}
-    Sword = {"Damage": 20, "damage_to_weapon_per_hit": 10, "Cooldown": 2, "IsShortRange": True}
-    Laser = {"Damage": 15, "damage_to_weapon_per_hit": 10, "Cooldown": 2, "IsShortRange": False}
+    Fist = {"Damage": 10, "damage_to_weapon_per_hit": 0, "Cooldown": 1, "IsShortRange": True, "shot_speed": 0}
+    Sword = {"Damage": 20, "damage_to_weapon_per_hit": 10, "Cooldown": 2, "IsShortRange": True, "shot_speed": 0}
+    Laser = {"Damage": 15, "damage_to_weapon_per_hit": 10, "Cooldown": 2, "IsShortRange": False, "shot_speed": 5}
 
     @staticmethod
     def getObj(string):
@@ -80,6 +80,9 @@ class Weapon(Animated):
             self.x = kwargs["x"]
             super(Weapon, self).draw(g=kwargs["g"])
 
+    # def position_weapon(self, pos):
+    #     x_pos, y_pos = pos
+
     def can_hit(self):
         """
         Returns whether the weapon can currently hit
@@ -105,6 +108,24 @@ class Weapon(Animated):
             self.sound_destroy.play()
         else:
             self.sound_hit.play()
+
+    def is_short_range_weapon(self):
+        """
+        returns whether the weapon is a short range weapon
+        """
+        return self.weapon_type.value["IsShortRange"]
+
+    def get_shot_speed(self):
+        """
+        returns the speed of a shoot
+        """
+        return self.weapon_type.value["shot_speed"]
+
+    def get_weapon_damage(self):
+        """
+        Returns the damage caused by the weapon
+        """
+        return self.weapon_type.value["Damage"]
 
     @staticmethod
     def check_hit(pl, players, map_df, g):

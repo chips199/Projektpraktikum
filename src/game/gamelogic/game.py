@@ -141,9 +141,16 @@ class Game:
                 if keys[pygame.K_s]:
                     # Check if Player can use his weapon
                     if self.playerList[id].weapon.can_hit():
-                        # Check if an enemy player is in range
+                        # hit with the weapon
                         self.playerList[id].weapon.hit()
-                        self.playerList[id].weapon.start_animation_in_direction(self.playerList[id].animation_direction)
+                        # Check if Weapon is a short range weapon
+                        if self.playerList[id].weapon.is_short_range_weapon():
+                            # Start shot Animation
+                            self.playerList[id].weapon.start_animation_in_direction(self.playerList[id].animation_direction)
+                        else:
+                            # long distance weapon shot
+                            print("Shot fired")
+                            self.playerList[id].add_shot()
 
                 if keys[pygame.K_d] and not self.playerList[id].block_x_axis:
                     if self.playerList[id].landed:
@@ -223,6 +230,11 @@ class Game:
             for p in self.playerList:
                 if p.is_connected:
                     p.draw(self.canvas.get_canvas())
+                    # Draw Shots
+                    for shot in p.weapon_shots:
+                        if shot.is_active():
+                            print(shot)
+                            shot.draw(self.canvas.get_canvas())
             if not self.playerList[id].is_alive():
                 # Draw Death-screen
                 self.canvas.get_canvas().blit(pygame.image.load(wrk_dir + '\\wasted.png').convert_alpha(), (0, 0))

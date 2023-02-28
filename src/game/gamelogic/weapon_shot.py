@@ -3,12 +3,11 @@ from copy import copy
 import pandas as pd
 import pygame
 
-
-import player
+from src.game.gamelogic import animated
 
 
 class WeaponShot:
-    def __init__(self, pos, velocity, color, direction):
+    def __init__(self, pos, velocity, color, direction, damage):
         """
         pygame.Color(231, 24, 55)
         param: direction: +1, -1 (left, right)
@@ -16,9 +15,10 @@ class WeaponShot:
         self.x, self.y = pos
         self.velocity = velocity
         self.color = color
-        self.height = 2
-        self.width = 10
+        self.height = 4
+        self.width = 20
         self.direction = direction
+        self.damage = damage
         solid = []
         for x in range(self.width):
             solid.append((x, 0))
@@ -29,6 +29,9 @@ class WeaponShot:
         self.solid_df = pd.DataFrame(solid, columns=["x", "y"])
 
     def get_dataframe(self):
+        """
+        returns the data frame of the shot
+        """
         df = copy(self.solid_df)
         if self.direction == -1:
             df['x'] = df['x'].map(lambda x: x + self.x - self.width)
@@ -47,12 +50,20 @@ class WeaponShot:
             velocity = self.velocity
 
         self.x += direction * velocity
-
-        self.solid_df = player.shift_df(self.solid_df, direction, velocity)
+        # Shift dataframe
+        self.solid_df = animated.shift_df(self.solid_df, direction, velocity)
 
     def draw(self, g):
-        pygame.draw.line(surface=g,
+        """
+        Draws the shot as a line on the canvas
+        """
+        pygame.draw.rect(surface=g,
                          color=self.color,
-                         start_pos=(self.x, self.y + self.height / 2),
-                         end_pos=(self.x + self.width * self.direction, self.y - self.height),
-                         width=self.height)
+                         rect=[self.x, self.y + self.height / 2, self.width, self.height],
+                         width=0)
+
+    def is_active(self):
+        """
+        Returns whether the shot is still active or has already hit something
+        """
+        return self.direction != 0
