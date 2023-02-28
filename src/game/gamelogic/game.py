@@ -235,6 +235,7 @@ class Game:
                         if shot.is_active():
                             print(shot)
                             shot.draw(self.canvas.get_canvas())
+                            shot.move()
             if not self.playerList[id].is_alive():
                 # Draw Death-screen
                 self.canvas.get_canvas().blit(pygame.image.load(wrk_dir + '\\wasted.png').convert_alpha(), (0, 0))

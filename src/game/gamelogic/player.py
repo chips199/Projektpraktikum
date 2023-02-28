@@ -365,6 +365,8 @@ class Player(Animated):
         # Direction of the shot
         shot_direction = self.animation_direction
         if self.animation_direction == 0:
+            shot_direction = 1
+        elif self.animation_direction == 1:
             shot_direction = -1
         # determine start position from shot
         pos = self.weapon.get_position_weapon(x=self.x, y=self.y, width=self.frame_width, height=self.frame_height)

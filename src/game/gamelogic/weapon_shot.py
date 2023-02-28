@@ -3,7 +3,7 @@ from copy import copy
 import pandas as pd
 import pygame
 
-from src.game.gamelogic import animated
+from src.game.gamelogic.animated import Animated
 
 
 class WeaponShot:
@@ -40,18 +40,17 @@ class WeaponShot:
             df['x'] = df['x'].map(lambda x: x + self.x)
             df['y'] = df['y'].map(lambda y: y + self.y - self.height / 2)
 
-    def move(self, direction, velocity=-99):
+    def move(self, velocity=-99):
         """
         Moves the shot object
-        param: direction: +1, -1 (left, right)
         param: velocity: velocity of the shot
         """
         if velocity == -99:
             velocity = self.velocity
 
-        self.x += direction * velocity
+        self.x += self.direction * velocity
         # Shift dataframe
-        self.solid_df = animated.shift_df(self.solid_df, direction, velocity)
+        self.solid_df = Animated.shift_df(self.solid_df, self.direction, velocity)
 
     def draw(self, g):
         """
