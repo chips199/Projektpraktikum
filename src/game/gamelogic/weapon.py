@@ -11,7 +11,7 @@ from src.game.gamelogic.sounds import Sounds
 class WeaponType(Enum):
     Fist = {"Damage": 10, "damage_to_weapon_per_hit": 0, "Cooldown": 1, "IsShortRange": True, "shot_speed": 0}
     Sword = {"Damage": 20, "damage_to_weapon_per_hit": 10, "Cooldown": 2, "IsShortRange": True, "shot_speed": 0}
-    Laser = {"Damage": 15, "damage_to_weapon_per_hit": 10, "Cooldown": 2, "IsShortRange": False, "shot_speed": 10}
+    Laser = {"Damage": 15, "damage_to_weapon_per_hit": 10, "Cooldown": 2, "IsShortRange": False, "shot_speed": 1}
 
     @staticmethod
     def getObj(string):
@@ -143,21 +143,14 @@ class Weapon(Animated):
             if p.weapon.animation_running:
                 if not p.weapon.hitted_me and not pd.merge(p.weapon.get_dataframe(), pldf, how='inner',
                                                            on=['x', 'y']).empty:
-                    if pl.is_blocking:
-                        print("blocked")
-                        pl.health -= (p.weapon.weapon_type.value["Damage"] / 2)
-                        pl.blood_animation.set_pos(pl.x - 47, pl.y + 15)
-                        pl.blood_animation.draw_animation_once(g=g, reset=True)
-                    else:
-                        pl.health -= p.weapon.weapon_type.value["Damage"]
-                    p.weapon.hitted_me = True
-                    if not pl.is_alive():
-                        pl.killed_by[int(p.id)] += 1
-                        pl.death_time = datetime.now()
-                    else:
-                        pl.sound_hurt.play()
+                    Weapon.player_hit(g, p, pl, p.weapon.weapon_type.value["Damage"])
             else:
                 p.weapon.hitted_me = False
+            # check if a weapon shot has hit a player
+            for shot in p.weapon_shots:
+                if not pd.merge(shot.get_dataframe(), pldf, how='inner', on=['x', 'y']).empty:
+                    Weapon.player_hit(g, p, pl, shot.damge)
+
         # hitting wall
         if pl.weapon.animation_running:
             if not pl.weapon.hitted_me and not pd.merge(pl.weapon.get_dataframe(), map_df, how='inner',
@@ -176,3 +169,22 @@ class Weapon(Animated):
                     pl.sound_hurt.play()
         else:
             pl.weapon.hitted_me = False
+
+    @staticmethod
+    def player_hit(g, p, pl, damage):
+        """
+        Method executed when a player is hit by a weapon or a gunshot
+        """
+        if pl.is_blocking:
+            print("blocked")
+            pl.health -= (damage / 2)
+            pl.blood_animation.set_pos(pl.x - 47, pl.y + 15)
+            pl.blood_animation.draw_animation_once(g=g, reset=True)
+        else:
+            pl.health -= damage
+        p.weapon.hitted_me = True
+        if not pl.is_alive():
+            pl.killed_by[int(p.id)] += 1
+            pl.death_time = datetime.now()
+        else:
+            pl.sound_hurt.play()
