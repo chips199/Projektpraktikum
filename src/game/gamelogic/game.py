@@ -447,16 +447,13 @@ class Game:
     def next_to_solid_df(self, input_df, dirn, distance):
         """
         calculates the distance to the nearest object in one direction in a range
-        :param player: the current player
+        :param input_df: the current dataframe
         :param dirn: the direction
         :param distance: the range in which to check
         :return: integer representing the distance to the next object within the range
         """
         # first combining all solid pixels in one dataframe
-        # other_players = self.playerList[:self.id] + self.playerList[self.id + 1:]
         solid_pixels_df = copy(self.map.solid_df)
-        # for op in other_players:
-        #     solid_pixels_df = pd.concat([solid_pixels_df, op.solid_df])
         # getting copy of the solid dataframe
         df = copy(input_df)
         erg = 0

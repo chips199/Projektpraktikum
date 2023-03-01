@@ -15,6 +15,7 @@ class WeaponShot:
         self.color = color
         self.height = 4
         self.width = 20
+        self.max_width = self.width
         self.direction = direction
         self.damage = damage
         solid = []
@@ -53,12 +54,9 @@ class WeaponShot:
         elif self.direction == -1:
             dirn = 1
         self.x += self.direction * game.next_to_solid_df(self.get_dataframe(), dirn, velocity)
-        # if game.next_to_solid_df(self.get_dataframe(), dirn, velocity) != 0 :
-        #     #self.x += self.direction
-        #     # Shift dataframe
-        #     #self.solid_df = Animated.shift_df(self.solid_df, dirn, velocity)
-        # else:
-        #     self.active = False
+        # Disappear shot, when they hit an object
+        if game.next_to_solid_df(self.get_dataframe(), dirn, velocity) == 0:
+            self.active = False
 
     def draw(self, g):
         """
