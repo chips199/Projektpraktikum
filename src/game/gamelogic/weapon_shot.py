@@ -77,3 +77,9 @@ class WeaponShot:
         Returns whether the shot is still active or has already hit something
         """
         return self.direction != 0 and self.active
+
+    def get_sync_data(self):
+        """
+        [x, y, direction, damage]
+        """
+        return [self.x, self.y, self.direction, self.velocity, self.damage]

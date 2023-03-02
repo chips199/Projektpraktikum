@@ -9,7 +9,7 @@ import pygame
 from src.game.gamelogic.animated import Animated
 from src.game.gamelogic.canvas import Canvas
 
-from src.game.gamelogic import canvas
+from src.game.gamelogic import canvas, weapon_shot
 from src.game.gamelogic.map import Map
 from src.game.gamelogic import player as player
 from src.game.gamelogic import weapon as weapon
@@ -198,9 +198,9 @@ class Game:
             # timer = datetime.datetime.now()
 
             # sync data
-            self.player_frames, self.weapon_frames, health, killed, pos, con = self.parse()
-            for i, (data_player, data_weapon, health, killed, pos, con) in enumerate(
-                    zip(self.player_frames, self.weapon_frames, health, killed, pos, con)):
+            self.player_frames, self.weapon_frames, health, killed, pos, con, shots = self.parse()
+            for i, (data_player, data_weapon, health, killed, pos, con, shots) in enumerate(
+                    zip(self.player_frames, self.weapon_frames, health, killed, pos, con, shots)):
                 self.playerList[i].current_frame = data_player[0]
                 self.playerList[i].animation_running = data_player[1]
                 self.playerList[i].animation_direction = data_player[2]
@@ -217,6 +217,9 @@ class Game:
                 self.playerList[i].killed_by = killed
                 self.playerList[i].x, self.playerList[i].y = pos
                 self.playerList[i].is_connected = con
+                self.playerList[i].weapon_shots = []
+                for s in shots:
+                    self.playerList[i].weapon_shots.append(weapon_shot.WeaponShot((s[0], s[1]), s[3], player.Player.get_color_rgb(self.playerList[i]), s[2], s[4]))
 
             for p in self.playerList:
                 if p == self.playerList[id]:
@@ -368,7 +371,8 @@ class Game:
                              self.playerList[int(self.data['id'])].weapon.weapon_type.name,
                              self.playerList[int(self.data['id'])].weapon.durability],
             "health": self.playerList[int(self.data['id'])].health,
-            "killed_by": self.playerList[int(self.data['id'])].killed_by
+            "killed_by": self.playerList[int(self.data['id'])].killed_by,
+            "shots": list(map(weapon_shot.WeaponShot.get_sync_data, self.playerList[int(self.data['id'])].weapon_shots))
         }
         self.conn.send(temp_data)
 
@@ -389,6 +393,7 @@ class Game:
         erg_killed_by = []
         erg_pos = []
         erg_con = []
+        erg_shots = []
         for key, value in self.data.items():
             # since a fifth dictionary entry named 'id' is added for the player id, ignore this key/entry
             if key != "id" and key != "metadata":
@@ -430,9 +435,14 @@ class Game:
                             erg_con.append(value2)
                         else:
                             erg_con.append(True)
+                    elif key2 == "shots":
+                        if key != str(self.id):
+                            erg_shots.append(value2)
+                        else:
+                            erg_shots.append(list(map(weapon_shot.WeaponShot.get_sync_data, self.playerList[int(self.data['id'])].weapon_shots)))
             else:
                 continue
-        return erg_player, erg_weapon, erg_health, erg_killed_by, erg_pos, erg_con
+        return erg_player, erg_weapon, erg_health, erg_killed_by, erg_pos, erg_con, erg_shots
 
     def next_to_solid(self, player, dirn, distance):
         """
