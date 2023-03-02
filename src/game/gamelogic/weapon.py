@@ -11,7 +11,7 @@ from src.game.gamelogic.sounds import Sounds
 class WeaponType(Enum):
     Fist = {"Damage": 10, "damage_to_weapon_per_hit": 0, "Cooldown": 1, "IsShortRange": True, "shot_speed": 0}
     Sword = {"Damage": 20, "damage_to_weapon_per_hit": 10, "Cooldown": 2, "IsShortRange": True, "shot_speed": 0}
-    Laser = {"Damage": 15, "damage_to_weapon_per_hit": 10, "Cooldown": 2, "IsShortRange": False, "shot_speed": 1}
+    Laser = {"Damage": 15, "damage_to_weapon_per_hit": 10, "Cooldown": 2, "IsShortRange": False, "shot_speed": 15}
 
     @staticmethod
     def getObj(string):
@@ -149,7 +149,7 @@ class Weapon(Animated):
             # check if a weapon shot has hit a player
             for shot in p.weapon_shots:
                 if not pd.merge(shot.get_dataframe(), pldf, how='inner', on=['x', 'y']).empty:
-                    Weapon.player_hit(g, p, pl, shot.damge)
+                    Weapon.player_hit(g, p, pl, shot.damage)
 
         # hitting wall
         if pl.weapon.animation_running:
