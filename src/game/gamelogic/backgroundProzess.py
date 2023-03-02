@@ -2,7 +2,9 @@ import datetime
 import os
 import json
 import time
+from typing import List
 
+from src.game.gamelogic import weapon_shot
 from src.game.gamelogic.network import Network
 from multiprocessing.connection import Connection
 
@@ -27,7 +29,7 @@ class backgroundProzess:
         self.weapon_frame = [0, False, 1, "Fist", 100]
         self.health = 100
         self.killed_by = [0, 0, 0, 0, 0]
-        self.shots = []
+        self.shots: List[weapon_shot.WeaponShot] = []
 
         # self.net.send("ready")
 
