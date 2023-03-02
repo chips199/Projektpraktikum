@@ -1,3 +1,6 @@
+import datetime
+import time
+import calendar
 from copy import copy
 
 import pandas as pd
@@ -5,7 +8,7 @@ import pygame
 
 
 class WeaponShot:
-    def __init__(self, pos, velocity, color, direction, damage):
+    def __init__(self, pos, velocity, color, direction, damage, shot_id=0):
         """
         pygame.Color(231, 24, 55)
         param: direction: +1, -1 (left, right)
@@ -27,6 +30,11 @@ class WeaponShot:
             solid.append((self.width, y))
         self.solid_df = pd.DataFrame(solid, columns=["x", "y"])
 
+        if shot_id == 0:
+            date = datetime.datetime.utcnow()
+            self.shot_id = calendar.timegm(date.utctimetuple())
+        else:
+            self.shot_id = shot_id
         self.active = True
 
     def get_dataframe(self):
@@ -82,4 +90,4 @@ class WeaponShot:
         """
         [x, y, direction, damage]
         """
-        return [self.x, self.y, self.direction, self.velocity, self.damage]
+        return [self.shot_id, self.x, self.y, self.direction, self.velocity, self.damage]

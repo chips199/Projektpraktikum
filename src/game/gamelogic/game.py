@@ -219,7 +219,15 @@ class Game:
                 self.playerList[i].is_connected = con
                 self.playerList[i].weapon_shots = []
                 for s in shots:
-                    self.playerList[i].weapon_shots.append(weapon_shot.WeaponShot((s[0], s[1]), s[3], player.Player.get_color_rgb(self.playerList[i]), s[2], s[4]))
+                    shot_found = False
+                    for shot in self.playerList[i].weapon_shots:
+                        if s[0] == shot.shot_id:
+                            shot_found = True
+                            shot.x = s[1]
+                            shot.y = s[2]
+                            print("shot")
+                    if not shot_found:
+                        self.playerList[i].weapon_shots.append(weapon_shot.WeaponShot((s[1], s[2]), s[4], player.Player.get_color_rgb(self.playerList[i]), s[3], s[5], shot_id=s[0]))
 
             for p in self.playerList:
                 if p == self.playerList[id]:
@@ -239,6 +247,8 @@ class Game:
                         if shot.is_active():
                             shot.draw(self.canvas.get_canvas())
                             shot.move(self)
+                        else:
+                            p.weapon_shots.remove(shot)
             if not self.playerList[id].is_alive():
                 # Draw Death-screen
                 self.canvas.get_canvas().blit(pygame.image.load(wrk_dir + '\\wasted.png').convert_alpha(), (0, 0))
