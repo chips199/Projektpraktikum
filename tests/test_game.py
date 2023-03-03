@@ -8,9 +8,9 @@ import src.game.gamelogic.backgroundProzess as process
 @pytest.fixture
 def setup():
     conn1, conn2 = multiprocessing.Pipe(duplex=True)
-    connection = multiprocessing.Process(target=process.backgroundProzess, args=("abc", conn2))
-    connection.start()
-    return game.Game(50, 50, conn1, None)
+    test_process = multiprocessing.Process(target=process.backgroundProzess, args=("abc", conn2))
+    test_process.start()
+    return game.Game(50, 50, conn1, test_process)
 
 
 def test_print_loading(setup):

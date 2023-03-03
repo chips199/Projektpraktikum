@@ -12,8 +12,9 @@ import pygame
 @pytest.fixture
 def p_setup():
     pygame.display.set_mode((50, 50))
-    basicmap = str(os.path.abspath(os.path.dirname(__file__))) + "/basicmap"
-    test_player = player.Player(1, [0, 0], directory=basicmap + r"/player/animation")
+    basicmap = str(os.path.abspath(os.path.dirname(__file__))) + "\\basicmap"
+    print(basicmap + "\\player\\animation\\basic_player_magenta_animation")
+    test_player = player.Player(1, [0, 0], directory=basicmap + "\\player\\animation\\basic_player_magenta_animation")
     test_player.solid_df = pd.DataFrame([(1, 2), (3, 4), (4, 5)], columns=['x', 'y'])
     test_player.relative_solid_df = pd.DataFrame([(1, 1)], columns=["x", "y"])
     return test_player
@@ -22,10 +23,10 @@ def p_setup():
 @pytest.fixture
 def setup():
     basicmap = str(os.path.abspath(os.path.dirname(__file__)))
-    t1 = player.Player(1, [0, 0], basicmap + r"/player/animation")
-    t2 = player.Player(2, [0, 0], basicmap + r"/player/animation")
-    t3 = player.Player(3, [0, 0], basicmap + r"/player/animation")
-    t4 = player.Player(4, [0, 0], basicmap + r"/player/animation")
+    t1 = player.Player(1, [0, 0], basicmap + "\\player\\animation\\basic_player_magenta_animation")
+    t2 = player.Player(2, [0, 0], basicmap + "\\player\\animation\\basic_player_magenta_animation")
+    t3 = player.Player(3, [0, 0], basicmap + "\\player\\animation\\basic_player_magenta_animation")
+    t4 = player.Player(4, [0, 0], basicmap + "\\player\\animation\\basic_player_magenta_animation")
     return t1, t2, t3, t4
 
 
@@ -40,12 +41,12 @@ def test_velocity(p_setup):
     assert p_setup.moving_velocity_in_air == 5
     assert p_setup.velocity_jumping == 7
     assert p_setup.velocity_counter == 2
-    p_setup.set_velocity((-2, -3, -5. - 7))
+    p_setup.set_velocity((-2, -3, -5, - 7))
     assert p_setup.moving_velocity_on_ground == -2
     assert p_setup.moving_velocity_in_air == -3
     assert p_setup.velocity_jumping == -5
     assert p_setup.velocity_counter == -7
-    p_setup.set_velocity(0, 0, 0, 0)
+    p_setup.set_velocity((0, 0, 0, 0))
     assert p_setup.moving_velocity_on_ground == 0
     assert p_setup.moving_velocity_in_air == 0
     assert p_setup.velocity_jumping == 0
@@ -53,13 +54,13 @@ def test_velocity(p_setup):
 
 
 def test_keep_sliding(p_setup):
-    p_setup.sliding_frame_counter = 2
     p_setup.landed = True
     p_setup.moving_on_edge = True
     p_setup.is_falling = False
     p_setup.sliding_frame_counter = 1
     test_fun = MagicMock()
     p_setup.animation_direction = 1
+    p_setup.max_sliding_frames = 1
     p_setup.keep_sliding(test_fun)
     test_fun.assert_called_with((p_setup, 1, int(p_setup.current_moving_velocity)) *
                                 math.sqrt(p_setup.sliding_frame_counter / p_setup.max_sliding_frames))
@@ -123,16 +124,16 @@ def test_move(p_setup):
     p_setup.move(1, 1)
     assert p_setup.x == 0
     p_setup.move(2, 1)
-    assert p_setup.y == 1
+    assert p_setup.y == -1
     p_setup.move(3, 1)
     assert p_setup.y == 0
 
 
 def test_jump(p_setup):
     p_setup.is_falling = False
-    assert p_setup.jump(game.next_to_solid()) is None
+    assert p_setup.jump(game.Game.next_to_solid) is None
     p_setup.is_falling = True
-    assert p_setup.jump(game.next_to_solid()) is None
+    assert p_setup.jump(game.Game.next_to_solid) is None
 
 
 def test_start_blocking(p_setup):
@@ -169,9 +170,9 @@ def test_refresh_solids(p_setup):
 
 def test_falling(p_setup):
     p_setup.is_jumping = False
-    assert p_setup.falling(game.next_to_solid()) is None
+    assert p_setup.falling(game.Game.next_to_solid) is None
     p_setup.is_jumping = True
-    assert p_setup.falling(game.next_to_solid()) is None
+    assert p_setup.falling(game.Game.next_to_solid) is None
 
 
 def test_get_color(setup):

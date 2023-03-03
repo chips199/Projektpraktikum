@@ -12,7 +12,7 @@ import pygame
 def setup():
     wrk_dir = os.path.abspath(os.path.dirname(__file__))
     basicmap = str(wrk_dir) + r"/basicmap"
-    screen = pygame.display.set_mode((50, 50))
+    pygame.display.set_mode((50, 50))
     test_weapon1 = weapon.Weapon(type.Fist, basicmap + r"/waffen/faeuste", 0, [0, 0],
                                  basicmap + r"/waffen/faeuste/animation/fists_magenta_animation")
     test_weapon2 = weapon.Weapon(type.Sword, basicmap + r"/waffen/schwert", 1, [1, 1],
@@ -31,6 +31,8 @@ def test_get_dataframe(setup):
 
 def test_draw(setup):
     for i in setup:
+        i.x = 100
+        i.y = 100
         i.animation_direction = 0
         assert i.draw() is None
         i.animation_direction = 1
@@ -96,11 +98,12 @@ def test_check_hit(setup):
     player1.killed_by = [0, 0, 0, 1]
     canvas = MagicMock()
     player1.weapon.animation_running = False
-    setup.check_hit(player1, player_list, MagicMock(), canvas)
-    assert player1.health == 25
-    player1.is_blocking = False
-    setup.check_hit(player1, player_list, MagicMock(), canvas)
-    assert player1.health == 0
-    player1.is_alive = False
-    setup.check_hit(player1, player_list, MagicMock(), canvas)
-    assert player1.killed_by[4] == 2
+    for i in setup:
+        i.check_hit(player1, player_list, MagicMock(), canvas)
+        assert player1.health == 25
+        player1.is_blocking = False
+        i.check_hit(player1, player_list, MagicMock(), canvas)
+        assert player1.health == 0
+        player1.is_alive = False
+        i.check_hit(player1, player_list, MagicMock(), canvas)
+        assert player1.killed_by[4] == 2
