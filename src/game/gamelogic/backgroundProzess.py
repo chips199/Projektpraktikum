@@ -2,7 +2,9 @@ import datetime
 import os
 import json
 import time
+from typing import List
 
+from src.game.gamelogic import weapon_shot
 from src.game.gamelogic.network import Network
 from multiprocessing.connection import Connection
 
@@ -27,6 +29,7 @@ class backgroundProzess:
         self.weapon_frame = [0, False, 1, "Fist", 100]
         self.health = 100
         self.killed_by = [0, 0, 0, 0, 0]
+        self.shots: List[weapon_shot.WeaponShot] = []
 
         # self.net.send("ready")
 
@@ -82,11 +85,16 @@ class backgroundProzess:
         data['weapon_frame'] = self.weapon_frame
         data['health'] = self.health
         data['killed_by'] = self.killed_by
+        data['shots'] = self.shots
+        print(data)
         self.reply = self.net.send(json.dumps(data))
-        self.reply = json.loads(self.reply)
-        self.reply["id"] = self.net.id  # type:ignore[index]
-        self.reply = json.dumps(self.reply)
-        self.conn.send(self.reply)
+        try:
+            self.reply = json.loads(self.reply)
+            self.reply["id"] = self.net.id  # type:ignore[index]
+            self.reply = json.dumps(self.reply)
+            self.conn.send(self.reply)
+        except:
+            print(self.reply)
 
     def update_game_pos(self):
         while self.conn.poll():
@@ -96,3 +104,4 @@ class backgroundProzess:
             self.weapon_frame = data['weapon_frame']
             self.health = data['health']
             self.killed_by = data['killed_by']
+            self.shots = data['shots']

@@ -9,8 +9,9 @@ from src.game.gamelogic.sounds import Sounds
 
 
 class WeaponType(Enum):
-    Fist = {"Damage": 10, "damage_to_weapon_per_hit": 0, "Cooldown": 1, "IsShortRange": True}
-    Sword = {"Damage": 20, "damage_to_weapon_per_hit": 10, "Cooldown": 2, "IsShortRange": True}
+    Fist = {"Damage": 10, "damage_to_weapon_per_hit": 0, "Cooldown": 1, "IsShortRange": True, "shot_speed": 0}
+    Sword = {"Damage": 20, "damage_to_weapon_per_hit": 10, "Cooldown": 2, "IsShortRange": True, "shot_speed": 0}
+    Laser = {"Damage": 15, "damage_to_weapon_per_hit": 10, "Cooldown": 2, "IsShortRange": False, "shot_speed": 15}
 
     @staticmethod
     def getObj(string):
@@ -79,6 +80,17 @@ class Weapon(Animated):
             self.x = kwargs["x"]
             super(Weapon, self).draw(g=kwargs["g"])
 
+    def get_position_weapon_shot(self, **kwargs):
+        """
+        Returns the position for the shot
+        """
+        if self.animation_direction == 1:
+            x_pos = kwargs["x"] + kwargs["width"] - self.frame_width - 5
+        else:
+            x_pos = kwargs["x"] + self.frame_width - 5
+        y_pos = kwargs["y"] + kwargs["height"] - self.frame_height + 46
+        return x_pos, y_pos
+
     def can_hit(self):
         """
         Returns whether the weapon can currently hit
@@ -105,6 +117,24 @@ class Weapon(Animated):
         else:
             self.sound_hit.play()
 
+    def is_short_range_weapon(self):
+        """
+        returns whether the weapon is a short range weapon
+        """
+        return self.weapon_type.value["IsShortRange"]
+
+    def get_shot_speed(self):
+        """
+        returns the speed of a shoot
+        """
+        return self.weapon_type.value["shot_speed"]
+
+    def get_weapon_damage(self):
+        """
+        Returns the damage caused by the weapon
+        """
+        return self.weapon_type.value["Damage"]
+
     @staticmethod
     def check_hit(pl, players, map_df, g):
         pldf = pl.solid_df
@@ -113,21 +143,15 @@ class Weapon(Animated):
             if p.weapon.animation_running:
                 if not p.weapon.hitted_me and not pd.merge(p.weapon.get_dataframe(), pldf, how='inner',
                                                            on=['x', 'y']).empty:
-                    if pl.is_blocking:
-                        print("blocked")
-                        pl.health -= (p.weapon.weapon_type.value["Damage"] / 2)
-                        pl.blood_animation.set_pos(pl.x - 47, pl.y + 15)
-                        pl.blood_animation.draw_animation_once(g=g, reset=True)
-                    else:
-                        pl.health -= p.weapon.weapon_type.value["Damage"]
-                    p.weapon.hitted_me = True
-                    if not pl.is_alive():
-                        pl.killed_by[int(p.id)] += 1
-                        pl.death_time = datetime.now()
-                    else:
-                        pl.sound_hurt.play()
+                    Weapon.player_hit(g, p, pl, p.weapon.weapon_type.value["Damage"])
             else:
                 p.weapon.hitted_me = False
+            # check if a weapon shot has hit a player
+            for shot in p.weapon_shots:
+                if not pd.merge(shot.get_dataframe(), pldf, how='inner', on=['x', 'y']).empty:
+                    Weapon.player_hit(g, p, pl, shot.damage)
+                    shot.active = False
+
         # hitting wall
         if pl.weapon.animation_running:
             if not pl.weapon.hitted_me and not pd.merge(pl.weapon.get_dataframe(), map_df, how='inner',
@@ -146,3 +170,22 @@ class Weapon(Animated):
                     pl.sound_hurt.play()
         else:
             pl.weapon.hitted_me = False
+
+    @staticmethod
+    def player_hit(g, p, pl, damage):
+        """
+        Method executed when a player is hit by a weapon or a gunshot
+        """
+        if pl.is_blocking:
+            print("blocked")
+            pl.health -= (damage / 2)
+            pl.blood_animation.set_pos(pl.x - 47, pl.y + 15)
+            pl.blood_animation.draw_animation_once(g=g, reset=True)
+        else:
+            pl.health -= damage
+        p.weapon.hitted_me = True
+        if not pl.is_alive():
+            pl.killed_by[int(p.id)] += 1
+            pl.death_time = datetime.now()
+        else:
+            pl.sound_hurt.play()
