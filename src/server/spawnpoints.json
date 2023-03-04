@@ -6,11 +6,11 @@
     "3" : [1350, 40],
     "velocity": [7, 7, 20, 0],
     "items": {
-      "Sword": [[780, 400]]
+      "Sword": [[780, 380]]
     },
     "item_spawnpoints" : [[780, 380]],
     "item-odds" : {
-      "Sword": 0.25
+      "Sword": 0.5
     }
   },
   "platformmap" : {
