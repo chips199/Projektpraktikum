@@ -245,7 +245,7 @@ class Game:
                     for shot in p.weapon_shots:
                         for ps in self.playerList:
                             if ps.id != id and not pd.merge(ps.solid_df, shot.get_dataframe(), how='inner',
-                                         on=['x', 'y']).empty:
+                                                            on=['x', 'y']).empty:
                                 shot.active = False
                         if shot.is_active():
                             shot.draw(self.canvas.get_canvas())
