@@ -56,7 +56,7 @@ print("Waiting for a connection")
 seperator = "\\" if platform.system() == 'Windows' else "/"
 config_file = seperator.join(
     list(os.path.abspath(os.path.dirname(__file__)).split(seperator)[
-         :-1])) + f"{seperator}game{seperator}configuration.json"
+         :-1])) + f"{seperator}gamelogic{seperator}configuration.json"
 # print("\\".join(list(os.path.abspath(os.path.dirname(__file__)).split("\\")[:-1])) + "\\game\\configuration.json")
 with open(config_file) as file:
     game_data = json.load(file)
@@ -265,9 +265,9 @@ def threaded_client(conn):
             # if no data has been sent the connection has been closed
             if data:
                 # parse the client data into the game_data Dictionary, and send the result back to the client
-                game_data_dict[game_id][this_pid] = json.loads(reply)
+                game_data_dict[game_id][str(this_pid)] = json.loads(reply)
                 # print(game_data_dict[game_id][this_pid])
-                deaths = game_data_dict[game_id][this_pid]["killed_by"]
+                deaths = game_data_dict[game_id][str(this_pid)]["killed_by"]
                 kills = list(map(lambda x: x[1]["killed_by"][:4],  # type: ignore[no-any-return]
                                  list(filter(lambda x: x[0] != "metadata", game_data_dict[game_id].items()))))
                 for k, v in enumerate(zip(*kills)):

@@ -217,7 +217,7 @@ class Game:
                 self.playerList[i].killed_by = killed
                 self.playerList[i].x, self.playerList[i].y = pos
                 self.playerList[i].is_connected = con
-                self.playerList[i].weapon_shots = []
+
                 for s in shots:
                     shot_found = False
                     for shot in self.playerList[i].weapon_shots:
@@ -225,7 +225,6 @@ class Game:
                             shot_found = True
                             shot.x = s[1]
                             shot.y = s[2]
-                            print("shot")
                     if not shot_found:
                         self.playerList[i].weapon_shots.append(weapon_shot.WeaponShot((s[1], s[2]), s[4], player.Player.get_color_rgb(self.playerList[i]), s[3], s[5], shot_id=s[0]))
 
@@ -244,6 +243,10 @@ class Game:
                     p.draw(self.canvas.get_canvas())
                     # Draw Shots
                     for shot in p.weapon_shots:
+                        for ps in self.playerList:
+                            if ps.id != id and not pd.merge(ps.solid_df, shot.get_dataframe(), how='inner',
+                                         on=['x', 'y']).empty:
+                                shot.active = False
                         if shot.is_active():
                             shot.draw(self.canvas.get_canvas())
                             shot.move(self)

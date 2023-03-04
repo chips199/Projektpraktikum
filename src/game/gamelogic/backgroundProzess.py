@@ -86,12 +86,15 @@ class backgroundProzess:
         data['health'] = self.health
         data['killed_by'] = self.killed_by
         data['shots'] = self.shots
+        print(data)
         self.reply = self.net.send(json.dumps(data))
-        print(self.reply)
-        self.reply = json.loads(self.reply)
-        self.reply["id"] = self.net.id  # type:ignore[index]
-        self.reply = json.dumps(self.reply)
-        self.conn.send(self.reply)
+        try:
+            self.reply = json.loads(self.reply)
+            self.reply["id"] = self.net.id  # type:ignore[index]
+            self.reply = json.dumps(self.reply)
+            self.conn.send(self.reply)
+        except:
+            print(self.reply)
 
     def update_game_pos(self):
         while self.conn.poll():

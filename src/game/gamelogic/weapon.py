@@ -150,6 +150,7 @@ class Weapon(Animated):
             for shot in p.weapon_shots:
                 if not pd.merge(shot.get_dataframe(), pldf, how='inner', on=['x', 'y']).empty:
                     Weapon.player_hit(g, p, pl, shot.damage)
+                    shot.active = False
 
         # hitting wall
         if pl.weapon.animation_running:
