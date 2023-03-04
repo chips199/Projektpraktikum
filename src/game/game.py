@@ -349,10 +349,10 @@ class Game:
                              self.playerList[int(self.data['id'])].animation_running,
                              self.playerList[int(self.data['id'])].animation_direction],
             "weapon_data": [self.playerList[int(self.data['id'])].weapon.current_frame,
-                             self.playerList[int(self.data['id'])].weapon.animation_running,
-                             self.playerList[int(self.data['id'])].weapon.animation_direction,
-                             self.playerList[int(self.data['id'])].weapon.weapon_type.name,
-                             self.playerList[int(self.data['id'])].weapon.durability],
+                            self.playerList[int(self.data['id'])].weapon.animation_running,
+                            self.playerList[int(self.data['id'])].weapon.animation_direction,
+                            self.playerList[int(self.data['id'])].weapon.weapon_type.name,
+                            self.playerList[int(self.data['id'])].weapon.durability],
             "health": self.playerList[int(self.data['id'])].health,
             "killed_by": self.playerList[int(self.data['id'])].killed_by
         }

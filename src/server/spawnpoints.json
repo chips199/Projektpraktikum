@@ -6,9 +6,9 @@
     "3" : [1350, 40],
     "velocity": [7, 7, 20, 0],
     "items": {
-      "Sword": [[780, 380]]
+      "Sword": []
     },
-    "item_spawnpoints" : [[780, 380]],
+    "item_spawnpoints" : [[110,50],[1400,50],[780, 380]],
     "item-odds" : {
       "Sword": 0.5
     }
@@ -20,11 +20,11 @@
     "3" : [1470, 90],
     "velocity": [7, 7, 15, 1],
     "items": {
-      "Sword": [[780, 400]]
+      "Sword": []
     },
-    "item_spawnpoints" : [[780, 380]],
+    "item_spawnpoints" : [[730, 300],[0, 175],[1455, 145]],
     "item-odds" : {
-      "Sword": 0.25
+      "Sword": 0.5
     }
   },
   "schneemap" : {
@@ -34,11 +34,11 @@
     "3" : [1260,70],
     "velocity": [4, 7, 20, 0],
     "items": {
-      "Sword": [[780, 400]]
+      "Sword": []
     },
-    "item_spawnpoints" : [[780, 380]],
+    "item_spawnpoints" : [[10, 40],[1340, 235],[830, 405]],
     "item-odds" : {
-      "Sword": 0.25
+      "Sword": 0.5
     }
   }
 }

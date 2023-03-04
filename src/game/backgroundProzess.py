@@ -97,4 +97,3 @@ class backgroundProzess:
             self.weapon_data = data['weapon_data']
             self.health = data['health']
             self.killed_by = data['killed_by']
-
