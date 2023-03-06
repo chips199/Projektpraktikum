@@ -99,6 +99,7 @@ def game_server(game_id, this_gid):
         w_of_p = list(map(lambda x: x[1]["weapon_data"][3],
                           filter(lambda y: ["0", "1", "2", "3"].__contains__(y[0]),
                                  tmp)))
+        print(w_of_p)
         # print(game_data_dict[game_id].items())
         for ip, wp in enumerate(w_of_p):
             p_pos = game_data_dict[game_id][str(ip)]["position"]

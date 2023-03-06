@@ -1,6 +1,6 @@
 import pandas as pd
 import pygame.image
-from src.game import weapon
+from src.game.gamelogic import weapon
 
 
 class Item:

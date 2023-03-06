@@ -115,7 +115,7 @@ class Game:
             if self.playerList[id].is_alive():
                 # check if weapon is destroyed and give player fists if true
                 if self.playerList[id].weapon.destroyed and not self.playerList[id].weapon.animation_running:
-                    self.playerList[id].weapon = weapon.Weapon(weapon.WeaponType.Fist, self.map.directory + r"\waffen\faeuste", 1.0,
+                    self.playerList[id].weapon = weapon.Weapon(weapon.WeaponType.Fist, self.map.directory + r"\waffen\faeuste",
                                                                [self.playerList[id].x, self.playerList[id].y],
                                                                self.playerList[id].weapon_path[
                                                                    weapon.WeaponType.Fist.name])
@@ -143,8 +143,10 @@ class Game:
                     for w in self.map.items:
                         new_weapon = w.getItem(self.playerList[id].solid_df)
                         if new_weapon is not None:
-                            self.playerList[id].weapon = weapon.Weapon(new_weapon,
-                                                                       [self.playerList[id].x, self.playerList[id].y],
+                            weapon_sound_file = "\\".join(str(self.playerList[id].weapon_path[
+                                                                           new_weapon.name]).split('\\')[:-2])
+                            self.playerList[id].weapon = weapon.Weapon(new_weapon, weapon_sound_file,
+                                                        [self.playerList[id].x, self.playerList[id].y],
                                                                        self.playerList[id].weapon_path[
                                                                            new_weapon.name])
                         break
@@ -216,7 +218,7 @@ class Game:
                 self.playerList[i].animation_running = data_player[1]
                 self.playerList[i].animation_direction = data_player[2]
                 if self.playerList[i].weapon.weapon_type != weapon.WeaponType.getObj(data_weapon[3]):
-                    self.playerList[i].weapon = weapon.Weapon(weapon.WeaponType.getObj(data_weapon[3]), self.map.directory + r"\waffen\faeuste", 1.0,
+                    self.playerList[i].weapon = weapon.Weapon(weapon.WeaponType.getObj(data_weapon[3]), self.map.directory + r"\waffen\faeuste",
                                                               [self.playerList[i].x, self.playerList[i].y],
                                                               self.playerList[i].weapon_path[
                                                                   weapon.WeaponType.getObj(data_weapon[3]).name])
