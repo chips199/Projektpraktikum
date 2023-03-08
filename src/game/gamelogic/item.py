@@ -19,8 +19,8 @@ class Item:
                     solid.append((xi + self.x, yi + self.y))
         self.solid_df = pd.DataFrame(solid, columns=['x', 'y'])
 
-    def getItem(self, df):
-        if not pd.merge(self.solid_df, df, how='inner', on=['x', 'y']).empty:
+    def getItem(self, df, wt):
+        if not pd.merge(self.solid_df, df, how='inner', on=['x', 'y']).empty and wt != self.type:
             return self.type
         return None
 

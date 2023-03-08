@@ -108,16 +108,18 @@ class Map:
 
     def setitems(self, item_dict):
         # self.items = list()
-        new_items = list()
+        # new_ietms = list()
         for k, v in item_dict.items():
             for pos in v:
-                # if not list(map(lambda i: [i.x, i.y], self.items)).__contains__(pos):
-                new_items.append(Item(WeaponType.getObj(k), pos, self.weapon_path[k]))
-        self.items = new_items
+                if not list(map(lambda i: [i.x, i.y], self.items)).__contains__(pos):
+                    self.items.append(Item(WeaponType.getObj(k), pos, self.weapon_path[k]))
+        # self.items = new_items
         # print(item_dict)
-        # for i in self.items:
-        #     if item_dict[i.type.name].__contains__((i.x, i.y)):
-        #         self.items.remove(i)
+        for i in self.items:
+            if item_dict[i.type.name].__contains__([i.x, i.y]):
+                self.items.remove(i)
+
+        print(list(map(lambda x: [x.type.name, x.x, x.y], self.items)))
         # print(list(map(lambda x: x.type.name, self.items)))
 
     def draw(self, screen):

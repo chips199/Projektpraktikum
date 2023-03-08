@@ -138,10 +138,12 @@ class Game:
                     self.show_scoreboard = True
                 else:
                     self.show_scoreboard = False
+
                 # pick up weapon
                 if keys[pygame.K_e]:
                     for w in self.map.items:
-                        new_weapon = w.getItem(self.playerList[id].solid_df)
+                        print(f"{w.type.name} liegt an {w.x}, {w.y}")
+                        new_weapon = w.getItem(self.playerList[id].solid_df, self.playerList[id].weapon.weapon_type)
                         if new_weapon is not None:
                             weapon_sound_file = "\\".join(str(self.playerList[id].weapon_path[
                                                                            new_weapon.name]).split('\\')[:-2])
@@ -149,7 +151,7 @@ class Game:
                                                         [self.playerList[id].x, self.playerList[id].y],
                                                                        self.playerList[id].weapon_path[
                                                                            new_weapon.name])
-                        break
+                            break
 
                 # Hit
                 if keys[pygame.K_s]:
@@ -248,6 +250,8 @@ class Game:
 
             # sync items
             # print(self.data["metadata"]["spawnpoints"]["items"])
+            # print(self.data["metadata"]["spawnpoints"]["items"])
+            # self.data["metadata"]["spawnpoints"]["items"] = {'Sword': [[110, 50]], 'Laser': [[1400, 50], [780, 380]]}
             self.map.setitems(self.data["metadata"]["spawnpoints"]["items"])
             # print("Handling pos parsing:", datetime.datetime.now() - timer)
             # timer = datetime.datetime.now()
