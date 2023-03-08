@@ -89,13 +89,12 @@ def game_server(game_id, this_gid):
     game_data_dict[game_id]["metadata"]["end"] = (datetime.datetime.now() + datetime.timedelta(seconds=310)).strftime(
         "%d/%m/%Y, %H:%M:%S")
     last_w_of_p = [None] * number_of_players_per_game
-    last_spawn_check = None
+    last_spawn_check = datetime.datetime.now()
     while players_connected[this_gid] != [0] * number_of_players_per_game:
         tmp = copy(list(game_data_dict[game_id].items()))
-        w_of_p = list(map(lambda x: x[1]["weapon_data"][3],
+        w_of_p = list(map(lambda x: x[1]["weapon_data"][3],  # type: ignore[no-any-return]
                           filter(lambda y: ["0", "1", "2", "3"].__contains__(y[0]),
                                  tmp)))
-        print(w_of_p)
         for ip, wp in enumerate(w_of_p):
             p_pos = game_data_dict[game_id][str(ip)]["position"]
             if last_w_of_p[ip] != wp:
@@ -105,7 +104,7 @@ def game_server(game_id, this_gid):
                     potential_items_distances = list(map(lambda x: math.dist(p_pos, x), potential_items))
                     i = potential_items_distances.index(min(potential_items_distances))
                     game_data_dict[game_id]["metadata"]["spawnpoints"]["items"][wp].pop(i)
-        if last_spawn_check is None or datetime.datetime.now() - last_spawn_check > datetime.timedelta(seconds=10):
+        if datetime.datetime.now() - last_spawn_check > datetime.timedelta(seconds=10):
             last_spawn_check = datetime.datetime.now()
             for point in spawn_points[maps_dict[game_id]]["item_spawnpoints"]:
                 free = True
@@ -273,12 +272,6 @@ def threaded_client(conn):
             reset_games()
             conn.close()
             exit(0)
-        # elif msg == "":
-        #     print("connection lost")
-        #     players_connected[this_gid][this_pid] = 0
-        #     reset_games()
-        #     conn.close()
-        #     exit(0)
 
         sleep(0.2)
 

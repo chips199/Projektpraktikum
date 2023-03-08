@@ -9,10 +9,10 @@
       "Sword": [],
       "Laser": []
     },
-    "item_spawnpoints" : [[110,50],[1400,50],[780, 380]],
+    "item_spawnpoints" : [[110,50],[1400,50],[750, 380]],
     "item-odds" : {
-      "Sword": 0.5,
-      "Laser": 0.5
+      "Sword": 0.4,
+      "Laser": 0.2
     }
   },
   "platformmap" : {
@@ -27,13 +27,13 @@
     },
     "item_spawnpoints" : [[730, 300],[0, 175],[1455, 145]],
     "item-odds" : {
-      "Sword": 0.5,
-      "Laser": 0.5
+      "Sword": 0.4,
+      "Laser": 0.2
     }
   },
   "schneemap" : {
     "0" : [50,678],
-    "1" : [1500,678],
+    "1" : [1200,678],
     "2" : [240,100],
     "3" : [1260,70],
     "velocity": [4, 7, 20, 0],
@@ -43,8 +43,8 @@
     },
     "item_spawnpoints" : [[10, 40],[1340, 235],[830, 405]],
     "item-odds" : {
-      "Sword": 0.5,
-      "Laser": 0.5
+      "Sword": 0.4,
+      "Laser": 0.2
     }
   }
 }
