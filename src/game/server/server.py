@@ -88,19 +88,14 @@ def game_server(game_id, this_gid):
         "%d/%m/%Y, %H:%M:%S")
     game_data_dict[game_id]["metadata"]["end"] = (datetime.datetime.now() + datetime.timedelta(seconds=310)).strftime(
         "%d/%m/%Y, %H:%M:%S")
-    # print(game_data_dict[game_id]["metadata"]["start"], game_data_dict[game_id]["metadata"]["end"])
-    # exit(0)
     last_w_of_p = [None] * number_of_players_per_game
     last_spawn_check = None
     while players_connected[this_gid] != [0] * number_of_players_per_game:
-        # print(game_data_dict[game_id])
         tmp = copy(list(game_data_dict[game_id].items()))
-        # print(tmp)
         w_of_p = list(map(lambda x: x[1]["weapon_data"][3],
                           filter(lambda y: ["0", "1", "2", "3"].__contains__(y[0]),
                                  tmp)))
         print(w_of_p)
-        # print(game_data_dict[game_id].items())
         for ip, wp in enumerate(w_of_p):
             p_pos = game_data_dict[game_id][str(ip)]["position"]
             if last_w_of_p[ip] != wp:

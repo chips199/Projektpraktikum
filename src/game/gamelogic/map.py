@@ -6,7 +6,7 @@ from pandas import DataFrame
 
 from src.game.gamelogic import weapon
 from src.game.gamelogic.item import Item
-from src.game.gamelogic.weapon import *
+from src.game.gamelogic.weapon import WeaponType
 
 from src.game.gamelogic.background_music import Music
 
@@ -21,8 +21,8 @@ class Map:
         self.directory = uri
         self.items = list()
         self.weapon_path = {
-            weapon.WeaponType.Sword.name: self.directory + f"\\waffen\\schwert\\Sword.png",
-            weapon.WeaponType.Laser.name: self.directory + f"\\waffen\\laser\\laser.png"
+            weapon.WeaponType.Sword.name: self.directory + "\\waffen\\schwert\\Sword.png",
+            weapon.WeaponType.Laser.name: self.directory + "\\waffen\\laser\\laser.png"
         }
         self.music = None
         self.music_load()
@@ -107,20 +107,13 @@ class Map:
             self.static_objects_img = self.static_objects_img.convert_alpha()
 
     def setitems(self, item_dict):
-        # self.items = list()
-        # new_ietms = list()
         for k, v in item_dict.items():
             for pos in v:
                 if not list(map(lambda i: [i.x, i.y], self.items)).__contains__(pos):
                     self.items.append(Item(WeaponType.getObj(k), pos, self.weapon_path[k]))
-        # self.items = new_items
-        # print(item_dict)
         for i in self.items:
-            if item_dict[i.type.name].__contains__([i.x, i.y]):
+            if not item_dict[i.type.name].__contains__([i.x, i.y]):
                 self.items.remove(i)
-
-        print(list(map(lambda x: [x.type.name, x.x, x.y], self.items)))
-        # print(list(map(lambda x: x.type.name, self.items)))
 
     def draw(self, screen):
         """

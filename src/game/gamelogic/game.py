@@ -115,7 +115,8 @@ class Game:
             if self.playerList[id].is_alive():
                 # check if weapon is destroyed and give player fists if true
                 if self.playerList[id].weapon.destroyed and not self.playerList[id].weapon.animation_running:
-                    self.playerList[id].weapon = weapon.Weapon(weapon.WeaponType.Fist, self.map.directory + r"\waffen\faeuste",
+                    self.playerList[id].weapon = weapon.Weapon(weapon.WeaponType.Fist,
+                                                               self.map.directory + r"\waffen\faeuste",
                                                                [self.playerList[id].x, self.playerList[id].y],
                                                                self.playerList[id].weapon_path[
                                                                    weapon.WeaponType.Fist.name])
@@ -146,9 +147,9 @@ class Game:
                         new_weapon = w.getItem(self.playerList[id].solid_df, self.playerList[id].weapon.weapon_type)
                         if new_weapon is not None:
                             weapon_sound_file = "\\".join(str(self.playerList[id].weapon_path[
-                                                                           new_weapon.name]).split('\\')[:-2])
+                                                                  new_weapon.name]).split('\\')[:-2])
                             self.playerList[id].weapon = weapon.Weapon(new_weapon, weapon_sound_file,
-                                                        [self.playerList[id].x, self.playerList[id].y],
+                                                                       [self.playerList[id].x, self.playerList[id].y],
                                                                        self.playerList[id].weapon_path[
                                                                            new_weapon.name])
                             break
@@ -162,7 +163,8 @@ class Game:
                         # Check if Weapon is a short range weapon
                         if self.playerList[id].weapon.is_short_range_weapon():
                             # Start shot Animation
-                            self.playerList[id].weapon.start_animation_in_direction(self.playerList[id].animation_direction)
+                            self.playerList[id].weapon.start_animation_in_direction(
+                                self.playerList[id].animation_direction)
                         else:
                             # long distance weapon shot
                             print("Shot fired")
@@ -220,7 +222,8 @@ class Game:
                 self.playerList[i].animation_running = data_player[1]
                 self.playerList[i].animation_direction = data_player[2]
                 if self.playerList[i].weapon.weapon_type != weapon.WeaponType.getObj(data_weapon[3]):
-                    self.playerList[i].weapon = weapon.Weapon(weapon.WeaponType.getObj(data_weapon[3]), self.map.directory + r"\waffen\faeuste",
+                    self.playerList[i].weapon = weapon.Weapon(weapon.WeaponType.getObj(data_weapon[3]),
+                                                              self.map.directory + r"\waffen\faeuste",
                                                               [self.playerList[i].x, self.playerList[i].y],
                                                               self.playerList[i].weapon_path[
                                                                   weapon.WeaponType.getObj(data_weapon[3]).name])
@@ -241,7 +244,9 @@ class Game:
                             shot.x = s[1]
                             shot.y = s[2]
                     if not shot_found:
-                        self.playerList[i].weapon_shots.append(weapon_shot.WeaponShot((s[1], s[2]), s[4], player.Player.get_color_rgb(self.playerList[i]), s[3], s[5], shot_id=s[0]))
+                        self.playerList[i].weapon_shots.append(
+                            weapon_shot.WeaponShot((s[1], s[2]), s[4], player.Player.get_color_rgb(self.playerList[i]),
+                                                   s[3], s[5], shot_id=s[0]))
 
             for p in self.playerList:
                 if p == self.playerList[id]:
@@ -249,9 +254,6 @@ class Game:
                 p.refresh_solids()
 
             # sync items
-            # print(self.data["metadata"]["spawnpoints"]["items"])
-            # print(self.data["metadata"]["spawnpoints"]["items"])
-            # self.data["metadata"]["spawnpoints"]["items"] = {'Sword': [[110, 50]], 'Laser': [[1400, 50], [780, 380]]}
             self.map.setitems(self.data["metadata"]["spawnpoints"]["items"])
             # print("Handling pos parsing:", datetime.datetime.now() - timer)
             # timer = datetime.datetime.now()
@@ -473,7 +475,8 @@ class Game:
                         if key != str(self.id):
                             erg_shots.append(value2)
                         else:
-                            erg_shots.append(list(map(weapon_shot.WeaponShot.get_sync_data, self.playerList[int(self.data['id'])].weapon_shots)))
+                            erg_shots.append(list(map(weapon_shot.WeaponShot.get_sync_data,
+                                                      self.playerList[int(self.data['id'])].weapon_shots)))
             else:
                 continue
         return erg_player, erg_weapon, erg_health, erg_killed_by, erg_pos, erg_con, erg_shots
