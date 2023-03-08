@@ -84,6 +84,9 @@ def game_server(game_id, this_gid):
     while not players_connected[this_gid].__contains__(3) and players_connected[this_gid].count(
             0) != number_of_players_per_game:
         pass
+    game_data_dict[game_id]["metadata"]["spawnpoints"]["items"] = {"Sword": [],
+                                                                   "Laser": []
+                                                                   }
     game_data_dict[game_id]["metadata"]["start"] = (datetime.datetime.now() + datetime.timedelta(seconds=10)).strftime(
         "%d/%m/%Y, %H:%M:%S")
     game_data_dict[game_id]["metadata"]["end"] = (datetime.datetime.now() + datetime.timedelta(seconds=310)).strftime(
@@ -104,7 +107,7 @@ def game_server(game_id, this_gid):
                     potential_items_distances = list(map(lambda x: math.dist(p_pos, x), potential_items))
                     i = potential_items_distances.index(min(potential_items_distances))
                     game_data_dict[game_id]["metadata"]["spawnpoints"]["items"][wp].pop(i)
-        if datetime.datetime.now() - last_spawn_check > datetime.timedelta(seconds=10):
+        if datetime.datetime.now() - last_spawn_check > datetime.timedelta(seconds=20):
             last_spawn_check = datetime.datetime.now()
             for point in spawn_points[maps_dict[game_id]]["item_spawnpoints"]:
                 free = True
@@ -113,7 +116,6 @@ def game_server(game_id, this_gid):
                         free = False
                 for k, v in spawn_points[maps_dict[game_id]]["item-odds"].items():
                     r = random.random()
-                    print(r)
                     if r < v and free:
                         game_data_dict[game_id]["metadata"]["spawnpoints"]["items"][k].append(point)
                         break

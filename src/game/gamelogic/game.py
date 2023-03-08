@@ -71,7 +71,8 @@ class Game:
         self.new_fps_timer = datetime.datetime.now()
         self.show_scoreboard = False
 
-        # Sets the end_time of the game
+        # Sets the start and end time of the game
+        self.start_time = datetime.datetime.strptime(self.data["metadata"]["start"], "%d/%m/%Y, %H:%M:%S")
         self.end_time = datetime.datetime.strptime(self.data["metadata"]["end"], "%d/%m/%Y, %H:%M:%S")
 
         # Sound effects
@@ -87,6 +88,13 @@ class Game:
         """
         # pygame stuff
         # clock = pygame.time.Clock()
+
+        # Draw countdown
+        while datetime.datetime.now() < self.start_time:
+            self.canvas.get_canvas().fill((32, 32, 32))
+            self.canvas.draw_text(self.canvas.get_canvas(), str((self.start_time - datetime.datetime.now()).seconds),
+                                  300, (255, 255, 255), 700, 300)
+            self.canvas.update()
         run = True
 
         # just for comfort
@@ -143,7 +151,6 @@ class Game:
                 # pick up weapon
                 if keys[pygame.K_e]:
                     for w in self.map.items:
-                        print(f"{w.type.name} liegt an {w.x}, {w.y}")
                         new_weapon = w.getItem(self.playerList[id].solid_df, self.playerList[id].weapon.weapon_type)
                         if new_weapon is not None:
                             weapon_sound_file = "\\".join(str(self.playerList[id].weapon_path[
