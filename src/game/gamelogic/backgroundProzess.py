@@ -26,7 +26,7 @@ class backgroundProzess:
 
         self.position = [int(100), int(100)]
         self.player_frame = [0, False, 1]
-        self.weapon_frame = [0, False, 1, "Fist", 100]
+        self.weapon_data = [0, False, 1, "Fist", 100]
         self.health = 100
         self.killed_by = [0, 0, 0, 0, 0]
         self.shots: List[weapon_shot.WeaponShot] = []
@@ -82,11 +82,10 @@ class backgroundProzess:
         data['position'] = self.position
         data['connected'] = True
         data['player_frame'] = self.player_frame
-        data['weapon_frame'] = self.weapon_frame
+        data['weapon_data'] = self.weapon_data
         data['health'] = self.health
         data['killed_by'] = self.killed_by
         data['shots'] = self.shots
-        print(data)
         self.reply = self.net.send(json.dumps(data))
         try:
             self.reply = json.loads(self.reply)
@@ -101,7 +100,7 @@ class backgroundProzess:
             data = self.conn.recv()
             self.position = data['position']
             self.player_frame = data['player_frame']
-            self.weapon_frame = data['weapon_frame']
+            self.weapon_data = data['weapon_data']
             self.health = data['health']
             self.killed_by = data['killed_by']
             self.shots = data['shots']

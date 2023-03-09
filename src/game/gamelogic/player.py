@@ -57,11 +57,8 @@ class Player(Animated):
             weapon.WeaponType.Sword.name: map_dir + f"\\waffen\\schwert\\animation\\sword_hold_animation_{self.get_color(self.directory)}",
             weapon.WeaponType.Laser.name: map_dir + f"\\waffen\\laser\\animation\\laser_hold_{self.get_color(self.directory)}"
         }
-        # self.weapon = weapon.Weapon(weapon.WeaponType.Fist, [self.x, self.y],
-        #                             self.weapon_path[weapon.WeaponType.Fist.name])
-        weapon_sound_file = map_dir + r"\waffen\laser"
-        self.weapon = weapon.Weapon(weapon.WeaponType.Laser, weapon_sound_file, 0.9, [self.x, self.y],
-                                    self.weapon_path[weapon.WeaponType.Laser.name])
+        self.weapon = weapon.Weapon(weapon.WeaponType.Fist, map_dir + r"\waffen\faeuste", [self.x, self.y],
+                                    self.weapon_path[weapon.WeaponType.Fist.name])
 
         self.death_animation = Animated(start=[0, 0],
                                         directory=map_dir + f"\\player\\death_animation\\death_animation_{self.get_color(self.directory)}")
@@ -372,4 +369,6 @@ class Player(Animated):
         pos = self.weapon.get_position_weapon_shot(x=self.x, y=self.y, width=self.frame_width, height=self.frame_height)
         # Add shot to array
         print(Player.get_color_rgb(self))
-        self.weapon_shots.append(WeaponShot(pos, self.weapon.get_shot_speed(), Player.get_color_rgb(self), shot_direction, self.weapon.get_weapon_damage()))
+        self.weapon_shots.append(
+            WeaponShot(pos, self.weapon.get_shot_speed(), Player.get_color_rgb(self), shot_direction,
+                       self.weapon.get_weapon_damage()))

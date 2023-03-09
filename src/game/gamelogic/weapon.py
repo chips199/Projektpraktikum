@@ -3,27 +3,28 @@ from datetime import datetime
 from enum import Enum
 
 import pandas as pd
+import pygame.image
 
 from src.game.gamelogic.animated import Animated
 from src.game.gamelogic.sounds import Sounds
 
 
 class WeaponType(Enum):
-    Fist = {"Damage": 10, "damage_to_weapon_per_hit": 0, "Cooldown": 1, "IsShortRange": True, "shot_speed": 0}
-    Sword = {"Damage": 20, "damage_to_weapon_per_hit": 10, "Cooldown": 2, "IsShortRange": True, "shot_speed": 0}
-    Laser = {"Damage": 15, "damage_to_weapon_per_hit": 10, "Cooldown": 2, "IsShortRange": False, "shot_speed": 15}
+    Fist = {"Damage": 10, "damage_to_weapon_per_hit": 0, "Cooldown": 1, "IsShortRange": True, "shot_speed": 0, "sound_level": 1}
+    Sword = {"Damage": 20, "damage_to_weapon_per_hit": 10, "Cooldown": 2, "IsShortRange": True, "shot_speed": 0, "sound_level": 1}
+    Laser = {"Damage": 15, "damage_to_weapon_per_hit": 10, "Cooldown": 2, "IsShortRange": False, "shot_speed": 15, "sound_level": 0.9}
 
     @staticmethod
     def getObj(string):
         for e in WeaponType:
             if e.name == string:
                 return e
-        return WeaponType.Sword
+        return WeaponType.Fist
 
 
 class Weapon(Animated):
 
-    def __init__(self, weapon_type, impact_sound_path, impact_sound_path_volume, *args, **kwargs):
+    def __init__(self, weapon_type, impact_sound_path, *args, **kwargs):
         """
         Initialize the class weapon
         :param impact_sound_path: Path to the sound-file
@@ -34,12 +35,19 @@ class Weapon(Animated):
         self.weapon_type = weapon_type
         if self.weapon_type == WeaponType.Fist:
             self.cut_frames(2)
+        self.drop_img = None
+        try:
+            self.drop_img = pygame.image.load(
+                "\\".join(self.directory.split("\\")[:-2]) + "\\" + self.weapon_type.name + ".png").convert_alpha()
+        except FileNotFoundError:
+            pass
         self.last_hit = int(round(datetime.now().timestamp()))
         self.hitted = list()
         self.hitted_me = False
         self.durability = 100
         self.abs_l, self.abs_r, self.rel_l, self.rel_r = self.load_dfs()
         # Loads the sound of the weapon
+        impact_sound_path_volume = self.weapon_type.value['sound_level']
         self.sound_hit = Sounds(impact_sound_path + r"\sound_effects\sound_hit.mp3", impact_sound_path_volume)
         self.sound_destroy = Sounds(impact_sound_path + r"\sound_effects\sound_destroy.mp3", impact_sound_path_volume)
 

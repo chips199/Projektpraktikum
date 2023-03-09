@@ -31,8 +31,7 @@ pygame.font.init()
 class Game:
 
     def __init__(self, w, h, conn, process):
-        self.kills_to_win = 1
-
+        self.kills_to_win = 5
         self.counter = 0
         self.conn = conn
         self.process = process
@@ -71,7 +70,8 @@ class Game:
         self.new_fps_timer = datetime.datetime.now()
         self.show_scoreboard = False
 
-        # Sets the end_time of the game
+        # Sets the start and end time of the game
+        self.start_time = datetime.datetime.strptime(self.data["metadata"]["start"], "%d/%m/%Y, %H:%M:%S")
         self.end_time = datetime.datetime.strptime(self.data["metadata"]["end"], "%d/%m/%Y, %H:%M:%S")
 
         # Sound effects
@@ -87,6 +87,13 @@ class Game:
         """
         # pygame stuff
         # clock = pygame.time.Clock()
+
+        # Draw countdown
+        while datetime.datetime.now() < self.start_time:
+            self.canvas.get_canvas().fill((32, 32, 32))
+            self.canvas.draw_text(self.canvas.get_canvas(), str((self.start_time - datetime.datetime.now()).seconds),
+                                  300, (255, 255, 255), 700, 300)
+            self.canvas.update()
         run = True
 
         # just for comfort
@@ -115,7 +122,8 @@ class Game:
             if self.playerList[id].is_alive():
                 # check if weapon is destroyed and give player fists if true
                 if self.playerList[id].weapon.destroyed and not self.playerList[id].weapon.animation_running:
-                    self.playerList[id].weapon = weapon.Weapon(weapon.WeaponType.Fist, self.map.directory + r"\waffen\faeuste", 1.0,
+                    self.playerList[id].weapon = weapon.Weapon(weapon.WeaponType.Fist,
+                                                               self.map.directory + r"\waffen\faeuste",
                                                                [self.playerList[id].x, self.playerList[id].y],
                                                                self.playerList[id].weapon_path[
                                                                    weapon.WeaponType.Fist.name])
@@ -138,6 +146,20 @@ class Game:
                     self.show_scoreboard = True
                 else:
                     self.show_scoreboard = False
+
+                # pick up weapon
+                if keys[pygame.K_e]:
+                    for w in self.map.items:
+                        new_weapon = w.getItem(self.playerList[id].solid_df, self.playerList[id].weapon.weapon_type)
+                        if new_weapon is not None:
+                            weapon_sound_file = "\\".join(str(self.playerList[id].weapon_path[
+                                                                  new_weapon.name]).split('\\')[:-2])
+                            self.playerList[id].weapon = weapon.Weapon(new_weapon, weapon_sound_file,
+                                                                       [self.playerList[id].x, self.playerList[id].y],
+                                                                       self.playerList[id].weapon_path[
+                                                                           new_weapon.name])
+                            break
+
                 # Hit
                 if keys[pygame.K_s]:
                     # Check if Player can use his weapon
@@ -147,7 +169,8 @@ class Game:
                         # Check if Weapon is a short range weapon
                         if self.playerList[id].weapon.is_short_range_weapon():
                             # Start shot Animation
-                            self.playerList[id].weapon.start_animation_in_direction(self.playerList[id].animation_direction)
+                            self.playerList[id].weapon.start_animation_in_direction(
+                                self.playerList[id].animation_direction)
                         else:
                             # long distance weapon shot
                             print("Shot fired")
@@ -205,7 +228,8 @@ class Game:
                 self.playerList[i].animation_running = data_player[1]
                 self.playerList[i].animation_direction = data_player[2]
                 if self.playerList[i].weapon.weapon_type != weapon.WeaponType.getObj(data_weapon[3]):
-                    self.playerList[i].weapon = weapon.Weapon(weapon.WeaponType.getObj(data_weapon[3]), self.map.directory + r"\waffen\faeuste", 1.0,
+                    self.playerList[i].weapon = weapon.Weapon(weapon.WeaponType.getObj(data_weapon[3]),
+                                                              self.map.directory + r"\waffen\faeuste",
                                                               [self.playerList[i].x, self.playerList[i].y],
                                                               self.playerList[i].weapon_path[
                                                                   weapon.WeaponType.getObj(data_weapon[3]).name])
@@ -226,12 +250,17 @@ class Game:
                             shot.x = s[1]
                             shot.y = s[2]
                     if not shot_found:
-                        self.playerList[i].weapon_shots.append(weapon_shot.WeaponShot((s[1], s[2]), s[4], player.Player.get_color_rgb(self.playerList[i]), s[3], s[5], shot_id=s[0]))
+                        self.playerList[i].weapon_shots.append(
+                            weapon_shot.WeaponShot((s[1], s[2]), s[4], player.Player.get_color_rgb(self.playerList[i]),
+                                                   s[3], s[5], shot_id=s[0]))
 
             for p in self.playerList:
                 if p == self.playerList[id]:
                     continue
                 p.refresh_solids()
+
+            # sync items
+            self.map.setitems(self.data["metadata"]["spawnpoints"]["items"])
             # print("Handling pos parsing:", datetime.datetime.now() - timer)
             # timer = datetime.datetime.now()
 
@@ -378,11 +407,11 @@ class Game:
             "player_frame": [self.playerList[int(self.data['id'])].current_frame,
                              self.playerList[int(self.data['id'])].animation_running,
                              self.playerList[int(self.data['id'])].animation_direction],
-            "weapon_frame": [self.playerList[int(self.data['id'])].weapon.current_frame,
-                             self.playerList[int(self.data['id'])].weapon.animation_running,
-                             self.playerList[int(self.data['id'])].weapon.animation_direction,
-                             self.playerList[int(self.data['id'])].weapon.weapon_type.name,
-                             self.playerList[int(self.data['id'])].weapon.durability],
+            "weapon_data": [self.playerList[int(self.data['id'])].weapon.current_frame,
+                            self.playerList[int(self.data['id'])].weapon.animation_running,
+                            self.playerList[int(self.data['id'])].weapon.animation_direction,
+                            self.playerList[int(self.data['id'])].weapon.weapon_type.name,
+                            self.playerList[int(self.data['id'])].weapon.durability],
             "health": self.playerList[int(self.data['id'])].health,
             "killed_by": self.playerList[int(self.data['id'])].killed_by,
             "shots": list(map(weapon_shot.WeaponShot.get_sync_data, self.playerList[int(self.data['id'])].weapon_shots))
@@ -418,7 +447,7 @@ class Game:
                             erg_player.append([self.playerList[int(self.data["id"])].current_frame,
                                                self.playerList[int(self.data["id"])].animation_running,
                                                self.playerList[int(self.data["id"])].animation_direction])
-                    elif key2 == "weapon_frame":
+                    elif key2 == "weapon_data":
                         if key != str(self.id):
                             erg_weapon.append(value2)
                         else:
@@ -452,7 +481,8 @@ class Game:
                         if key != str(self.id):
                             erg_shots.append(value2)
                         else:
-                            erg_shots.append(list(map(weapon_shot.WeaponShot.get_sync_data, self.playerList[int(self.data['id'])].weapon_shots)))
+                            erg_shots.append(list(map(weapon_shot.WeaponShot.get_sync_data,
+                                                      self.playerList[int(self.data['id'])].weapon_shots)))
             else:
                 continue
         return erg_player, erg_weapon, erg_health, erg_killed_by, erg_pos, erg_con, erg_shots
