@@ -173,7 +173,6 @@ class Game:
                                 self.playerList[id].animation_direction)
                         else:
                             # long distance weapon shot
-                            print("Shot fired")
                             self.playerList[id].add_shot()
 
                 if keys[pygame.K_d] and not self.playerList[id].block_x_axis:
