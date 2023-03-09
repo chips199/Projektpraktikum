@@ -31,8 +31,7 @@ pygame.font.init()
 class Game:
 
     def __init__(self, w, h, conn, process):
-        self.kills_to_win = 1
-
+        self.kills_to_win = 5
         self.counter = 0
         self.conn = conn
         self.process = process

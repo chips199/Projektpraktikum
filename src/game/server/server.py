@@ -309,8 +309,9 @@ def threaded_client(conn):
             # if the connection doesn't exist anymore break the loop
             break
         if (datetime.datetime.now() - last_msg).seconds > 5:
-            # if the last message is more than 5 seconds old the connection timedout
+            # if the last message is more than 5 seconds old theconnection timedout
             print("Connection timeout")
+
             break
 
     print("Connection Closed")
