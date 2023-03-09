@@ -6,9 +6,10 @@ import datetime
 import pandas as pd
 import pygame
 
+from src.game.gamelogic.animated import Animated
 from src.game.gamelogic.canvas import Canvas
 
-from src.game.gamelogic import canvas
+from src.game.gamelogic import canvas, weapon_shot
 from src.game.gamelogic.map import Map
 from src.game.gamelogic import player as player
 from src.game.gamelogic import weapon as weapon
@@ -30,8 +31,7 @@ pygame.font.init()
 class Game:
 
     def __init__(self, w, h, conn, process):
-        self.kills_to_win = 1
-
+        self.kills_to_win = 5
         self.counter = 0
         self.conn = conn
         self.process = process
@@ -70,7 +70,8 @@ class Game:
         self.new_fps_timer = datetime.datetime.now()
         self.show_scoreboard = False
 
-        # Sets the end_time of the game
+        # Sets the start and end time of the game
+        self.start_time = datetime.datetime.strptime(self.data["metadata"]["start"], "%d/%m/%Y, %H:%M:%S")
         self.end_time = datetime.datetime.strptime(self.data["metadata"]["end"], "%d/%m/%Y, %H:%M:%S")
 
         # Sound effects
@@ -86,6 +87,13 @@ class Game:
         """
         # pygame stuff
         # clock = pygame.time.Clock()
+
+        # Draw countdown
+        while datetime.datetime.now() < self.start_time:
+            self.canvas.get_canvas().fill((32, 32, 32))
+            self.canvas.draw_text(self.canvas.get_canvas(), str((self.start_time - datetime.datetime.now()).seconds),
+                                  300, (255, 255, 255), 700, 300)
+            self.canvas.update()
         run = True
 
         # just for comfort
@@ -114,7 +122,8 @@ class Game:
             if self.playerList[id].is_alive():
                 # check if weapon is destroyed and give player fists if true
                 if self.playerList[id].weapon.destroyed and not self.playerList[id].weapon.animation_running:
-                    self.playerList[id].weapon = weapon.Weapon(weapon.WeaponType.Fist, self.map.directory + r"\waffen\faeuste", 1.0,
+                    self.playerList[id].weapon = weapon.Weapon(weapon.WeaponType.Fist,
+                                                               self.map.directory + r"\waffen\faeuste",
                                                                [self.playerList[id].x, self.playerList[id].y],
                                                                self.playerList[id].weapon_path[
                                                                    weapon.WeaponType.Fist.name])
@@ -137,13 +146,35 @@ class Game:
                     self.show_scoreboard = True
                 else:
                     self.show_scoreboard = False
+
+                # pick up weapon
+                if keys[pygame.K_e]:
+                    for w in self.map.items:
+                        new_weapon = w.getItem(self.playerList[id].solid_df, self.playerList[id].weapon.weapon_type)
+                        if new_weapon is not None:
+                            weapon_sound_file = "\\".join(str(self.playerList[id].weapon_path[
+                                                                  new_weapon.name]).split('\\')[:-2])
+                            self.playerList[id].weapon = weapon.Weapon(new_weapon, weapon_sound_file,
+                                                                       [self.playerList[id].x, self.playerList[id].y],
+                                                                       self.playerList[id].weapon_path[
+                                                                           new_weapon.name])
+                            break
+
                 # Hit
                 if keys[pygame.K_s]:
                     # Check if Player can use his weapon
                     if self.playerList[id].weapon.can_hit():
-                        # Check if an enemy player is in range
+                        # hit with the weapon
                         self.playerList[id].weapon.hit()
-                        self.playerList[id].weapon.start_animation_in_direction(self.playerList[id].animation_direction)
+                        # Check if Weapon is a short range weapon
+                        if self.playerList[id].weapon.is_short_range_weapon():
+                            # Start shot Animation
+                            self.playerList[id].weapon.start_animation_in_direction(
+                                self.playerList[id].animation_direction)
+                        else:
+                            # long distance weapon shot
+                            print("Shot fired")
+                            self.playerList[id].add_shot()
 
                 if keys[pygame.K_d] and not self.playerList[id].block_x_axis:
                     if self.playerList[id].landed:
@@ -190,14 +221,15 @@ class Game:
             # timer = datetime.datetime.now()
 
             # sync data
-            self.player_frames, self.weapon_frames, health, killed, pos, con = self.parse()
-            for i, (data_player, data_weapon, health, killed, pos, con) in enumerate(
-                    zip(self.player_frames, self.weapon_frames, health, killed, pos, con)):
+            self.player_frames, self.weapon_frames, health, killed, pos, con, shots = self.parse()
+            for i, (data_player, data_weapon, health, killed, pos, con, shots) in enumerate(
+                    zip(self.player_frames, self.weapon_frames, health, killed, pos, con, shots)):
                 self.playerList[i].current_frame = data_player[0]
                 self.playerList[i].animation_running = data_player[1]
                 self.playerList[i].animation_direction = data_player[2]
                 if self.playerList[i].weapon.weapon_type != weapon.WeaponType.getObj(data_weapon[3]):
-                    self.playerList[i].weapon = weapon.Weapon(weapon.WeaponType.getObj(data_weapon[3]), self.map.directory + r"\waffen\faeuste", 1.0,
+                    self.playerList[i].weapon = weapon.Weapon(weapon.WeaponType.getObj(data_weapon[3]),
+                                                              self.map.directory + r"\waffen\faeuste",
                                                               [self.playerList[i].x, self.playerList[i].y],
                                                               self.playerList[i].weapon_path[
                                                                   weapon.WeaponType.getObj(data_weapon[3]).name])
@@ -210,10 +242,25 @@ class Game:
                 self.playerList[i].x, self.playerList[i].y = pos
                 self.playerList[i].is_connected = con
 
+                for s in shots:
+                    shot_found = False
+                    for shot in self.playerList[i].weapon_shots:
+                        if s[0] == shot.shot_id:
+                            shot_found = True
+                            shot.x = s[1]
+                            shot.y = s[2]
+                    if not shot_found:
+                        self.playerList[i].weapon_shots.append(
+                            weapon_shot.WeaponShot((s[1], s[2]), s[4], player.Player.get_color_rgb(self.playerList[i]),
+                                                   s[3], s[5], shot_id=s[0]))
+
             for p in self.playerList:
                 if p == self.playerList[id]:
                     continue
                 p.refresh_solids()
+
+            # sync items
+            self.map.setitems(self.data["metadata"]["spawnpoints"]["items"])
             # print("Handling pos parsing:", datetime.datetime.now() - timer)
             # timer = datetime.datetime.now()
 
@@ -223,6 +270,17 @@ class Game:
             for p in self.playerList:
                 if p.is_connected:
                     p.draw(self.canvas.get_canvas())
+                    # Draw Shots
+                    for shot in p.weapon_shots:
+                        for ps in self.playerList:
+                            if ps.id != id and not pd.merge(ps.solid_df, shot.get_dataframe(), how='inner',
+                                                            on=['x', 'y']).empty:
+                                shot.active = False
+                        if shot.is_active():
+                            shot.draw(self.canvas.get_canvas())
+                            shot.move(self)
+                        else:
+                            p.weapon_shots.remove(shot)
             if not self.playerList[id].is_alive():
                 # Draw Death-screen
                 self.canvas.get_canvas().blit(pygame.image.load(wrk_dir + '\\wasted.png').convert_alpha(), (0, 0))
@@ -349,13 +407,14 @@ class Game:
             "player_frame": [self.playerList[int(self.data['id'])].current_frame,
                              self.playerList[int(self.data['id'])].animation_running,
                              self.playerList[int(self.data['id'])].animation_direction],
-            "weapon_frame": [self.playerList[int(self.data['id'])].weapon.current_frame,
-                             self.playerList[int(self.data['id'])].weapon.animation_running,
-                             self.playerList[int(self.data['id'])].weapon.animation_direction,
-                             self.playerList[int(self.data['id'])].weapon.weapon_type.name,
-                             self.playerList[int(self.data['id'])].weapon.durability],
+            "weapon_data": [self.playerList[int(self.data['id'])].weapon.current_frame,
+                            self.playerList[int(self.data['id'])].weapon.animation_running,
+                            self.playerList[int(self.data['id'])].weapon.animation_direction,
+                            self.playerList[int(self.data['id'])].weapon.weapon_type.name,
+                            self.playerList[int(self.data['id'])].weapon.durability],
             "health": self.playerList[int(self.data['id'])].health,
-            "killed_by": self.playerList[int(self.data['id'])].killed_by
+            "killed_by": self.playerList[int(self.data['id'])].killed_by,
+            "shots": list(map(weapon_shot.WeaponShot.get_sync_data, self.playerList[int(self.data['id'])].weapon_shots))
         }
         self.conn.send(temp_data)
 
@@ -376,6 +435,7 @@ class Game:
         erg_killed_by = []
         erg_pos = []
         erg_con = []
+        erg_shots = []
         for key, value in self.data.items():
             # since a fifth dictionary entry named 'id' is added for the player id, ignore this key/entry
             if key != "id" and key != "metadata":
@@ -387,7 +447,7 @@ class Game:
                             erg_player.append([self.playerList[int(self.data["id"])].current_frame,
                                                self.playerList[int(self.data["id"])].animation_running,
                                                self.playerList[int(self.data["id"])].animation_direction])
-                    elif key2 == "weapon_frame":
+                    elif key2 == "weapon_data":
                         if key != str(self.id):
                             erg_weapon.append(value2)
                         else:
@@ -417,9 +477,15 @@ class Game:
                             erg_con.append(value2)
                         else:
                             erg_con.append(True)
+                    elif key2 == "shots":
+                        if key != str(self.id):
+                            erg_shots.append(value2)
+                        else:
+                            erg_shots.append(list(map(weapon_shot.WeaponShot.get_sync_data,
+                                                      self.playerList[int(self.data['id'])].weapon_shots)))
             else:
                 continue
-        return erg_player, erg_weapon, erg_health, erg_killed_by, erg_pos, erg_con
+        return erg_player, erg_weapon, erg_health, erg_killed_by, erg_pos, erg_con, erg_shots
 
     def next_to_solid(self, player, dirn, distance):
         """
@@ -429,25 +495,32 @@ class Game:
         :param distance: the range in which to check
         :return: integer representing the distance to the next object within the range
         """
+        return self.next_to_solid_df(player.solid_df, dirn, distance)
+
+    def next_to_solid_df(self, input_df, dirn, distance):
+        """
+        calculates the distance to the nearest object in one direction in a range
+        :param input_df: the current dataframe
+        :param dirn: the direction
+        :param distance: the range in which to check
+        :return: integer representing the distance to the next object within the range
+        """
         # first combining all solid pixels in one dataframe
-        # other_players = self.playerList[:self.id] + self.playerList[self.id + 1:]
         solid_pixels_df = copy(self.map.solid_df)
-        # for op in other_players:
-        #     solid_pixels_df = pd.concat([solid_pixels_df, op.solid_df])
-        # getting copy of the players solid dataframe
-        simulated_player = copy(player.solid_df)
+        # getting copy of the solid dataframe
+        df = copy(input_df)
         erg = 0
 
-        player.shift_df(simulated_player, dirn, distance)
-        if pd.merge(simulated_player, solid_pixels_df, how='inner', on=['x', 'y']).empty:
+        Animated.shift_df(df, dirn, distance)
+        if pd.merge(df, solid_pixels_df, how='inner', on=['x', 'y']).empty:
             erg = distance
             return erg
-        player.shift_df(simulated_player, dirn, -distance)
+        Animated.shift_df(df, dirn, -distance)
 
         # checking for each pixel if a move ment would cause a collision
         for _ in range(distance):
-            player.shift_df(simulated_player, dirn, 1)
-            if not pd.merge(simulated_player, solid_pixels_df, how='inner', on=['x', 'y']).empty:
+            Animated.shift_df(df, dirn, 1)
+            if not pd.merge(df, solid_pixels_df, how='inner', on=['x', 'y']).empty:
                 return erg
             erg += 1
         return erg

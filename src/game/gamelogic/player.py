@@ -7,6 +7,7 @@ import pygame.draw
 from src.game.gamelogic import weapon
 from src.game.gamelogic.animated import Animated
 from src.game.gamelogic.sounds import Sounds
+from src.game.gamelogic.weapon_shot import WeaponShot
 
 
 class Player(Animated):
@@ -14,7 +15,6 @@ class Player(Animated):
     height_jump = 200
     status_jump = 0
     is_connected = False
-    mousepos = (0, 0)
     health = 100
 
     def __init__(self, pid, *args, killed_by=None, **kwargs):
@@ -44,6 +44,8 @@ class Player(Animated):
         self.death_time = datetime.datetime.now()
         # self.color = color
         self.weapon = weapon
+        # The shots of the long distance weapon
+        self.weapon_shots = []
         self.velocity_counter = 0
         self.velocity_counter2 = 0
         self.sliding_frame_counter = self.max_sliding_frames = 50
@@ -52,13 +54,11 @@ class Player(Animated):
         # Start Weapon
         self.weapon_path = {
             weapon.WeaponType.Fist.name: map_dir + f"\\waffen\\faeuste\\animation\\fists_{self.get_color(self.directory)}_animation",
-            weapon.WeaponType.Sword.name: map_dir + f"\\waffen\\schwert\\animation\\sword_hold_animation_{self.get_color(self.directory)}"
+            weapon.WeaponType.Sword.name: map_dir + f"\\waffen\\schwert\\animation\\sword_hold_animation_{self.get_color(self.directory)}",
+            weapon.WeaponType.Laser.name: map_dir + f"\\waffen\\laser\\animation\\laser_hold_{self.get_color(self.directory)}"
         }
-        # self.weapon = weapon.Weapon(weapon.WeaponType.Fist, [self.x, self.y],
-        #                             self.weapon_path[weapon.WeaponType.Fist.name])
-        weapon_sound_file = map_dir + r"\waffen\schwert"
-        self.weapon = weapon.Weapon(weapon.WeaponType.Sword, weapon_sound_file, 0.9, [self.x, self.y],
-                                    self.weapon_path[weapon.WeaponType.Sword.name])
+        self.weapon = weapon.Weapon(weapon.WeaponType.Fist, map_dir + r"\waffen\faeuste", [self.x, self.y],
+                                    self.weapon_path[weapon.WeaponType.Fist.name])
 
         self.death_animation = Animated(start=[0, 0],
                                         directory=map_dir + f"\\player\\death_animation\\death_animation_{self.get_color(self.directory)}")
@@ -152,50 +152,33 @@ class Player(Animated):
                 self.sound_die.play()
                 self.sound_die_played = True
 
-    @staticmethod
-    def shift_df(df, dirn, n):
-        """
-        "moves" dataframe of coordinates
-        :param df: dataframe
-        :param dirn: direction
-        :param n: distance
-        :return: new dataframe
-        """
-        if dirn == 0:
-            df['x'] = df['x'].map(lambda x: x + n)
-        elif dirn == 1:
-            df['x'] = df['x'].map(lambda x: x - n)
-        elif dirn == 2:
-            df['y'] = df['y'].map(lambda y: y - n)
-        else:
-            df['y'] = df['y'].map(lambda y: y + n)
-        return df
-
     def move(self, dirn, v=-99):
         """
         :param dirn: 0 - 3 (right, left, up, down)
         :param    v: velocity
         :return: None
         """
+        # set speed to current_moving_velocity value if v is -99
         if v == -99:
             v = self.current_moving_velocity
 
-        if dirn == 0:
+        if dirn == 0:  # Move right
             self.animation_direction = 0
             self.x += v
             self.weapon.x += v
-        elif dirn == 1:
+        elif dirn == 1:  # Move left
             self.animation_direction = 1
             self.x -= v
             self.weapon.x -= v
-        elif dirn == 2:
+        elif dirn == 2:  # Move up
             self.y -= v
             self.weapon.y -= v
-        else:
+        else:  # Move down
             self.y += v
             self.weapon.y += v
 
-        self.solid_df = Player.shift_df(self.solid_df, dirn, v)  # type:ignore[has-type]
+        # Adjust dataframe of the player according to the movement
+        self.solid_df = self.shift_df(self.solid_df, dirn, v)  # type:ignore[has-type]
 
     def jump(self, func):
         """
@@ -313,7 +296,7 @@ class Player(Animated):
                         self.shift_df(df=self.solid_df, dirn=1, n=moving_factor)
                         self.move(dirn=0, v=int(moving_factor))
                         self.move(dirn=3, v=int(vel))
-                        # to be able to slide on snowmap after ending the hill
+                        # to be able to slide on snow-map after ending the hill
                         self.moving_on_edge = True
                         self.reset_sliding_counter()
 
@@ -327,7 +310,7 @@ class Player(Animated):
                             self.shift_df(df=self.solid_df, dirn=0, n=moving_factor)
                             self.move(dirn=1, v=int(moving_factor))
                             self.move(dirn=3, v=int(vel))
-                            # to be able to slide on snowmap after ending the hill
+                            # to be able to slide on snow-map after ending the hill
                             self.moving_on_edge = True
                             self.reset_sliding_counter()
 
@@ -344,6 +327,10 @@ class Player(Animated):
 
     @staticmethod
     def get_color(p):
+        """
+        Returns the color of the player
+        param: p: Player
+        """
         if p.__contains__("magenta"):
             return "magenta"
         elif p.__contains__("orange"):
@@ -352,3 +339,36 @@ class Player(Animated):
             return "purple"
         else:
             return "turquoise"
+
+    @staticmethod
+    def get_color_rgb(p):
+        """
+        Returns the color of the player in hex
+        param: p: Player
+        """
+        if p.directory.__contains__("magenta"):
+            return pygame.Color(227, 0, 113)
+        elif p.directory.__contains__("orange"):
+            return pygame.Color(254, 174, 24)
+        elif p.directory.__contains__("purple"):
+            return pygame.Color(159, 2, 238)
+        else:
+            return pygame.Color(0, 195, 150)
+
+    def add_shot(self):
+        """
+        Starts a new shot from a ranged weapon
+        """
+        # Direction of the shot
+        shot_direction = self.animation_direction
+        if self.animation_direction == 0:
+            shot_direction = 1
+        elif self.animation_direction == 1:
+            shot_direction = -1
+        # determine start position from shot
+        pos = self.weapon.get_position_weapon_shot(x=self.x, y=self.y, width=self.frame_width, height=self.frame_height)
+        # Add shot to array
+        print(Player.get_color_rgb(self))
+        self.weapon_shots.append(
+            WeaponShot(pos, self.weapon.get_shot_speed(), Player.get_color_rgb(self), shot_direction,
+                       self.weapon.get_weapon_damage()))

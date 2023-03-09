@@ -6,7 +6,8 @@
 	"health": 100,
     "player_frame": [0, false, 1],
     "weapon_data": [0, false, 1, "Fist", 100],
-    "killed_by": [0, 0, 0, 0, 0]
+    "killed_by": [0, 0, 0, 0, 0],
+    "shots": []
   },
   "1": {
     "id": 1,
@@ -15,7 +16,8 @@
 	"health": 100,
     "player_frame": [0, false, 1],
     "weapon_data": [0, false, 1, "Fist", 100],
-    "killed_by": [0, 0, 0, 0, 0]
+    "killed_by": [0, 0, 0, 0, 0],
+    "shots": []
   },
   "2": {
     "id": 2,
@@ -24,7 +26,8 @@
 	"health": 100,
     "player_frame": [0, false, 1],
     "weapon_data": [0, false, 1, "Fist", 100],
-    "killed_by": [0, 0, 0, 0, 0]
+    "killed_by": [0, 0, 0, 0, 0],
+    "shots": []
   },
   "3": {
     "id": 3,
@@ -33,7 +36,8 @@
 	"health": 100,
     "player_frame": [0, false, 1],
     "weapon_data": [0, false, 1, "Fist", 100],
-    "killed_by": [0, 0, 0, 0, 0]
+    "killed_by": [0, 0, 0, 0, 0],
+    "shots": []
   },
   "metadata": {
     "start": "",
@@ -44,7 +48,11 @@
       "1" : [0,0],
       "2" : [0,0],
       "3" : [0,0],
-      "velocity": [7, 7, 20, 0]
+      "velocity": [7, 7, 20, 0],
+      "items": {
+        "Sword": [],
+        "Laser": []
+      }
     },
     "scoreboard": {
     "0" : [0,0],
