@@ -84,7 +84,6 @@ class Map:
 
         self.solid_df = pd.DataFrame(solid, columns=['x', 'y'])
 
-
         # generate one picture out of all solid and not solid images.
         comb_images = self.staticimages.copy()
         if len(comb_images) != 0:
