@@ -56,7 +56,7 @@ class Map:
                 img = img.convert_alpha()
             except:
                 continue
-            print(str(simg) + ' erfolgreich in pygame geladen')
+            print(str(simg) + ' successfully loaded into pygame')
             self.staticimages.append(img)
 
         # combine all static images into one, then use laplace to detect edges.
