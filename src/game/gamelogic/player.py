@@ -368,7 +368,6 @@ class Player(Animated):
         # determine start position from shot
         pos = self.weapon.get_position_weapon_shot(x=self.x, y=self.y, width=self.frame_width, height=self.frame_height)
         # Add shot to array
-        print(Player.get_color_rgb(self))
         self.weapon_shots.append(
             WeaponShot(pos, self.weapon.get_shot_speed(), Player.get_color_rgb(self), shot_direction,
                        self.weapon.get_weapon_damage()))
