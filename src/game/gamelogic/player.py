@@ -23,6 +23,8 @@ class Player(Animated):
 
         if killed_by is None:
             killed_by = [0, 0, 0, 0, 0]
+
+        self.map = self.get_map(self.directory)
         self.falling_time = datetime.now()
         self.jumping_time = datetime.now()
         self.id = pid
@@ -68,7 +70,7 @@ class Player(Animated):
         self.shield_left = pygame.transform.flip(self.shield_right, True, False)
         self.blocking_start_time = datetime.now().timestamp()
         self.last_block = datetime.now().timestamp()
-        self.renew_shield_cooldown = 2
+        self.renew_shield_cooldown = 0
         self.hold_shield_cooldown = 1
 
         # Sound effects:
@@ -148,23 +150,37 @@ class Player(Animated):
                                  width=3)
 
             if self.is_blocking:
-                if self.animation_direction == 0:
-                    player_rec = pygame.Rect(self.x-1, self.y-3, self.frame_width, self.frame_height)
-                    g.blit(self.shield_right, player_rec)
-                else:
-                    player_rec = pygame.Rect(self.x-39, self.y-3, self.frame_width, self.frame_height)
-                    g.blit(self.shield_left, player_rec)
+                player_rec = pygame.Rect(self.x - 1, self.y - 3, self.frame_width, self.frame_height)
+                g.blit(self.shield_right, player_rec)
+                player_rec = pygame.Rect(self.x - 42, self.y - 3, self.frame_width, self.frame_height)
+                g.blit(self.shield_left, player_rec)
+
+                # if self.animation_direction == 0:
+                #     player_rec = pygame.Rect(self.x-1, self.y-3, self.frame_width, self.frame_height)
+                #     g.blit(self.shield_right, player_rec)
+                # else:
+                #     player_rec = pygame.Rect(self.x-39, self.y-3, self.frame_width, self.frame_height)
+                #     g.blit(self.shield_left, player_rec)
 
             self.weapon.animation_direction = self.animation_direction
             self.weapon.draw(g=g, x=self.x, y=self.y, width=self.frame_width, height=self.frame_height)
 
             # blood splash animation
             if self.weapon.hitted_me or self.blood_animation.current_frame > 0:
+                y = 0
+                x = 0
+                if self.map == "basic":
+                    y = 40
+                if self.map == "space":
+                    y = 50
+                if self.map == "snow":
+                    y = 55
+
                 self.blood_animation.animation_direction = self.animation_direction
                 if self.animation_direction == 0:
-                    self.blood_animation.set_pos(self.x+4, self.y + 40)
+                    self.blood_animation.set_pos(self.x + 4, self.y + y)
                 else:
-                    self.blood_animation.set_pos(self.x+30, self.y + 40)
+                    self.blood_animation.set_pos(self.x + 30, self.y + y)
                 self.blood_animation.draw_animation_once(g=g, reset=True)
 
         # death animation
@@ -399,3 +415,14 @@ class Player(Animated):
             return "purple"
         else:
             return "turquoise"
+
+    @staticmethod
+    def get_map(p):
+        if p.__contains__("basic"):
+            return "basic"
+        elif p.__contains__("space"):
+            return "space"
+        elif p.__contains__("snow"):
+            return "snow"
+        else:
+            return "unknown map"

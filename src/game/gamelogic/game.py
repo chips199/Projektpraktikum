@@ -115,7 +115,8 @@ class Game:
             if self.playerList[id].is_alive():
                 # check if weapon is destroyed and give player fists if true
                 if self.playerList[id].weapon.destroyed and not self.playerList[id].weapon.animation_running:
-                    self.playerList[id].weapon = weapon.Weapon(weapon.WeaponType.Fist, self.map.directory + r"\waffen\faeuste", 1.0,
+                    self.playerList[id].weapon = weapon.Weapon(weapon.WeaponType.Fist,
+                                                               self.map.directory + r"\waffen\faeuste", 1.0,
                                                                [self.playerList[id].x, self.playerList[id].y],
                                                                self.playerList[id].weapon_path[
                                                                    weapon.WeaponType.Fist.name])
@@ -204,7 +205,8 @@ class Game:
                 self.playerList[i].animation_running = data_player[1]
                 self.playerList[i].animation_direction = data_player[2]
                 if self.playerList[i].weapon.weapon_type != weapon.WeaponType.getObj(data_weapon[3]):
-                    self.playerList[i].weapon = weapon.Weapon(weapon.WeaponType.getObj(data_weapon[3]), self.map.directory + r"\waffen\faeuste", 1.0,
+                    self.playerList[i].weapon = weapon.Weapon(weapon.WeaponType.getObj(data_weapon[3]),
+                                                              self.map.directory + r"\waffen\faeuste", 1.0,
                                                               [self.playerList[i].x, self.playerList[i].y],
                                                               self.playerList[i].weapon_path[
                                                                   weapon.WeaponType.getObj(data_weapon[3]).name])
@@ -224,15 +226,23 @@ class Game:
             # print("Handling pos parsing:", datetime.datetime.now() - timer)
             # timer = datetime.datetime.now()
 
-            # Draw Map
-            self.map.draw(self.canvas.get_canvas())
+            # Draw Map Background
+            # self.map.draw(self.canvas.get_canvas())
+            self.map.draw_background(self.canvas.get_canvas())
             # Draw Players
             for p in self.playerList:
                 if p.is_connected:
                     p.draw(self.canvas.get_canvas())
+
+            # Draw Solids on Map
+            self.map.draw_solids(self.canvas.get_canvas())
+
+            # Draw End Screen
             if not self.playerList[id].is_alive():
                 # Draw Death-screen
                 self.canvas.get_canvas().blit(pygame.image.load(wrk_dir + '\\wasted.png').convert_alpha(), (0, 0))
+
+            #  Draw Scorebpard
             if self.show_scoreboard:
                 # Generate Scoreboard
                 can = self.canvas.get_canvas()

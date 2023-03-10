@@ -482,8 +482,8 @@ class MenuSetup:
                             direction: str,
                             stepsize: int = 9,
                             after_time: int = 2000,
-                            func: Optional[Callable] = None, # type: ignore[type-arg]
-                            **kwargs: Optional[Callable]) -> None: # type: ignore[type-arg]
+                            func: Optional[Callable] = None,  # type: ignore[type-arg]
+                            **kwargs: Optional[Callable]) -> None:  # type: ignore[type-arg]
         """
         Clear the widget out of the window in a sliding animation.
         :param widget: widget to be cleared

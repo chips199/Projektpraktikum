@@ -56,7 +56,7 @@ print("Waiting for a connection")
 seperator = "\\" if platform.system() == 'Windows' else "/"
 config_file = seperator.join(
     list(os.path.abspath(os.path.dirname(__file__)).split(seperator)[
-         :-1])) + f"{seperator}game{seperator}configuration.json"
+         :-1])) + f"{seperator}gamelogic{seperator}configuration.json"
 # print("\\".join(list(os.path.abspath(os.path.dirname(__file__)).split("\\")[:-1])) + "\\game\\configuration.json")
 with open(config_file) as file:
     game_data = json.load(file)
