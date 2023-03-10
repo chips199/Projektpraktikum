@@ -70,7 +70,7 @@ class Player(Animated):
         self.shield_left = pygame.transform.flip(self.shield_right, True, False)
         self.blocking_start_time = datetime.now().timestamp()
         self.last_block = datetime.now().timestamp()
-        self.renew_shield_cooldown = 0
+        self.renew_shield_cooldown = 2
         self.hold_shield_cooldown = 1
 
         # Sound effects:
