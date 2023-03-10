@@ -39,6 +39,9 @@ class Game:
         self.update_background_process()
         self.id = int(self.data['id'])
 
+        # Status of the music
+        self.music_on = True
+
         # pygame.init()
         pygame.display.set_icon(pygame.image.load(wrk_dir + r"\..\stick_wars_logo.png"))
         self.width = w
@@ -78,9 +81,6 @@ class Game:
         self.lost_sound_effect = Sounds(self.map.directory + r"\sounds\lost_sound.mp3", 1.0)
         self.win_sound_effect = Sounds(self.map.directory + r"\sounds\win_sound.mp3", 1.0)
 
-        # Status of the music
-        self.music_on = True
-
     def run(self):
         """
         the core method of the game containing the game loop
@@ -116,7 +116,7 @@ class Game:
                     run = False
 
                 # Restarts the music, when all songs were played
-                if event.type == self.map.music.MUSIC_END and self.music_on:
+                if event.type == self.map.music.MUSIC_END and self.music_on and not self.map.music.get_status():
                     self.map.music_load()
 
             if self.playerList[id].is_alive():
