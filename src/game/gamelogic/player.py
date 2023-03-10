@@ -1,7 +1,7 @@
 import datetime
 import math
 from copy import copy
-from datetime import datetime
+from datetime import datetime as datetime
 
 import pygame.draw
 
@@ -168,7 +168,6 @@ class Player(Animated):
             # blood splash animation
             if self.weapon.hitted_me or self.blood_animation.current_frame > 0:
                 y = 0
-                x = 0
                 if self.map == "basic":
                     y = 40
                 if self.map == "space":
