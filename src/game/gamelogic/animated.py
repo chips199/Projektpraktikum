@@ -104,22 +104,22 @@ class Animated:
                 print(str(filename) + ' is no png')
                 continue
             image_path = self.directory + r"/" + filename
-            try:
-                image = pygame.image.load(image_path).convert_alpha()
-                image = pygame.transform.scale(image, (image.get_width() * self.scale, image.get_height() * self.scale))
-                if len(images_right) == 0:
-                    self.edge_surface = pygame.transform.laplacian(image).convert_alpha()
-                    alpha_array = pygame.surfarray.pixels_alpha(self.edge_surface)
-                    alpha_array = alpha_array.swapaxes(0, 1)
-                    for yi, y in enumerate(alpha_array):
-                        for xi, x in enumerate(y):
-                            if x > 200:
-                                self.solid.append((xi + self.x, yi + self.y))
-                                self.relativ_solids.append((xi, yi))
-                images_right.append(image)
-                images_left.append(pygame.transform.flip(image, True, False))
-            except:
-                print("is not image:", images_right)
+            # try:
+            image = pygame.image.load(image_path).convert_alpha()
+            image = pygame.transform.scale(image, (image.get_width() * self.scale, image.get_height() * self.scale))
+            if len(images_right) == 0:
+                self.edge_surface = pygame.transform.laplacian(image).convert_alpha()
+                alpha_array = pygame.surfarray.pixels_alpha(self.edge_surface)
+                alpha_array = alpha_array.swapaxes(0, 1)
+                for yi, y in enumerate(alpha_array):
+                    for xi, x in enumerate(y):
+                        if x > 200:
+                            self.solid.append((xi + self.x, yi + self.y))
+                            self.relativ_solids.append((xi, yi))
+            images_right.append(image)
+            images_left.append(pygame.transform.flip(image, True, False))
+            # except :
+            #     print("is not image:", images_right)
         self.relativ_solids_df = pd.DataFrame(self.relativ_solids, columns=['x', 'y'])
         self.solid_df = pd.DataFrame(self.solid, columns=['x', 'y'])
         return images_right, images_left

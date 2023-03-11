@@ -198,8 +198,8 @@ class Game:
                     self.playerList[id].stop_animation()
                     self.playerList[id].jump(func=self.next_to_solid)
 
-                # gravity
-                self.playerList[id].gravity(func=self.next_to_solid)
+                # falling
+                self.playerList[id].falling(func=self.next_to_solid)
 
                 # print("Handling Keys:", datetime.datetime.now() - timer)
                 # timer = datetime.datetime.now()

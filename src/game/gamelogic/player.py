@@ -241,7 +241,7 @@ class Player(Animated):
         new_pos['y'] = new_pos['y'].map(lambda y: y + self.y)
         self.solid_df = new_pos
 
-    def gravity(self, func):
+    def falling(self, func):
         """
         moves player downwards when possible
         :param func: function to check if there is no collision while falling
