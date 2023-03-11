@@ -1,0 +1,20 @@
+import src.game.menu.MyFrame as frame
+import src.game.menu.MyWindow as window
+import pytest
+from unittest.mock import MagicMock
+
+
+@pytest.fixture()
+def setup():
+    test_frame = frame.MyFrame(window.MyWindow(), 50, 50)
+    return test_frame
+
+
+def test_set_size(setup):
+    for widget in setup.winfo_children():
+        widget.place_forget = MagicMock()
+        widget.destroy = MagicMock()
+    setup.clear_frame()
+    for widget in setup.winfo_children():
+        widget.place_forget.assert_called()
+        widget.destroy.assert_called()
