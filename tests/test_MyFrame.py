@@ -10,11 +10,11 @@ def setup():
     return test_frame
 
 
-def test_set_size(setup):
+def test_clear_frame(setup):
     for widget in setup.winfo_children():
         widget.place_forget = MagicMock()
         widget.destroy = MagicMock()
-    setup.clear_frame()
+    assert setup.clear_frame() is None
     for widget in setup.winfo_children():
         widget.place_forget.assert_called()
         widget.destroy.assert_called()

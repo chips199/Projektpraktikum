@@ -74,6 +74,7 @@ class MenuSetup:
         # get screen width and height
         self.ws = self.root.winfo_screenwidth()  # width of the screen
         self.hs = self.root.winfo_screenheight()  # height of the screen
+        self.test_run = False
 
         # change size of window and other widgets, if the actual screen size is smaller than the planned screen size
         if self.ws < self.window_width_planned or self.hs < self.window_height_planned:
@@ -391,6 +392,7 @@ class MenuSetup:
                 self.load_player(path=self.player_dict[str(self.amount_player)][0],  # type: ignore[arg-type]
                                  rel_x_pos=self.player_dict[str(self.amount_player)][1])  # type: ignore[arg-type]
                 self.amount_player += 1
+                self.test_run = True
 
             # If the number of players in the game is greater than the number of players on the server
             else:
@@ -398,12 +400,12 @@ class MenuSetup:
                 player_to_remove = self.player.pop()
                 player_to_remove.destroy()
                 self.amount_player -= 1
+                self.test_run = True
 
         # If the game is running
         if self.root.run:
             # Call the update player method again after 1000ms
             self.main_frame.after(1000, lambda: self.update_player())
-
     # __________________command: Functions__________________
 
     def start_new_session(self):

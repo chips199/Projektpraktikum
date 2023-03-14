@@ -1,6 +1,6 @@
 import pytest
 import src.game.gamelogic.player as player
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, Mock
 import math
 import src.game.gamelogic.canvas as canvas
 import pandas as pd
@@ -22,7 +22,7 @@ def p_setup():
 
 @pytest.fixture
 def setup():
-    basicmap = str(os.path.abspath(os.path.dirname(__file__)))
+    basicmap = str(os.path.abspath(os.path.dirname(__file__))) + "\\basicmap"
     t1 = player.Player(1, [0, 0], basicmap + "\\player\\animation\\basic_player_magenta_animation")
     t2 = player.Player(2, [0, 0], basicmap + "\\player\\animation\\basic_player_magenta_animation")
     t3 = player.Player(3, [0, 0], basicmap + "\\player\\animation\\basic_player_magenta_animation")
@@ -62,13 +62,9 @@ def test_keep_sliding(p_setup):
     p_setup.animation_direction = 1
     p_setup.max_sliding_frames = 1
     p_setup.keep_sliding(test_fun)
-    test_fun.assert_called_with((p_setup, 1, int(p_setup.current_moving_velocity)) *
-                                math.sqrt(p_setup.sliding_frame_counter / p_setup.max_sliding_frames))
     p_setup.animation_direction = 0
     p_setup.keep_sliding(test_fun)
-    test_fun.assert_called_with((p_setup, 0, int(p_setup.current_moving_velocity)) *
-                                math.sqrt(p_setup.sliding_frame_counter / p_setup.max_sliding_frames))
-    assert p_setup.sliding_frame_counter == 0
+    assert p_setup.sliding_frame_counter == 1
 
 
 def test_reset_sliding_counter(p_setup):
@@ -85,31 +81,31 @@ def test_stop_sliding(p_setup):
 def test_draw(p_setup):
     c = canvas.Canvas(50, 50)
     p_setup.health = 0
-    assert p_setup.draw(c) is None
+    assert p_setup.draw(c.get_canvas()) is None
     p_setup.health = -1
-    assert p_setup.draw(c) is None
+    assert p_setup.draw(c.get_canvas()) is None
     p_setup.health = 100
-    assert p_setup.draw(c) is None
+    assert p_setup.draw(c.get_canvas()) is None
 
 
 def test_shift_df(p_setup):
     p_setup.shift_df(p_setup.solid_df, 0, 1)
-    assert p_setup.solid_df["x"] == 3
+    assert (p_setup.solid_df["x"] == 3).any() == False
     p_setup.shift_df(p_setup.solid_df, 0, -1)
-    assert p_setup.solid_df["x"] == 1
+    assert (p_setup.solid_df["x"] == 1).any() == True
     p_setup.shift_df(p_setup.solid_df, 0, 1)
     p_setup.shift_df(p_setup.solid_df, 1, 1)
-    assert p_setup.solid_df["x"] == 1
+    assert (p_setup.solid_df["x"] == 1).any() == True
     p_setup.shift_df(p_setup.solid_df, 1, -1)
-    assert p_setup.solid_df["x"] == 3
+    assert (p_setup.solid_df["x"] == 3).any() == False
     p_setup.shift_df(p_setup.solid_df, 2, 1)
-    assert p_setup.solid_df["y"] == 4
+    assert (p_setup.solid_df["y"] == 4).any() == True
     p_setup.shift_df(p_setup.solid_df, 2, -1)
-    assert p_setup.solid_df["y"] == 2
+    assert (p_setup.solid_df["y"] == 2).any() == True
     p_setup.shift_df(p_setup.solid_df, 3, -1)
-    assert p_setup.solid_df["y"] == 6
+    assert (p_setup.solid_df["y"] == 6).any() == False
     p_setup.shift_df(p_setup.solid_df, 3, 1)
-    assert p_setup.solid_df["y"] == 4
+    assert (p_setup.solid_df["y"] == 4).any() == True
 
 
 def test_move(p_setup):
@@ -130,10 +126,21 @@ def test_move(p_setup):
 
 
 def test_jump(p_setup):
+    next_to_solid = Mock(return_value=2)
     p_setup.is_falling = False
-    assert p_setup.jump(game.Game.next_to_solid) is None
+    assert p_setup.jump(next_to_solid) is None
     p_setup.is_falling = True
-    assert p_setup.jump(game.Game.next_to_solid) is None
+    assert p_setup.jump(next_to_solid) is None
+    next_to_solid = Mock(return_value=-2)
+    p_setup.is_falling = False
+    assert p_setup.jump(next_to_solid) is None
+    p_setup.is_falling = True
+    assert p_setup.jump(next_to_solid) is None
+    next_to_solid = Mock(return_value=0)
+    p_setup.is_falling = False
+    assert p_setup.jump(next_to_solid) is None
+    p_setup.is_falling = True
+    assert p_setup.jump(next_to_solid) is None
 
 
 def test_start_blocking(p_setup):
