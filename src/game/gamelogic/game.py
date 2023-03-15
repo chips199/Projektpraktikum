@@ -31,8 +31,7 @@ class Game:
 
     def __init__(self, w, h, conn, process):
         self.kills_to_win = 1
-        self.data = {}
-
+        self.data = {}  # type:ignore[var-annotated]
         self.counter = 0
         self.conn = conn
         self.process = process

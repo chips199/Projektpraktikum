@@ -379,7 +379,7 @@ class MenuSetup:
         Update the players in the game by extracting the amount of players from server handed over in the self.data
         In Addition change the directory path to the correct map path
         """
-        server_amount_player = int(self.data["amount_player"])  # type: ignore[union-attr]
+        server_amount_player = int(self.data["amount_player"])  # type: ignore[call-overload]
 
         if self.data["map"] not in self.player_dict['0'][0]:
             player = "unknown2"
@@ -390,8 +390,8 @@ class MenuSetup:
             elif self.data["map"] == "schneemap":
                 player = "snow"
             for key, val in self.player_dict.items():
-                val[0] = val[0].replace("unknown1", self.data["map"])
-                val[0] = val[0].replace("unknown2", player)
+                val[0] = val[0].replace("unknown1", self.data["map"])  # type:ignore[attr-defined]
+                val[0] = val[0].replace("unknown2", player)  # type:ignore[attr-defined]
 
         # Loop over the absolute difference between the number of players in the game and the number of players on the server
         else:

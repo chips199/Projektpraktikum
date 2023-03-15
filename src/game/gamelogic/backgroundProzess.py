@@ -63,13 +63,6 @@ class backgroundProzess:
         print("send", data['map'])
         self.conn.send(data)
 
-    # def update_menu(self):
-    #     while self.conn.poll():
-    #         data = self.conn.recv()
-    #         self.map = data['map']
-    #         print("received", self.map)
-
-
     def send_game(self):
         with open(config_file) as file:
             sample = json.load(file)
