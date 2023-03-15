@@ -5,6 +5,8 @@ import customtkinter as tk
 from src.game.menu.MyFrame import MyFrame
 from src.game.menu.MyLabel import MyLabel
 
+from typing import Union
+
 
 class MyWindow(tk.CTk):
     def __init__(self,

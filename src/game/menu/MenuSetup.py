@@ -381,7 +381,7 @@ class MenuSetup:
         """
         server_amount_player = int(self.data["amount_player"])  # type: ignore[call-overload]
 
-        if self.data["map"] not in self.player_dict['0'][0]:  # type:ignore[[operator]]
+        if self.data["map"] not in self.player_dict['0'][0]:  # type:ignore[operator]
             player = "unknown2"
             if self.data["map"] == "basicmap":
                 player = "basic"
