@@ -22,7 +22,6 @@ class Animated:
         self.edge_surface = None
         self.solid = []  # type: List[Tuple[int, int]]
         self.relativ_solids = []  # type: List[Tuple[int, int]]
-        # self.current_frame = None
         self.x = start[0]
         self.y = start[1]
         self.scale = 0.8

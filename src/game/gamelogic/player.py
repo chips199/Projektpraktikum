@@ -1,7 +1,6 @@
-import datetime
 import math
 from copy import copy
-from datetime import datetime as datetime
+import datetime
 
 import pygame.draw
 
@@ -11,7 +10,7 @@ from src.game.gamelogic.sounds import Sounds
 
 
 class Player(Animated):
-    last_jump = datetime.now()
+    last_jump = datetime.datetime.now()
     height_jump = 200
     status_jump = 0
     is_connected = False
@@ -25,8 +24,8 @@ class Player(Animated):
             killed_by = [0, 0, 0, 0, 0]
 
         self.map = self.get_map(self.directory)
-        self.falling_time = datetime.now()
-        self.jumping_time = datetime.now()
+        self.falling_time = datetime.datetime.now()
+        self.jumping_time = datetime.datetime.now()
         self.id = pid
         self.velocity = 7
         self.current_moving_velocity = 7
@@ -42,7 +41,7 @@ class Player(Animated):
         self.moving_on_edge = False
         # self.cut_frames(2)
         self.killed_by = killed_by
-        self.death_time = datetime.now()
+        self.death_time = datetime.datetime.now()
         # self.color = color
         self.weapon = weapon
         self.velocity_counter = 0
@@ -68,8 +67,8 @@ class Player(Animated):
         self.blood_animation.double_frames(factor=2)
         self.shield_right = pygame.image.load(map_dir + r"\waffen\shield\shield.png").convert_alpha()
         self.shield_left = pygame.transform.flip(self.shield_right, True, False)
-        self.blocking_start_time = datetime.now().timestamp()
-        self.last_block = datetime.now().timestamp()
+        self.blocking_start_time = datetime.datetime.now().timestamp()
+        self.last_block = datetime.datetime.now().timestamp()
         self.renew_shield_cooldown = 2
         self.hold_shield_cooldown = 1
 
@@ -122,6 +121,8 @@ class Player(Animated):
     def draw(self, g):
         if self.health > 0:
             super(Player, self).draw(g=g)
+
+            self.death_animation.current_frame = 0
 
             # health bar
             pygame.draw.line(surface=g,
@@ -184,6 +185,7 @@ class Player(Animated):
 
         # death animation
         else:
+            # print(self.death_animation.current_frame, "at:", datetime.now())
             self.death_animation.set_pos(self.x, self.y)
             self.death_animation.draw_animation_once(g=g)
             # Play sound effect die
@@ -282,11 +284,11 @@ class Player(Animated):
         Otherwise, stop blocking.
         """
         # If not already blocking and the renew shield cooldown is over, start blocking
-        if not self.is_blocking and datetime.now().timestamp() > self.last_block + self.renew_shield_cooldown:
-            self.blocking_start_time = datetime.now().timestamp()
+        if not self.is_blocking and datetime.datetime.now().timestamp() > self.last_block + self.renew_shield_cooldown:
+            self.blocking_start_time = datetime.datetime.now().timestamp()
 
         # If still holding shield, set blocking to True and block player moving on x-axis
-        if datetime.now().timestamp() < self.blocking_start_time + self.hold_shield_cooldown:
+        if datetime.datetime.now().timestamp() < self.blocking_start_time + self.hold_shield_cooldown:
             self.is_blocking = True
             self.block_x_axis = True
 
@@ -302,7 +304,7 @@ class Player(Animated):
         # If character is currently blocking, update last_block time to current time and subtract the
         # hold_shield_cooldown from blocking_start_time to simulate that the max holding time is reached
         if self.is_blocking:
-            self.last_block = datetime.now().timestamp()
+            self.last_block = datetime.datetime.now().timestamp()
             self.blocking_start_time -= self.hold_shield_cooldown
         self.is_blocking = False
         self.block_x_axis = False
