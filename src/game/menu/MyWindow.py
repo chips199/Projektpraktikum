@@ -84,7 +84,7 @@ class MyWindow(tk.CTk):
         self.process = process  # type:ignore[assignment]
 
     def move_out_of_window(self,
-                           widget: ['MyFrame|MyLabel'],  # type:ignore[misc]
+                           widget: Union['MyFrame|MyLabel'],  # type:ignore[valid-type]
                            direction: str,
                            delay: int = 17,
                            stepsize: int = 1,
