@@ -197,9 +197,9 @@ class Game:
             # timer = datetime.datetime.now()
 
             # sync data
-            self.player_frames, self.weapon_frames, health, killed, pos, con, blocking, hit = self.parse()
-            for i, (data_player, data_weapon, health, killed, pos, con, blocking, hit) in enumerate(
-                    zip(self.player_frames, self.weapon_frames, health, killed, pos, con, blocking, hit)):
+            self.player_frames, self.weapon_frames, health, killed, pos, con, blocking = self.parse()
+            for i, (data_player, data_weapon, health, killed, pos, con, blocking) in enumerate(
+                    zip(self.player_frames, self.weapon_frames, health, killed, pos, con, blocking)):
                 self.playerList[i].current_frame = data_player[0]
                 self.playerList[i].animation_running = data_player[1]
                 self.playerList[i].animation_direction = data_player[2]
@@ -375,8 +375,7 @@ class Game:
                              self.playerList[int(self.data['id'])].blood_frame],
             "health": self.playerList[int(self.data['id'])].health,
             "killed_by": self.playerList[int(self.data['id'])].killed_by,
-            "is_blocking": self.playerList[int(self.data['id'])].is_blocking,
-            "got_hit": self.playerList[int(self.data['id'])].weapon.hitted_me
+            "is_blocking": self.playerList[int(self.data['id'])].is_blocking
         }
         self.conn.send(temp_data)
 
@@ -446,14 +445,9 @@ class Game:
                             erg_blocking.append(value2)
                         else:
                             erg_blocking.append(self.playerList[int(self.data["id"])].is_blocking)
-                    elif key2 == "got_hit":
-                        if key != str(self.id):
-                            erg_hit.append(value2)
-                        else:
-                            erg_hit.append(self.playerList[int(self.data["id"])].weapon.hitted_me)
             else:
                 continue
-        return erg_player, erg_weapon, erg_health, erg_killed_by, erg_pos, erg_con, erg_blocking, erg_hit
+        return erg_player, erg_weapon, erg_health, erg_killed_by, erg_pos, erg_con, erg_blocking
 
     def next_to_solid(self, player, dirn, distance):
         """

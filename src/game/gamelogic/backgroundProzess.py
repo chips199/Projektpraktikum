@@ -26,7 +26,6 @@ class backgroundProzess:
         self.health = 100
         self.killed_by = [0, 0, 0, 0, 0]
         self.is_blocking = False
-        self.got_hit = False
         self.map = "unknown"
 
         # self.net.send("ready")
@@ -76,7 +75,6 @@ class backgroundProzess:
         data['health'] = self.health
         data['killed_by'] = self.killed_by
         data['is_blocking'] = self.is_blocking
-        data['got_hit'] = self.got_hit
         self.reply = self.net.send(json.dumps(data))
         self.reply = json.loads(self.reply)
         self.reply["id"] = self.net.id  # type:ignore[index]
@@ -92,4 +90,3 @@ class backgroundProzess:
             self.health = data['health']
             self.killed_by = data['killed_by']
             self.is_blocking = data['is_blocking']
-            self.got_hit = data['got_hit']
