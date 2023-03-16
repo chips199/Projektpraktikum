@@ -24,7 +24,7 @@ class backgroundProzess:
 
         self.position = [int(100), int(100)]
         self.player_frame = [0, False, 1]
-        self.weapon_frame = [0, False, 1, "Fist", 100, None]
+        self.weapon_data = [0, False, 1, "Fist", 100, None]
         self.health = 100
         self.killed_by = [0, 0, 0, 0, 0]
         self.is_blocking = False

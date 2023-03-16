@@ -422,7 +422,7 @@ class Game:
             "player_frame": [self.playerList[int(self.data['id'])].current_frame,
                              self.playerList[int(self.data['id'])].animation_running,
                              self.playerList[int(self.data['id'])].animation_direction],
-            "weapon_frame": [self.playerList[int(self.data['id'])].weapon.current_frame,
+            "weapon_data": [self.playerList[int(self.data['id'])].weapon.current_frame,
                              self.playerList[int(self.data['id'])].weapon.animation_running,
                              self.playerList[int(self.data['id'])].weapon.animation_direction,
                              self.playerList[int(self.data['id'])].weapon.weapon_type.name,
