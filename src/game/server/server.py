@@ -1,5 +1,6 @@
 import datetime
 import json
+import math
 import os
 import platform
 import socket
@@ -83,12 +84,41 @@ def game_server(game_id, this_gid):
     while not players_connected[this_gid].__contains__(3) and players_connected[this_gid].count(
             0) != number_of_players_per_game:
         pass
+    game_data_dict[game_id]["metadata"]["spawnpoints"]["items"] = {"Sword": [],
+                                                                   "Laser": []
+                                                                   }
     game_data_dict[game_id]["metadata"]["start"] = (datetime.datetime.now() + datetime.timedelta(seconds=10)).strftime(
         "%d/%m/%Y, %H:%M:%S")
     game_data_dict[game_id]["metadata"]["end"] = (datetime.datetime.now() + datetime.timedelta(seconds=310)).strftime(
         "%d/%m/%Y, %H:%M:%S")
-    print(game_data_dict[game_id]["metadata"]["start"], game_data_dict[game_id]["metadata"]["end"])
-    exit(0)
+    last_w_of_p = [None] * number_of_players_per_game
+    last_spawn_check = datetime.datetime.now()
+    while players_connected[this_gid] != [0] * number_of_players_per_game:
+        tmp = copy(list(game_data_dict[game_id].items()))
+        w_of_p = list(map(lambda x: x[1]["weapon_data"][3],  # type: ignore[no-any-return]
+                          filter(lambda y: ["0", "1", "2", "3"].__contains__(y[0]),
+                                 tmp)))
+        for ip, wp in enumerate(w_of_p):
+            p_pos = game_data_dict[game_id][str(ip)]["position"]
+            if last_w_of_p[ip] != wp:
+                last_w_of_p[ip] = wp
+                if wp != "Fist":
+                    potential_items = game_data_dict[game_id]["metadata"]["spawnpoints"]["items"][wp]
+                    potential_items_distances = list(map(lambda x: math.dist(p_pos, x), potential_items))
+                    i = potential_items_distances.index(min(potential_items_distances))
+                    game_data_dict[game_id]["metadata"]["spawnpoints"]["items"][wp].pop(i)
+        if datetime.datetime.now() - last_spawn_check > datetime.timedelta(seconds=20):
+            last_spawn_check = datetime.datetime.now()
+            for point in spawn_points[maps_dict[game_id]]["item_spawnpoints"]:
+                free = True
+                for ki, vi in game_data_dict[game_id]["metadata"]["spawnpoints"]["items"].items():
+                    if vi.__contains__(point):
+                        free = False
+                for k, v in spawn_points[maps_dict[game_id]]["item-odds"].items():
+                    r = random.random()
+                    if r < v and free:
+                        game_data_dict[game_id]["metadata"]["spawnpoints"]["items"][k].append(point)
+                        break
 
 
 def reset_games():
@@ -244,12 +274,6 @@ def threaded_client(conn):
             reset_games()
             conn.close()
             exit(0)
-        # elif msg == "":
-        #     print("connection lost")
-        #     players_connected[this_gid][this_pid] = 0
-        #     reset_games()
-        #     conn.close()
-        #     exit(0)
 
         sleep(0.2)
 
@@ -264,15 +288,17 @@ def threaded_client(conn):
             reply = data
             # if no data has been sent the connection has been closed
             if data:
+                # print(reply)
                 # parse the client data into the game_data Dictionary, and send the result back to the client
-                game_data_dict[game_id][this_pid] = json.loads(reply)
+                game_data_dict[game_id][str(this_pid)] = json.loads(reply)
                 # print(game_data_dict[game_id][this_pid])
-                deaths = game_data_dict[game_id][this_pid]["killed_by"]
+                deaths = game_data_dict[game_id][str(this_pid)]["killed_by"]
                 kills = list(map(lambda x: x[1]["killed_by"][:4],  # type: ignore[no-any-return]
                                  list(filter(lambda x: x[0] != "metadata", game_data_dict[game_id].items()))))
                 for k, v in enumerate(zip(*kills)):
                     game_data_dict[game_id]["metadata"]["scoreboard"][str(k)][0] = sum(v)
                 game_data_dict[game_id]["metadata"]["scoreboard"][str(this_pid)][1] = sum(deaths)
+                # print(game_data_dict[game_id])
                 conn.sendall(str.encode(json.dumps(game_data_dict[game_id])))
                 # to track how often the client sends a message track the time
                 last_msg = datetime.datetime.now()
@@ -283,8 +309,9 @@ def threaded_client(conn):
             # if the connection doesn't exist anymore break the loop
             break
         if (datetime.datetime.now() - last_msg).seconds > 5:
-            # if the last message is more than 5 seconds old the connection timedout
+            # if the last message is more than 5 seconds old theconnection timedout
             print("Connection timeout")
+
             break
 
     print("Connection Closed")

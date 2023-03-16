@@ -2,7 +2,13 @@ import os
 import pandas as pd
 import pygame
 from typing import List
+
+from matplotlib import pyplot as plt
 from pandas import DataFrame
+
+from src.game.gamelogic import weapon
+from src.game.gamelogic.item import Item
+from src.game.gamelogic.weapon import WeaponType
 
 from src.game.gamelogic.background_music import Music
 
@@ -15,6 +21,11 @@ class Map:
     def __init__(self, game, uri):
         self.game = game
         self.directory = uri
+        self.items = list()
+        self.weapon_path = {
+            weapon.WeaponType.Sword.name: self.directory + "\\waffen\\schwert\\Sword.png",
+            weapon.WeaponType.Laser.name: self.directory + "\\waffen\\laser\\laser.png"
+        }
         self.music = None
         self.music_load()
 
@@ -45,7 +56,7 @@ class Map:
                 img = img.convert_alpha()
             except:
                 continue
-            print(str(simg) + ' erfolgreich in pygame geladen')
+            print(str(simg) + ' successfully loaded into pygame')
             self.staticimages.append(img)
 
         # combine all static images into one, then use laplace to detect edges.
@@ -73,22 +84,6 @@ class Map:
 
         self.solid_df = pd.DataFrame(solid, columns=['x', 'y'])
 
-        # load unsolid images
-        # for filename in os.listdir(self.directory + r'/not_solid'):
-        #     nsimg = os.path.join(self.directory + r'/not_solid', filename)
-        #     if not os.path.isfile(nsimg):
-        #         print(str(nsimg) + ' is not a file')
-        #         continue
-        #
-        #     # load image for displaying
-        #     try:
-        #         img = pygame.image.load(nsimg)
-        #         img = img.convert_alpha()
-        #     except:
-        #         continue
-        #     print(str(nsimg) + ' erfolgreich in pygame geladen')
-        #     self.staticimages.append(img)
-
         # generate one picture out of all solid and not solid images.
         comb_images = self.staticimages.copy()
         if len(comb_images) != 0:
@@ -96,6 +91,15 @@ class Map:
             for image in comb_images:
                 self.static_objects_img.blit(image, (0, 0))
             self.static_objects_img = self.static_objects_img.convert_alpha()
+
+    def setitems(self, item_dict):
+        for k, v in item_dict.items():
+            for pos in v:
+                if not list(map(lambda i: [i.x, i.y], self.items)).__contains__(pos):
+                    self.items.append(Item(WeaponType.getObj(k), pos, self.weapon_path[k]))
+        for i in self.items:
+            if not item_dict[i.type.name].__contains__([i.x, i.y]):
+                self.items.remove(i)
 
     def draw(self, screen):
         """
@@ -107,8 +111,8 @@ class Map:
             screen.blit(self.background, canvas_rec)
             if len(self.staticimages) != 0:
                 screen.blit(self.static_objects_img, canvas_rec)
-        else:
-            screen.fill((41, 41, 41))  # type:ignore[unreachable]
+        for i in self.items:
+            i.draw(screen)
 
     def draw_background(self, screen):
         canvas_rec = pygame.Rect(0, 0, self.game.width, self.game.height)

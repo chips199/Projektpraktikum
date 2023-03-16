@@ -50,3 +50,10 @@ class Music:
         :return: None
         """
         pygame.mixer.music.fadeout(time)
+
+    def get_status(self):
+        """
+        Returns whether music is currently being played
+        :return: boolean
+        """
+        return pygame.mixer.music.get_busy()

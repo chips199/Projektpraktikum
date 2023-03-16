@@ -154,3 +154,22 @@ class Animated:
             rel_r.append(pd.DataFrame(relativ, columns=['x', 'y']))
 
         return abs_l, abs_r, rel_l, rel_r
+
+    @staticmethod
+    def shift_df(df, dirn, n):
+        """
+        "moves" dataframe of coordinates
+        :param df: dataframe
+        :param dirn: direction
+        :param n: distance
+        :return: new dataframe
+        """
+        if dirn == 0:
+            df['x'] = df['x'].map(lambda x: x + n)
+        elif dirn == 1:
+            df['x'] = df['x'].map(lambda x: x - n)
+        elif dirn == 2:
+            df['y'] = df['y'].map(lambda y: y - n)
+        else:
+            df['y'] = df['y'].map(lambda y: y + n)
+        return df
