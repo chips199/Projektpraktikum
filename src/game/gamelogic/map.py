@@ -114,6 +114,16 @@ class Map:
         for i in self.items:
             i.draw(screen)
 
+    def draw_background(self, screen):
+        canvas_rec = pygame.Rect(0, 0, self.game.width, self.game.height)
+        if isinstance(self.background, pygame.Surface):
+            screen.blit(self.background, canvas_rec)
+
+    def draw_solids(self, screen):
+        canvas_rec = pygame.Rect(0, 0, self.game.width, self.game.height)
+        if len(self.staticimages) != 0:
+            screen.blit(self.static_objects_img, canvas_rec)
+
     def music_load(self):
         """
         Loads the music from the folder and starts playing it

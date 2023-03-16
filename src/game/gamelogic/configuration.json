@@ -5,8 +5,9 @@
 	"connected": false,
 	"health": 100,
     "player_frame": [0, false, 1],
-    "weapon_data": [0, false, 1, "Fist", 100],
+    "weapon_data": [0, false, 1, "Fist", 100, null],
     "killed_by": [0, 0, 0, 0, 0],
+    "is_blocking": false
     "shots": []
   },
   "1": {
@@ -15,8 +16,9 @@
 	"connected": false,
 	"health": 100,
     "player_frame": [0, false, 1],
-    "weapon_data": [0, false, 1, "Fist", 100],
+    "weapon_data": [0, false, 1, "Fist", 100, null],
     "killed_by": [0, 0, 0, 0, 0],
+    "is_blocking": false
     "shots": []
   },
   "2": {
@@ -25,8 +27,9 @@
 	"connected": false,
 	"health": 100,
     "player_frame": [0, false, 1],
-    "weapon_data": [0, false, 1, "Fist", 100],
+    "weapon_data": [0, false, 1, "Fist", 100, null],
     "killed_by": [0, 0, 0, 0, 0],
+    "is_blocking": false
     "shots": []
   },
   "3": {
@@ -35,8 +38,9 @@
 	"connected": false,
 	"health": 100,
     "player_frame": [0, false, 1],
-    "weapon_data": [0, false, 1, "Fist", 100],
+    "weapon_data": [0, false, 1, "Fist", 100, null],
     "killed_by": [0, 0, 0, 0, 0],
+    "is_blocking": false
     "shots": []
   },
   "metadata": {

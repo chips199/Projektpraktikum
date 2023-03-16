@@ -22,7 +22,6 @@ class Animated:
         self.edge_surface = None
         self.solid = []  # type: List[Tuple[int, int]]
         self.relativ_solids = []  # type: List[Tuple[int, int]]
-        # self.current_frame = None
         self.x = start[0]
         self.y = start[1]
         self.scale = 0.8
@@ -74,7 +73,8 @@ class Animated:
             self.current_frame = 0
             self.animation_running = False
 
-    def draw_animation_once(self, g, reset=False):
+    def draw_animation_once(self, g, reset=False, direction=None):
+
         if self.current_frame < self.frame_count:
             self.animation_running = True
             self.draw(g=g)
