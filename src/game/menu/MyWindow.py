@@ -5,6 +5,8 @@ import customtkinter as tk
 from src.game.menu.MyFrame import MyFrame
 from src.game.menu.MyLabel import MyLabel
 
+from typing import Union
+
 
 class MyWindow(tk.CTk):
     def __init__(self,
@@ -84,7 +86,7 @@ class MyWindow(tk.CTk):
         self.process = process  # type:ignore[assignment]
 
     def move_out_of_window(self,
-                           widget: ['MyFrame|MyLabel'],  # type:ignore[valid-type]
+                           widget: Union['MyFrame|MyLabel'],  # type:ignore[valid-type]
                            direction: str,
                            delay: int = 17,
                            stepsize: int = 1,

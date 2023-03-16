@@ -1,6 +1,5 @@
 import json
 import os
-import time
 from copy import copy
 import datetime
 
@@ -32,16 +31,16 @@ class Game:
 
     def __init__(self, w, h, conn, process):
         self.kills_to_win = 1
-
+        self.data = {}  # type:ignore[var-annotated]
         self.counter = 0
         self.conn = conn
         self.process = process
         self.timer = datetime.datetime.now()
-        self.update_background_process()
+        self.initialize_game_data()
         self.id = int(self.data['id'])
 
         # pygame.init()
-        time.sleep(0.5)
+        # time.sleep(0.5)
         pygame.display.set_icon(pygame.image.load(wrk_dir + r"\..\stick_wars_logo.png"))
         self.width = w
         self.height = h
@@ -198,9 +197,9 @@ class Game:
             # timer = datetime.datetime.now()
 
             # sync data
-            self.player_frames, self.weapon_frames, health, killed, pos, con = self.parse()
-            for i, (data_player, data_weapon, health, killed, pos, con) in enumerate(
-                    zip(self.player_frames, self.weapon_frames, health, killed, pos, con)):
+            self.player_frames, self.weapon_frames, health, killed, pos, con, blocking, hit = self.parse()
+            for i, (data_player, data_weapon, health, killed, pos, con, blocking, hit) in enumerate(
+                    zip(self.player_frames, self.weapon_frames, health, killed, pos, con, blocking, hit)):
                 self.playerList[i].current_frame = data_player[0]
                 self.playerList[i].animation_running = data_player[1]
                 self.playerList[i].animation_direction = data_player[2]
@@ -219,6 +218,7 @@ class Game:
                 self.playerList[i].killed_by = killed
                 self.playerList[i].x, self.playerList[i].y = pos
                 self.playerList[i].is_connected = con
+                self.playerList[i].is_blocking = blocking
 
             for p in self.playerList:
                 if p == self.playerList[id]:
@@ -227,15 +227,23 @@ class Game:
             # print("Handling pos parsing:", datetime.datetime.now() - timer)
             # timer = datetime.datetime.now()
 
-            # Draw Map
-            self.map.draw(self.canvas.get_canvas())
+            # Draw Map Background
+            # self.map.draw(self.canvas.get_canvas())
+            self.map.draw_background(self.canvas.get_canvas())
             # Draw Players
             for p in self.playerList:
                 if p.is_connected:
                     p.draw(self.canvas.get_canvas())
+
+            # Draw Solids on Map
+            self.map.draw_solids(self.canvas.get_canvas())
+
+            # Draw End Screen
             if not self.playerList[id].is_alive():
                 # Draw Death-screen
                 self.canvas.get_canvas().blit(pygame.image.load(wrk_dir + '\\wasted.png').convert_alpha(), (0, 0))
+
+            #  Draw Scorebpard
             if self.show_scoreboard:
                 # Generate Scoreboard
                 can = self.canvas.get_canvas()
@@ -366,7 +374,9 @@ class Game:
                              self.playerList[int(self.data['id'])].weapon.durability,
                              self.playerList[int(self.data['id'])].blood_frame],
             "health": self.playerList[int(self.data['id'])].health,
-            "killed_by": self.playerList[int(self.data['id'])].killed_by
+            "killed_by": self.playerList[int(self.data['id'])].killed_by,
+            "is_blocking": self.playerList[int(self.data['id'])].is_blocking,
+            "got_hit": self.playerList[int(self.data['id'])].weapon.hitted_me
         }
         self.conn.send(temp_data)
 
@@ -387,6 +397,8 @@ class Game:
         erg_killed_by = []
         erg_pos = []
         erg_con = []
+        erg_blocking = []
+        erg_hit = []
         for key, value in self.data.items():
             # since a fifth dictionary entry named 'id' is added for the player id, ignore this key/entry
             if key != "id" and key != "metadata":
@@ -429,9 +441,19 @@ class Game:
                             erg_con.append(value2)
                         else:
                             erg_con.append(True)
+                    elif key2 == "is_blocking":
+                        if key != str(self.id):
+                            erg_blocking.append(value2)
+                        else:
+                            erg_blocking.append(self.playerList[int(self.data["id"])].is_blocking)
+                    elif key2 == "got_hit":
+                        if key != str(self.id):
+                            erg_hit.append(value2)
+                        else:
+                            erg_hit.append(self.playerList[int(self.data["id"])].weapon.hitted_me)
             else:
                 continue
-        return erg_player, erg_weapon, erg_health, erg_killed_by, erg_pos, erg_con
+        return erg_player, erg_weapon, erg_health, erg_killed_by, erg_pos, erg_con, erg_blocking, erg_hit
 
     def next_to_solid(self, player, dirn, distance):
         """
@@ -463,3 +485,7 @@ class Game:
                 return erg
             erg += 1
         return erg
+
+    def initialize_game_data(self):
+        while "metadata" not in self.data:
+            self.update_background_process()

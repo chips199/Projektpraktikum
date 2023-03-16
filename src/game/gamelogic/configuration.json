@@ -6,7 +6,9 @@
 	"health": 100,
     "player_frame": [0, false, 1],
     "weapon_data": [0, false, 1, "Fist", 100, null],
-    "killed_by": [0, 0, 0, 0, 0]
+    "killed_by": [0, 0, 0, 0, 0],
+    "is_blocking": false,
+    "got_hit": false
   },
   "1": {
     "id": 1,
@@ -15,7 +17,9 @@
 	"health": 100,
     "player_frame": [0, false, 1],
     "weapon_data": [0, false, 1, "Fist", 100, null],
-    "killed_by": [0, 0, 0, 0, 0]
+    "killed_by": [0, 0, 0, 0, 0],
+    "is_blocking": false,
+    "got_hit": false
   },
   "2": {
     "id": 2,
@@ -24,7 +28,9 @@
 	"health": 100,
     "player_frame": [0, false, 1],
     "weapon_data": [0, false, 1, "Fist", 100, null],
-    "killed_by": [0, 0, 0, 0, 0]
+    "killed_by": [0, 0, 0, 0, 0],
+    "is_blocking": false,
+    "got_hit": false
   },
   "3": {
     "id": 3,
@@ -33,7 +39,9 @@
 	"health": 100,
     "player_frame": [0, false, 1],
     "weapon_data": [0, false, 1, "Fist", 100, null],
-    "killed_by": [0, 0, 0, 0, 0]
+    "killed_by": [0, 0, 0, 0, 0],
+    "is_blocking": false,
+    "got_hit": false
   },
   "metadata": {
     "start": "",
