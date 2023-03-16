@@ -228,8 +228,8 @@ class Game:
 
             # sync data
             self.player_frames, self.weapon_frames, health, killed, pos, con, shots, blocking = self.parse()
-            for i, (data_player, data_weapon, health, killed, pos, con, shots) in enumerate(
-                    zip(self.player_frames, self.weapon_frames, health, killed, pos, con, shots)):
+            for i, (data_player, data_weapon, health, killed, pos, con, shots, blocking) in enumerate(
+                    zip(self.player_frames, self.weapon_frames, health, killed, pos, con, shots, blocking)):
                 self.playerList[i].current_frame = data_player[0]
                 self.playerList[i].animation_running = data_player[1]
                 self.playerList[i].animation_direction = data_player[2]
@@ -297,6 +297,9 @@ class Game:
             if not self.playerList[id].is_alive():
                 # Draw Death-screen
                 self.canvas.get_canvas().blit(pygame.image.load(wrk_dir + '\\wasted.png').convert_alpha(), (0, 0))
+
+            # Draw Items
+            self.map.draw_items(self.canvas.get_canvas())
 
             #  Draw Scorebpard
             if self.show_scoreboard:
@@ -423,11 +426,11 @@ class Game:
                              self.playerList[int(self.data['id'])].animation_running,
                              self.playerList[int(self.data['id'])].animation_direction],
             "weapon_data": [self.playerList[int(self.data['id'])].weapon.current_frame,
-                             self.playerList[int(self.data['id'])].weapon.animation_running,
-                             self.playerList[int(self.data['id'])].weapon.animation_direction,
-                             self.playerList[int(self.data['id'])].weapon.weapon_type.name,
-                             self.playerList[int(self.data['id'])].weapon.durability,
-                             self.playerList[int(self.data['id'])].blood_frame],
+                            self.playerList[int(self.data['id'])].weapon.animation_running,
+                            self.playerList[int(self.data['id'])].weapon.animation_direction,
+                            self.playerList[int(self.data['id'])].weapon.weapon_type.name,
+                            self.playerList[int(self.data['id'])].weapon.durability,
+                            self.playerList[int(self.data['id'])].blood_frame],
             "health": self.playerList[int(self.data['id'])].health,
             "killed_by": self.playerList[int(self.data['id'])].killed_by,
             "is_blocking": self.playerList[int(self.data['id'])].is_blocking,

@@ -101,16 +101,7 @@ class Map:
             if not item_dict[i.type.name].__contains__([i.x, i.y]):
                 self.items.remove(i)
 
-    def draw(self, screen):
-        """
-        displays all map objects to the canvas
-        :param screen: pygame canvas
-        """
-        canvas_rec = pygame.Rect(0, 0, self.game.width, self.game.height)
-        if isinstance(self.background, pygame.Surface):
-            screen.blit(self.background, canvas_rec)
-            if len(self.staticimages) != 0:
-                screen.blit(self.static_objects_img, canvas_rec)
+    def draw_items(self, screen):
         for i in self.items:
             i.draw(screen)
 
