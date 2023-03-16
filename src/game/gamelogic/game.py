@@ -1,4 +1,5 @@
 import json
+import math
 import os
 from copy import copy
 import datetime
@@ -328,6 +329,30 @@ class Game:
                                  165)
                 # Draw the Scoreboard
                 can.blit(scoreboard, (100, 100))
+
+            # Draw Clock
+            game_length = (self.end_time - self.start_time).total_seconds()
+            remaining = (self.end_time - datetime.datetime.now()).total_seconds()
+            remain_per = remaining / game_length
+            if remain_per > 0.2:
+                # shifted four times, because of strange artefacts when done only once
+                pygame.draw.arc(self.canvas.get_canvas(), [255, 255, 255], [self.width - 60, 10, 50, 50], math.pi * 0.5,
+                                (math.pi * 2 * remain_per) + math.pi * 0.5, 25)
+                pygame.draw.arc(self.canvas.get_canvas(), [255, 255, 255], [self.width - 61, 10, 50, 50], math.pi * 0.5,
+                                (math.pi * 2 * remain_per) + math.pi * 0.5, 25)
+                pygame.draw.arc(self.canvas.get_canvas(), [255, 255, 255], [self.width - 60, 11, 50, 50], math.pi * 0.5,
+                                (math.pi * 2 * remain_per) + math.pi * 0.5, 25)
+                pygame.draw.arc(self.canvas.get_canvas(), [255, 255, 255], [self.width - 61, 11, 50, 50], math.pi * 0.5,
+                                (math.pi * 2 * remain_per) + math.pi * 0.5, 25)
+            else:
+                pygame.draw.arc(self.canvas.get_canvas(), [255, 0, 0], [self.width - 60, 10, 50, 50], math.pi * 0.5,
+                                (math.pi * 2 * remain_per) + math.pi * 0.5, 25)
+                pygame.draw.arc(self.canvas.get_canvas(), [255, 0, 0], [self.width - 61, 10, 50, 50], math.pi * 0.5,
+                                (math.pi * 2 * remain_per) + math.pi * 0.5, 25)
+                pygame.draw.arc(self.canvas.get_canvas(), [255, 0, 0], [self.width - 60, 11, 50, 50], math.pi * 0.5,
+                                (math.pi * 2 * remain_per) + math.pi * 0.5, 25)
+                pygame.draw.arc(self.canvas.get_canvas(), [255, 0, 0], [self.width - 61, 11, 50, 50], math.pi * 0.5,
+                                (math.pi * 2 * remain_per) + math.pi * 0.5, 25)
 
             # Draw End screen
             kills_per_player = list(
