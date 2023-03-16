@@ -275,7 +275,7 @@ class Game:
             # Draw Map Background
             # self.map.draw(self.canvas.get_canvas())
             self.map.draw_background(self.canvas.get_canvas())
-            
+
             # Draw Players
             for p in self.playerList:
                 if p.is_connected:
@@ -291,7 +291,7 @@ class Game:
                             shot.move(self)
                         else:
                             p.weapon_shots.remove(shot)
-                            
+
             # Draw Solids on Map
             self.map.draw_solids(self.canvas.get_canvas())
             if not self.playerList[id].is_alive():

@@ -1,4 +1,3 @@
-import datetime
 import math
 from copy import copy
 import datetime
@@ -176,9 +175,9 @@ class Player(Animated):
                     self.blood_frame = None
                 self.blood_animation.animation_direction = self.animation_direction
                 if self.animation_direction == 0:
-                    self.blood_animation.set_pos(self.x+4, self.y + 40)
+                    self.blood_animation.set_pos(self.x + 4, self.y + y)
                 else:
-                    self.blood_animation.set_pos(self.x+30, self.y + 40)
+                    self.blood_animation.set_pos(self.x + 30, self.y + y)
                 self.blood_animation.draw_animation_once(g=g, reset=True)
 
         # death animation
@@ -412,7 +411,7 @@ class Player(Animated):
             return "snow"
         else:
             return "unknown map"
-            
+
     @staticmethod
     def get_color_rgb(p):
         """
