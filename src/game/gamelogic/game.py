@@ -115,7 +115,8 @@ class Game:
             if self.playerList[id].is_alive():
                 # check if weapon is destroyed and give player fists if true
                 if self.playerList[id].weapon.destroyed and not self.playerList[id].weapon.animation_running:
-                    self.playerList[id].weapon = weapon.Weapon(weapon.WeaponType.Fist, self.map.directory + r"\waffen\faeuste", 1.0,
+                    self.playerList[id].weapon = weapon.Weapon(weapon.WeaponType.Fist,
+                                                               self.map.directory + r"\waffen\faeuste", 1.0,
                                                                [self.playerList[id].x, self.playerList[id].y],
                                                                self.playerList[id].weapon_path[
                                                                    weapon.WeaponType.Fist.name])
@@ -147,7 +148,7 @@ class Game:
                         self.playerList[id].weapon.start_animation_in_direction(self.playerList[id].animation_direction)
 
                 # blocking
-                if keys[pygame.K_m]:
+                if keys[pygame.K_m] or keys[pygame.K_q]:
                     self.playerList[id].start_blocking()
                 else:
                     self.playerList[id].stop_blocking()
@@ -204,7 +205,8 @@ class Game:
                 self.playerList[i].animation_running = data_player[1]
                 self.playerList[i].animation_direction = data_player[2]
                 if self.playerList[i].weapon.weapon_type != weapon.WeaponType.getObj(data_weapon[3]):
-                    self.playerList[i].weapon = weapon.Weapon(weapon.WeaponType.getObj(data_weapon[3]), self.map.directory + r"\waffen\faeuste", 1.0,
+                    self.playerList[i].weapon = weapon.Weapon(weapon.WeaponType.getObj(data_weapon[3]),
+                                                              self.map.directory + r"\waffen\faeuste", 1.0,
                                                               [self.playerList[i].x, self.playerList[i].y],
                                                               self.playerList[i].weapon_path[
                                                                   weapon.WeaponType.getObj(data_weapon[3]).name])
@@ -212,6 +214,7 @@ class Game:
                 self.playerList[i].weapon.current_frame = data_weapon[0]
                 self.playerList[i].weapon.animation_running = data_weapon[1]
                 self.playerList[i].weapon.animation_direction = data_weapon[2]
+                self.playerList[i].blood_frame = data_weapon[5]
                 self.playerList[i].health = health
                 self.playerList[i].killed_by = killed
                 self.playerList[i].x, self.playerList[i].y = pos
@@ -360,7 +363,8 @@ class Game:
                              self.playerList[int(self.data['id'])].weapon.animation_running,
                              self.playerList[int(self.data['id'])].weapon.animation_direction,
                              self.playerList[int(self.data['id'])].weapon.weapon_type.name,
-                             self.playerList[int(self.data['id'])].weapon.durability],
+                             self.playerList[int(self.data['id'])].weapon.durability,
+                             self.playerList[int(self.data['id'])].blood_frame],
             "health": self.playerList[int(self.data['id'])].health,
             "killed_by": self.playerList[int(self.data['id'])].killed_by
         }
@@ -402,7 +406,8 @@ class Game:
                                                self.playerList[int(self.data["id"])].weapon.animation_running,
                                                self.playerList[int(self.data["id"])].weapon.animation_direction,
                                                self.playerList[int(self.data["id"])].weapon.weapon_type.name,
-                                               self.playerList[int(self.data["id"])].weapon.durability])
+                                               self.playerList[int(self.data["id"])].weapon.durability,
+                                               self.playerList[int(self.data["id"])].blood_frame])
                     elif key2 == "health":
                         if key != str(self.id):
                             erg_health.append(value2)

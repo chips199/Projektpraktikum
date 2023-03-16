@@ -70,6 +70,7 @@ class Player(Animated):
         self.last_block = datetime.now().timestamp()
         self.renew_shield_cooldown = 2
         self.hold_shield_cooldown = 1
+        self.blood_frame = None
 
         # Sound effects:
         # Load sound effect hurt
@@ -149,22 +150,26 @@ class Player(Animated):
 
             if self.is_blocking:
                 if self.animation_direction == 0:
-                    player_rec = pygame.Rect(self.x-1, self.y-3, self.frame_width, self.frame_height)
+                    player_rec = pygame.Rect(self.x - 1, self.y - 3, self.frame_width, self.frame_height)
                     g.blit(self.shield_right, player_rec)
                 else:
-                    player_rec = pygame.Rect(self.x-39, self.y-3, self.frame_width, self.frame_height)
+                    player_rec = pygame.Rect(self.x - 39, self.y - 3, self.frame_width, self.frame_height)
                     g.blit(self.shield_left, player_rec)
 
             self.weapon.animation_direction = self.animation_direction
             self.weapon.draw(g=g, x=self.x, y=self.y, width=self.frame_width, height=self.frame_height)
 
             # blood splash animation
-            if self.weapon.hitted_me or self.blood_animation.current_frame > 0:
+            if self.blood_frame is not None:
+                if self.blood_animation.current_frame < self.blood_animation.frame_count:
+                    self.blood_frame = self.blood_animation.current_frame
+                else:
+                    self.blood_frame = None
                 self.blood_animation.animation_direction = self.animation_direction
                 if self.animation_direction == 0:
-                    self.blood_animation.set_pos(self.x+4, self.y + 40)
+                    self.blood_animation.set_pos(self.x + 4, self.y + 40)
                 else:
-                    self.blood_animation.set_pos(self.x+30, self.y + 40)
+                    self.blood_animation.set_pos(self.x + 30, self.y + 40)
                 self.blood_animation.draw_animation_once(g=g, reset=True)
 
         # death animation
