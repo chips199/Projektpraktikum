@@ -87,9 +87,9 @@ def game_server(game_id, this_gid):
     game_data_dict[game_id]["metadata"]["spawnpoints"]["items"] = {"Sword": [],
                                                                    "Laser": []
                                                                    }
-    game_data_dict[game_id]["metadata"]["start"] = (datetime.datetime.now() + datetime.timedelta(seconds=10)).strftime(
+    game_data_dict[game_id]["metadata"]["start"] = (datetime.datetime.now() + datetime.timedelta(seconds=12)).strftime(
         "%d/%m/%Y, %H:%M:%S")
-    game_data_dict[game_id]["metadata"]["end"] = (datetime.datetime.now() + datetime.timedelta(seconds=310)).strftime(
+    game_data_dict[game_id]["metadata"]["end"] = (datetime.datetime.now() + datetime.timedelta(seconds=312)).strftime(
         "%d/%m/%Y, %H:%M:%S")
     last_w_of_p = [None] * number_of_players_per_game
     last_spawn_check = datetime.datetime.now()
