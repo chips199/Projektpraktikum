@@ -23,6 +23,6 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install tox tox-gh-actions
-          apt install xvfb && xvfb-run
+          sudo apt install xvfb && xvfb-run
       - name: Test with tox
         run: tox
