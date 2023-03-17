@@ -1,6 +1,6 @@
-import datetime
 import math
 from copy import copy
+import datetime
 
 import pygame.draw
 
@@ -22,10 +22,10 @@ class Player(Animated):
 
         if killed_by is None:
             killed_by = [0, 0, 0, 0, 0]
+
+        self.map = self.get_map(self.directory)
         self.falling_time = datetime.datetime.now()
         self.jumping_time = datetime.datetime.now()
-        # self.x = startx
-        # self.y = starty
         self.id = pid
         self.velocity = 7
         self.current_moving_velocity = 7
@@ -62,9 +62,16 @@ class Player(Animated):
 
         self.death_animation = Animated(start=[0, 0],
                                         directory=map_dir + f"\\player\\death_animation\\death_animation_{self.get_color(self.directory)}")
+        self.death_animation.double_frames(2)
         self.blood_animation = Animated(start=[0, 0], directory=map_dir + r"\player\blood_animation")
-        self.blood_animation.start_animation_in_direction(direction=1)
         self.blood_animation.double_frames(factor=2)
+        self.shield_right = pygame.image.load(map_dir + r"\waffen\shield\shield.png").convert_alpha()
+        self.shield_left = pygame.transform.flip(self.shield_right, True, False)
+        self.blocking_start_time = datetime.datetime.now().timestamp()
+        self.last_block = datetime.datetime.now().timestamp()
+        self.renew_shield_cooldown = 2
+        self.hold_shield_cooldown = 1
+        self.blood_frame = None
 
         # Sound effects:
         # Load sound effect hurt
@@ -80,11 +87,12 @@ class Player(Animated):
         self.velocity_counter = data[3]
 
     def keep_sliding(self, func):
-        # if (self.landed or self.moving_on_edge) and \
-        #         not self.is_jumping and \
-        #         not self.is_falling and \
-        #         self.sliding_frame_counter > 1:
-        # landed for when landed and moving_on_edge for when player s sliding down hill on snowmap
+        """
+        If the player has landed or is moving on the edge and not falling and still has sliding frames left,
+        moves the player in the current direction, with distance calculated in the handed over function
+        distance is calculated with math.sqrt to reach a quadratic behaviour instead of linear behaviour
+        """
+        # landed needed when player is landed, and moving_on_edge for when player is sliding down hill on snowmap
         if (self.landed or self.moving_on_edge) and \
                 not self.is_falling and \
                 self.sliding_frame_counter > 1:
@@ -100,14 +108,22 @@ class Player(Animated):
                 self.sliding_frame_counter -= 1
 
     def reset_sliding_counter(self):
+        """
+        Reset the sliding frame counter to the maximum sliding frames
+        """
         self.sliding_frame_counter = self.max_sliding_frames
 
     def stop_sliding(self):
+        """
+        Stop the sliding by setting the sliding frame counter to 1
+        """
         self.sliding_frame_counter = 1
 
     def draw(self, g):
         if self.health > 0:
             super(Player, self).draw(g=g)
+
+            self.death_animation.current_frame = 0
 
             # health bar
             pygame.draw.line(surface=g,
@@ -135,16 +151,38 @@ class Player(Animated):
                                  end_pos=(self.x + (self.frame_width * (self.weapon.durability / 100)), self.y - 10),
                                  width=3)
 
+            if self.is_blocking:
+                player_rec = pygame.Rect(self.x - 1, self.y - 3, self.frame_width, self.frame_height)
+                g.blit(self.shield_right, player_rec)
+                player_rec = pygame.Rect(self.x - 42, self.y - 3, self.frame_width, self.frame_height)
+                g.blit(self.shield_left, player_rec)
+
             self.weapon.animation_direction = self.animation_direction
             self.weapon.draw(g=g, x=self.x, y=self.y, width=self.frame_width, height=self.frame_height)
 
-            # bloods plash animation
-            if self.weapon.hitted_me or self.blood_animation.current_frame > 0:
-                self.blood_animation.set_pos(self.x - 47, self.y + 15)
+            # blood splash animation
+            if self.blood_frame is not None:
+                y = 0
+                if self.map == "basic":
+                    y = 40
+                if self.map == "space":
+                    y = 50
+                if self.map == "snow":
+                    y = 55
+                if self.blood_animation.current_frame < self.blood_animation.frame_count:
+                    self.blood_frame = self.blood_animation.current_frame
+                else:
+                    self.blood_frame = None
+                self.blood_animation.animation_direction = self.animation_direction
+                if self.animation_direction == 0:
+                    self.blood_animation.set_pos(self.x + 4, self.y + y)
+                else:
+                    self.blood_animation.set_pos(self.x + 30, self.y + y)
                 self.blood_animation.draw_animation_once(g=g, reset=True)
 
         # death animation
         else:
+            # print(self.death_animation.current_frame, "at:", datetime.now())
             self.death_animation.set_pos(self.x, self.y)
             self.death_animation.draw_animation_once(g=g)
             # Play sound effect die
@@ -221,10 +259,33 @@ class Player(Animated):
                 self.velocity_jumping = self.max_jumping_speed
 
     def start_blocking(self):
-        self.is_blocking = True
-        self.block_x_axis = True
+        """
+        Begin blocking if not already blocking and the renew shield cooldown is over.
+        Otherwise, stop blocking.
+        """
+        # If not already blocking and the renew shield cooldown is over, start blocking
+        if not self.is_blocking and datetime.datetime.now().timestamp() > self.last_block + self.renew_shield_cooldown:
+            self.blocking_start_time = datetime.datetime.now().timestamp()
+
+        # If still holding shield, set blocking to True and block player moving on x-axis
+        if datetime.datetime.now().timestamp() < self.blocking_start_time + self.hold_shield_cooldown:
+            self.is_blocking = True
+            self.block_x_axis = True
+
+        # Otherwise, stop blocking
+        else:
+            self.stop_blocking()
 
     def stop_blocking(self):
+        """
+        Stop the blocking state and reset relevant variables.
+        Set is_blocking to False and reset block_x_axis to False so player is allowed to move on x-axis again.
+        """
+        # If character is currently blocking, update last_block time to current time and subtract the
+        # hold_shield_cooldown from blocking_start_time to simulate that the max holding time is reached
+        if self.is_blocking:
+            self.last_block = datetime.datetime.now().timestamp()
+            self.blocking_start_time -= self.hold_shield_cooldown
         self.is_blocking = False
         self.block_x_axis = False
 
@@ -339,6 +400,17 @@ class Player(Animated):
             return "purple"
         else:
             return "turquoise"
+
+    @staticmethod
+    def get_map(p):
+        if p.__contains__("basic"):
+            return "basic"
+        elif p.__contains__("space"):
+            return "space"
+        elif p.__contains__("snow"):
+            return "snow"
+        else:
+            return "unknown map"
 
     @staticmethod
     def get_color_rgb(p):

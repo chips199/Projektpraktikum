@@ -31,24 +31,25 @@ pygame.font.init()
 class Game:
 
     def __init__(self, w, h, conn, process):
+        self.data = {}  # type:ignore[var-annotated]
         self.kills_to_win = 5
         self.counter = 0
         self.conn = conn
         self.process = process
         self.timer = datetime.datetime.now()
-        self.update_background_process()
+        self.initialize_game_data()
         self.id = int(self.data['id'])
 
         # Status of the music
         self.music_on = True
 
         # pygame.init()
+        # time.sleep(0.5)
         pygame.display.set_icon(pygame.image.load(wrk_dir + r"\..\stick_wars_logo.png"))
         self.width = w
         self.height = h
         self.canvas = canvas.Canvas(self.width, self.height, str(self.id) + "Stick  Wars")
         self.print_loading(0.1)
-        # self.map = Map(self, map_names_dict[self.data['map_name']])
         self.map = Map(self, map_names_dict[self.data["metadata"]["map"]])
         self.print_loading(0.2)
         print("MAP:", self.data["metadata"]["map"])
@@ -175,6 +176,12 @@ class Game:
                             # long distance weapon shot
                             self.playerList[id].add_shot()
 
+                # blocking
+                if keys[pygame.K_m] or keys[pygame.K_q]:
+                    self.playerList[id].start_blocking()
+                else:
+                    self.playerList[id].stop_blocking()
+
                 if keys[pygame.K_d] and not self.playerList[id].block_x_axis:
                     if self.playerList[id].landed:
                         self.playerList[id].start_animation_in_direction(0)
@@ -220,9 +227,9 @@ class Game:
             # timer = datetime.datetime.now()
 
             # sync data
-            self.player_frames, self.weapon_frames, health, killed, pos, con, shots = self.parse()
-            for i, (data_player, data_weapon, health, killed, pos, con, shots) in enumerate(
-                    zip(self.player_frames, self.weapon_frames, health, killed, pos, con, shots)):
+            self.player_frames, self.weapon_frames, health, killed, pos, con, shots, blocking = self.parse()
+            for i, (data_player, data_weapon, health, killed, pos, con, shots, blocking) in enumerate(
+                    zip(self.player_frames, self.weapon_frames, health, killed, pos, con, shots, blocking)):
                 self.playerList[i].current_frame = data_player[0]
                 self.playerList[i].animation_running = data_player[1]
                 self.playerList[i].animation_direction = data_player[2]
@@ -236,10 +243,12 @@ class Game:
                 self.playerList[i].weapon.current_frame = data_weapon[0]
                 self.playerList[i].weapon.animation_running = data_weapon[1]
                 self.playerList[i].weapon.animation_direction = data_weapon[2]
+                self.playerList[i].blood_frame = data_weapon[5]
                 self.playerList[i].health = health
                 self.playerList[i].killed_by = killed
                 self.playerList[i].x, self.playerList[i].y = pos
                 self.playerList[i].is_connected = con
+                self.playerList[i].is_blocking = blocking
 
                 for s in shots:
                     shot_found = False
@@ -263,8 +272,10 @@ class Game:
             # print("Handling pos parsing:", datetime.datetime.now() - timer)
             # timer = datetime.datetime.now()
 
-            # Draw Map
-            self.map.draw(self.canvas.get_canvas())
+            # Draw Map Background
+            # self.map.draw(self.canvas.get_canvas())
+            self.map.draw_background(self.canvas.get_canvas())
+
             # Draw Players
             for p in self.playerList:
                 if p.is_connected:
@@ -280,9 +291,17 @@ class Game:
                             shot.move(self)
                         else:
                             p.weapon_shots.remove(shot)
+
+            # Draw Solids on Map
+            self.map.draw_solids(self.canvas.get_canvas())
             if not self.playerList[id].is_alive():
                 # Draw Death-screen
                 self.canvas.get_canvas().blit(pygame.image.load(wrk_dir + '\\wasted.png').convert_alpha(), (0, 0))
+
+            # Draw Items
+            self.map.draw_items(self.canvas.get_canvas())
+
+            #  Draw Scorebpard
             if self.show_scoreboard:
                 # Generate Scoreboard
                 can = self.canvas.get_canvas()
@@ -309,6 +328,30 @@ class Game:
                                  165)
                 # Draw the Scoreboard
                 can.blit(scoreboard, (100, 100))
+
+            # Draw Clock
+            game_length = (self.end_time - self.start_time).total_seconds()
+            remaining = (self.end_time - datetime.datetime.now()).total_seconds()
+            remain_per = remaining / game_length
+            if remain_per > 0.2:
+                # shifted four times, because of strange artefacts when done only once
+                pygame.draw.arc(self.canvas.get_canvas(), [255, 255, 255], [self.width - 60, 10, 50, 50], math.pi * 0.5,
+                                (math.pi * 2 * remain_per) + math.pi * 0.5, 25)
+                pygame.draw.arc(self.canvas.get_canvas(), [255, 255, 255], [self.width - 61, 10, 50, 50], math.pi * 0.5,
+                                (math.pi * 2 * remain_per) + math.pi * 0.5, 25)
+                pygame.draw.arc(self.canvas.get_canvas(), [255, 255, 255], [self.width - 60, 11, 50, 50], math.pi * 0.5,
+                                (math.pi * 2 * remain_per) + math.pi * 0.5, 25)
+                pygame.draw.arc(self.canvas.get_canvas(), [255, 255, 255], [self.width - 61, 11, 50, 50], math.pi * 0.5,
+                                (math.pi * 2 * remain_per) + math.pi * 0.5, 25)
+            else:
+                pygame.draw.arc(self.canvas.get_canvas(), [255, 0, 0], [self.width - 60, 10, 50, 50], math.pi * 0.5,
+                                (math.pi * 2 * remain_per) + math.pi * 0.5, 25)
+                pygame.draw.arc(self.canvas.get_canvas(), [255, 0, 0], [self.width - 61, 10, 50, 50], math.pi * 0.5,
+                                (math.pi * 2 * remain_per) + math.pi * 0.5, 25)
+                pygame.draw.arc(self.canvas.get_canvas(), [255, 0, 0], [self.width - 60, 11, 50, 50], math.pi * 0.5,
+                                (math.pi * 2 * remain_per) + math.pi * 0.5, 25)
+                pygame.draw.arc(self.canvas.get_canvas(), [255, 0, 0], [self.width - 61, 11, 50, 50], math.pi * 0.5,
+                                (math.pi * 2 * remain_per) + math.pi * 0.5, 25)
 
             # Draw End screen
             kills_per_player = list(
@@ -410,9 +453,11 @@ class Game:
                             self.playerList[int(self.data['id'])].weapon.animation_running,
                             self.playerList[int(self.data['id'])].weapon.animation_direction,
                             self.playerList[int(self.data['id'])].weapon.weapon_type.name,
-                            self.playerList[int(self.data['id'])].weapon.durability],
+                            self.playerList[int(self.data['id'])].weapon.durability,
+                            self.playerList[int(self.data['id'])].blood_frame],
             "health": self.playerList[int(self.data['id'])].health,
             "killed_by": self.playerList[int(self.data['id'])].killed_by,
+            "is_blocking": self.playerList[int(self.data['id'])].is_blocking,
             "shots": list(map(weapon_shot.WeaponShot.get_sync_data, self.playerList[int(self.data['id'])].weapon_shots))
         }
         self.conn.send(temp_data)
@@ -434,6 +479,7 @@ class Game:
         erg_killed_by = []
         erg_pos = []
         erg_con = []
+        erg_blocking = []
         erg_shots = []
         for key, value in self.data.items():
             # since a fifth dictionary entry named 'id' is added for the player id, ignore this key/entry
@@ -454,7 +500,8 @@ class Game:
                                                self.playerList[int(self.data["id"])].weapon.animation_running,
                                                self.playerList[int(self.data["id"])].weapon.animation_direction,
                                                self.playerList[int(self.data["id"])].weapon.weapon_type.name,
-                                               self.playerList[int(self.data["id"])].weapon.durability])
+                                               self.playerList[int(self.data["id"])].weapon.durability,
+                                               self.playerList[int(self.data["id"])].blood_frame])
                     elif key2 == "health":
                         if key != str(self.id):
                             erg_health.append(value2)
@@ -476,6 +523,11 @@ class Game:
                             erg_con.append(value2)
                         else:
                             erg_con.append(True)
+                    elif key2 == "is_blocking":
+                        if key != str(self.id):
+                            erg_blocking.append(value2)
+                        else:
+                            erg_blocking.append(self.playerList[int(self.data["id"])].is_blocking)
                     elif key2 == "shots":
                         if key != str(self.id):
                             erg_shots.append(value2)
@@ -484,7 +536,7 @@ class Game:
                                                       self.playerList[int(self.data['id'])].weapon_shots)))
             else:
                 continue
-        return erg_player, erg_weapon, erg_health, erg_killed_by, erg_pos, erg_con, erg_shots
+        return erg_player, erg_weapon, erg_health, erg_killed_by, erg_pos, erg_con, erg_shots, erg_blocking
 
     def next_to_solid(self, player, dirn, distance):
         """
@@ -523,3 +575,7 @@ class Game:
                 return erg
             erg += 1
         return erg
+
+    def initialize_game_data(self):
+        while "metadata" not in self.data:
+            self.update_background_process()

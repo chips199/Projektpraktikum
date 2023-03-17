@@ -30,14 +30,12 @@ class MenuSetup:
         self.timer = datetime.datetime.now()
         self.update_background_after_id = None
         self.network_started = False
-        # self.id = "5"
         self.conn1 = Type[Connection]
         self.conn2 = Type[Connection]
         self.entry_session_id = None
         self.label_error = None
         self.label_game_name = None
         self.back_button = None
-        # self.net = None
         self.w = 300
         self.h = 60
         self.window_width_planned = self.window_width = 1600
@@ -52,7 +50,8 @@ class MenuSetup:
         self.data = {
             "id": 1,
             "s_id": 2984,
-            "amount_player": 2
+            "amount_player": 2,
+            "map": "unknown"
         }
 
         # -------------------------------------------  Music  -------------------------------------------
@@ -60,11 +59,13 @@ class MenuSetup:
         self.music.play(-1)
 
         self.player_dict = {
-            "0": [wrk_dir + r"\..\basicmap\player\basic_player_magenta.png", 0.14],
-            "1": [wrk_dir + r"\..\basicmap\player\basic_player_orange.png", 0.37],
-            "2": [wrk_dir + r"\..\basicmap\player\basic_player_purple.png", 0.6],
-            "3": [wrk_dir + r"\..\basicmap\player\basic_player_turquoise.png", 0.83]
+            "0": [wrk_dir + r"\..\unknown1\player\unknown2_player_magenta.png", 0.14],
+            "1": [wrk_dir + r"\..\unknown1\player\unknown2_player_orange.png", 0.37],
+            "2": [wrk_dir + r"\..\unknown1\player\unknown2_player_purple.png", 0.6],
+            "3": [wrk_dir + r"\..\unknown1\player\unknown2_player_turquoise.png", 0.83]
         }
+
+        self.copy_player_dict = copy.deepcopy(self.player_dict)
 
         # -------------------------------------------  Window  -------------------------------------------
         # configure root window
@@ -74,7 +75,6 @@ class MenuSetup:
         # get screen width and height
         self.ws = self.root.winfo_screenwidth()  # width of the screen
         self.hs = self.root.winfo_screenheight()  # height of the screen
-        self.test_run = False
 
         # change size of window and other widgets, if the actual screen size is smaller than the planned screen size
         if self.ws < self.window_width_planned or self.hs < self.window_height_planned:
@@ -98,8 +98,6 @@ class MenuSetup:
         self.root.geometry("{}x{}+{}+{}".format(self.window_width, self.window_height, self.x, self.y))
         self.root.resizable(False, False)
 
-        # self.main_frame = MyFrame(master=self.root, width=self.window_width, height=self.window_height)
-        # self.main_frame.place(anchor='center', relx=0.5, rely=0.5)
         self.main_frame = None
         self.interaction_frame = None
         self.lobby_frame = None
@@ -134,9 +132,6 @@ class MenuSetup:
                                        text=None,
                                        image=game_name_image,
                                        fg_color="#212121")
-        # self.label_game_name.place(x=int(self.window_width / 2),
-        #                            y=int(164 * self.sizing_height),
-        #                            anchor='s')
         self.label_game_name.place(relx=0.5,
                                    rely=0.02,
                                    anchor='n')
@@ -254,7 +249,7 @@ class MenuSetup:
 
         # load snow map
         schnee_map_platforms = tk.CTkImage(
-            dark_image=Image.open(wrk_dir + r"\..\menu\maps\schnee_map.png"),
+            dark_image=Image.open(wrk_dir + r"\..\menu\maps\snow_map.png"),
             size=(width, height))
         map3 = MyLabel(master=self.choose_map_frame,
                        text=None,
@@ -381,31 +376,44 @@ class MenuSetup:
     def update_player(self) -> None:
         """
         Update the players in the game by extracting the amount of players from server handed over in the self.data
+        In Addition change the directory path to the correct map path
         """
-        server_amount_player = int(self.data["amount_player"])  # type: ignore[union-attr]
+        server_amount_player = int(self.data["amount_player"])  # type: ignore[call-overload]
+
+        if self.data["map"] not in self.player_dict['0'][0]:  # type:ignore[operator]
+            player = "unknown2"
+            if self.data["map"] == "basicmap":
+                player = "basic"
+            elif self.data["map"] == "platformmap":
+                player = "space"
+            elif self.data["map"] == "schneemap":
+                player = "snow"
+            for key, val in self.player_dict.items():
+                val[0] = val[0].replace("unknown1", self.data["map"])  # type:ignore[attr-defined]
+                val[0] = val[0].replace("unknown2", player)  # type:ignore[attr-defined]
 
         # Loop over the absolute difference between the number of players in the game and the number of players on the server
-        for i in range(abs(server_amount_player - self.amount_player)):
-            # If the number of players in the game is less than the number of players on the server
-            if self.amount_player < server_amount_player:
-                # Load the new player
-                self.load_player(path=self.player_dict[str(self.amount_player)][0],  # type: ignore[arg-type]
-                                 rel_x_pos=self.player_dict[str(self.amount_player)][1])  # type: ignore[arg-type]
-                self.amount_player += 1
-                self.test_run = True
+        else:
+            for i in range(abs(server_amount_player - self.amount_player)):
+                # If the number of players in the game is less than the number of players on the server
+                if self.amount_player < server_amount_player:
+                    # Load the new player
+                    self.load_player(path=self.player_dict[str(self.amount_player)][0],  # type: ignore[arg-type]
+                                     rel_x_pos=self.player_dict[str(self.amount_player)][1])  # type: ignore[arg-type]
+                    self.amount_player += 1
 
-            # If the number of players in the game is greater than the number of players on the server
-            else:
-                # Remove the last player in the game
-                player_to_remove = self.player.pop()
-                player_to_remove.destroy()
-                self.amount_player -= 1
-                self.test_run = True
+                # If the number of players in the game is greater than the number of players on the server
+                else:
+                    # Remove the last player in the game
+                    player_to_remove = self.player.pop()
+                    player_to_remove.destroy()
+                    self.amount_player -= 1
 
         # If the game is running
         if self.root.run:
             # Call the update player method again after 1000ms
             self.main_frame.after(1000, lambda: self.update_player())
+
     # __________________command: Functions__________________
 
     def start_new_session(self):
@@ -450,7 +458,7 @@ class MenuSetup:
         # has started, to send correct data to the game
         # Stop the music
         self.music.fadeout(2000)
-        sleep(2)
+        # sleep(2)
         g = game.Game(w=1600, h=900, conn=self.conn1, process=self.process)
         g.run()
 
@@ -466,6 +474,7 @@ class MenuSetup:
             self.load_main_frame()
             self.load_interaction_frame()
             self.back_button.place_forget()
+            self.player_dict = copy.deepcopy(self.copy_player_dict)
             if self.process is not None:
                 self.process.kill()
                 self.amount_player = 0
@@ -484,8 +493,8 @@ class MenuSetup:
                             direction: str,
                             stepsize: int = 9,
                             after_time: int = 2000,
-                            func: Optional[Callable] = None, # type: ignore[type-arg]
-                            **kwargs: Optional[Callable]) -> None: # type: ignore[type-arg]
+                            func: Optional[Callable] = None,  # type: ignore[type-arg]
+                            **kwargs: Optional[Callable]) -> None:  # type: ignore[type-arg]
         """
         Clear the widget out of the window in a sliding animation.
         :param widget: widget to be cleared
@@ -522,6 +531,7 @@ class MenuSetup:
         """
         try:
             if argument != "":
+                # self.update_directory(map_name = argument)
                 # Set up connection between main process and background process
                 self.conn1, self.conn2 = multiprocessing.Pipe(duplex=True)
                 # Start the background process
@@ -574,7 +584,6 @@ class MenuSetup:
                 message="No answer from server")
 
     def update_background_process(self):
-        # print("GET_background")
         if datetime.datetime.now() - self.timer >= datetime.timedelta(seconds=1):
             self.timer = datetime.datetime.now()
             print("count in Menu:", self.counter)
@@ -583,12 +592,12 @@ class MenuSetup:
             self.counter += 1
         if self.conn1.poll():  # type:ignore[attr-defined]
             self.data = self.conn1.recv()  # type:ignore[attr-defined]
-        self.update_background_after_id = self.main_frame.after(300, self.update_background_process)
-
-    def send_data(self, msg):
-        self.conn1.send(msg)  # type:ignore[attr-defined]
+        self.update_background_after_id = self.main_frame.after(100, self.update_background_process)
 
 
 if __name__ == "__main__":
     m = MenuSetup()
     m.run()
+
+    print(int(round(datetime.datetime.now().timestamp())))
+    print(datetime.datetime.now().timestamp())

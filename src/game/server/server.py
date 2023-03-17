@@ -87,9 +87,9 @@ def game_server(game_id, this_gid):
     game_data_dict[game_id]["metadata"]["spawnpoints"]["items"] = {"Sword": [],
                                                                    "Laser": []
                                                                    }
-    game_data_dict[game_id]["metadata"]["start"] = (datetime.datetime.now() + datetime.timedelta(seconds=10)).strftime(
+    game_data_dict[game_id]["metadata"]["start"] = (datetime.datetime.now() + datetime.timedelta(seconds=12)).strftime(
         "%d/%m/%Y, %H:%M:%S")
-    game_data_dict[game_id]["metadata"]["end"] = (datetime.datetime.now() + datetime.timedelta(seconds=310)).strftime(
+    game_data_dict[game_id]["metadata"]["end"] = (datetime.datetime.now() + datetime.timedelta(seconds=312)).strftime(
         "%d/%m/%Y, %H:%M:%S")
     last_w_of_p = [None] * number_of_players_per_game
     last_spawn_check = datetime.datetime.now()
@@ -107,7 +107,7 @@ def game_server(game_id, this_gid):
                     potential_items_distances = list(map(lambda x: math.dist(p_pos, x), potential_items))
                     i = potential_items_distances.index(min(potential_items_distances))
                     game_data_dict[game_id]["metadata"]["spawnpoints"]["items"][wp].pop(i)
-        if datetime.datetime.now() - last_spawn_check > datetime.timedelta(seconds=20):
+        if datetime.datetime.now() - last_spawn_check > datetime.timedelta(seconds=10):
             last_spawn_check = datetime.datetime.now()
             for point in spawn_points[maps_dict[game_id]]["item_spawnpoints"]:
                 free = True
