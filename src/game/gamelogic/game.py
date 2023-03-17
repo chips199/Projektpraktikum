@@ -5,7 +5,7 @@ import datetime
 
 import pandas as pd
 import pygame
-
+import math
 from src.game.gamelogic.animated import Animated
 from src.game.gamelogic.canvas import Canvas
 
@@ -413,7 +413,7 @@ class Game:
     def print_loading(self, percent):
         """
         displayes a loading screen
-        :param percent: percetige to display
+        :param percent: percentige to display
         """
         pygame.draw.line(surface=self.canvas.get_canvas(),
                          color=pygame.Color(255, 255, 255),

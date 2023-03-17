@@ -35,7 +35,7 @@ def test_set_pos(setup):
 
 
 def test_draw(setup, setup_canvas):
-    assert setup.draw(setup_canvas) is None
+    assert setup.draw(g=setup_canvas.get_canvas()) is None
 
 
 def test_cut_frames(setup):
@@ -58,7 +58,7 @@ def test_double_frames(setup):
 
 
 def test_draw_animation_once(setup, setup_canvas):
-    assert setup.draw_animation_once(setup_canvas) is None
+    assert setup.draw_animation_once(setup_canvas.get_canvas()) is None
 
 
 def test_stop_animation(setup):

@@ -11,4 +11,4 @@ def test_Background_Connection():
     time.sleep(15)
     assert connection.close() is None
 
-# Background Connection cannot be used as an object and therefore test need to be indirect
+# Background Connection cannot be used as an object and therefore testsneed to be indirect

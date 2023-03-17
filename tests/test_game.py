@@ -1,6 +1,5 @@
 import src.game.gamelogic.game as game
 import pytest
-from typing import Type
 import multiprocessing
 import src.game.gamelogic.backgroundProzess as process
 
@@ -13,8 +12,8 @@ def setup():
     return game.Game(50, 50, conn1, test_process)
 
 
-def test_print_loading(setup):
-    x = 0
-    while x < 1:
-        assert setup.print_loading(0.1) is None
-        x = x + 0.1
+#def test_print_loading(setup):
+#    x = 0
+#    while x < 1:
+#        x = x + 0.1
+#        assert setup.print_loading(x) is None

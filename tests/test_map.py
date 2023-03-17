@@ -21,10 +21,23 @@ def setup():
     return test_map
 
 
-def test_draw(setup):
+def test_draw_solids(setup):
     # canvas cannot be mocked easily so the dependency will be tolerated
     test_canvas = canvas.Canvas(50, 50)
-    assert setup.draw(test_canvas.get_canvas()) is None
+    assert setup.draw_solids(test_canvas.get_canvas()) is None
+
+
+def test_draw_background(setup):
+    # canvas cannot be mocked easily so the dependency will be tolerated
+    test_canvas = canvas.Canvas(50, 50)
+    assert setup.draw_background(test_canvas.get_canvas()) is None
+
+
+def test_draw_items(setup):
+    # canvas cannot be mocked easily so the dependency will be tolerated
+    test_canvas = canvas.Canvas(50, 50)
+    assert setup.draw_items(test_canvas.get_canvas()) is None
+
 
 # test only to be run locally
 # def test_load_music(setup):

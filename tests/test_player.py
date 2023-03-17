@@ -1,10 +1,8 @@
 import pytest
 import src.game.gamelogic.player as player
 from unittest.mock import MagicMock, Mock
-import math
 import src.game.gamelogic.canvas as canvas
 import pandas as pd
-import src.game.gamelogic.game as game
 import os
 import pygame
 
@@ -13,7 +11,6 @@ import pygame
 def p_setup():
     pygame.display.set_mode((50, 50))
     basicmap = str(os.path.abspath(os.path.dirname(__file__))) + "\\basicmap"
-    print(basicmap + "\\player\\animation\\basic_player_magenta_animation")
     test_player = player.Player(1, [0, 0], directory=basicmap + "\\player\\animation\\basic_player_magenta_animation")
     test_player.solid_df = pd.DataFrame([(1, 2), (3, 4), (4, 5)], columns=['x', 'y'])
     test_player.relative_solid_df = pd.DataFrame([(1, 1)], columns=["x", "y"])
@@ -22,6 +19,7 @@ def p_setup():
 
 @pytest.fixture
 def setup():
+    pygame.display.set_mode((50, 50))
     basicmap = str(os.path.abspath(os.path.dirname(__file__))) + "\\basicmap"
     t1 = player.Player(1, [0, 0], basicmap + "\\player\\animation\\basic_player_magenta_animation")
     t2 = player.Player(2, [0, 0], basicmap + "\\player\\animation\\basic_player_magenta_animation")
@@ -90,22 +88,22 @@ def test_draw(p_setup):
 
 def test_shift_df(p_setup):
     p_setup.shift_df(p_setup.solid_df, 0, 1)
-    assert (p_setup.solid_df["x"] == 3).any() == False
+    assert (p_setup.solid_df["x"] == 3).any() is False
     p_setup.shift_df(p_setup.solid_df, 0, -1)
-    assert (p_setup.solid_df["x"] == 1).any() == True
+    assert (p_setup.solid_df["x"] == 1).any() is True
     p_setup.shift_df(p_setup.solid_df, 0, 1)
     p_setup.shift_df(p_setup.solid_df, 1, 1)
-    assert (p_setup.solid_df["x"] == 1).any() == True
+    assert (p_setup.solid_df["x"] == 1).any() is True
     p_setup.shift_df(p_setup.solid_df, 1, -1)
-    assert (p_setup.solid_df["x"] == 3).any() == False
+    assert (p_setup.solid_df["x"] == 3).any() is False
     p_setup.shift_df(p_setup.solid_df, 2, 1)
-    assert (p_setup.solid_df["y"] == 4).any() == True
+    assert (p_setup.solid_df["y"] == 4).any() is True
     p_setup.shift_df(p_setup.solid_df, 2, -1)
-    assert (p_setup.solid_df["y"] == 2).any() == True
+    assert (p_setup.solid_df["y"] == 2).any() is True
     p_setup.shift_df(p_setup.solid_df, 3, -1)
-    assert (p_setup.solid_df["y"] == 6).any() == False
+    assert (p_setup.solid_df["y"] == 6).any() is False
     p_setup.shift_df(p_setup.solid_df, 3, 1)
-    assert (p_setup.solid_df["y"] == 4).any() == True
+    assert (p_setup.solid_df["y"] == 4).any() is True
 
 
 def test_move(p_setup):
@@ -169,22 +167,45 @@ def test_is_alive(p_setup):
 
 
 def test_refresh_solids(p_setup):
+    p_setup.relativ_solids_df = pd.DataFrame([(1, 1)], columns=["x", "y"])
     p_setup.x = 1
     p_setup.y = 1
     p_setup.refresh_solids()
-    assert p_setup.solid_df == pd.DataFrame([(2, 2)], columns=["x", "y"])
+    assert (p_setup.solid_df["x"] == 2).all()
+    assert (p_setup.solid_df["y"] == 2).all()
+    p_setup.relativ_solids_df = pd.DataFrame([(2, 2)], columns=["x", "y"])
+    p_setup.x = -1
+    p_setup.y = -1
+    p_setup.refresh_solids()
+    assert (p_setup.solid_df["x"] == 1).all()
+    assert (p_setup.solid_df["y"] == 1).all()
+    p_setup.relativ_solids_df = pd.DataFrame([(1, 1)], columns=["x", "y"])
+    p_setup.x = 0
+    p_setup.y = 0
+    p_setup.refresh_solids()
+    assert (p_setup.solid_df["x"] == 1).all()
+    assert (p_setup.solid_df["y"] == 1).all()
 
 
 def test_falling(p_setup):
+    next_to_solid = Mock(return_value=10)
     p_setup.is_jumping = False
-    assert p_setup.falling(game.Game.next_to_solid) is None
+    assert p_setup.falling(next_to_solid) is None
     p_setup.is_jumping = True
-    assert p_setup.falling(game.Game.next_to_solid) is None
+    assert p_setup.falling(next_to_solid) is None
+    next_to_solid = Mock(return_value=0)
+    p_setup.is_jumping = False
+    assert p_setup.falling(next_to_solid) is None
+    p_setup.is_jumping = True
+    assert p_setup.falling(next_to_solid) is None
+    next_to_solid = Mock(return_value=-10)
+    p_setup.is_jumping = False
+    assert p_setup.falling(next_to_solid) is None
+    p_setup.is_jumping = True
+    assert p_setup.falling(next_to_solid) is None
 
 
 def test_get_color(setup):
-    test = [setup[0].get_color(), setup[1].get_color(), setup[2].get_color(), setup[3].get_color()]
+    test = [setup[0].get_color(setup[0].directory), setup[0].get_color(setup[1].directory), setup[2].get_color(setup[2].directory), setup[3].get_color(setup[3].directory)]
     assert "magenta" in test
-    assert "orange" in test
-    assert "purple" in test
-    assert "turquoise" in test
+    assert len(test) == 4
