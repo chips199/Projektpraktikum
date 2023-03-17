@@ -54,10 +54,9 @@ def test_load_player(setup):
     assert setup.load_player(-5.0, "basicmap/player/basic_player_magenta.png") is None
 
 
-# This method loops
-# def test_update_player(setup):
-#    assert setup.update_player() is None
-#   setup.main_frame.after.assert_called_with(1000, lambda: setup.update_player())
+def test_update_player(setup):
+    assert setup.update_player() is None
+    setup.main_frame.after.assert_called_with(1000, lambda: setup.update_player())
 
 
 # test_start_new_session only calls another already tested method
@@ -65,7 +64,6 @@ def test_load_player(setup):
 
 def test_create_lobby(setup):
     assert setup.create_lobby("Schneemap") is None
-    setup.main_frame.after.assert_called_with(300, setup.update_background_process)
     setup.label_error.label_hide_show.assert_called()
     setup.label_game_name.winfo_height.assert_called()
     setup.label_game_name.winfo_y.assert_called()

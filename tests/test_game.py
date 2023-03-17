@@ -12,7 +12,8 @@ def setup():
     return game.Game(50, 50, conn1, test_process)
 
 
-#def test_print_loading(setup):
+#looping
+# def test_print_loading(setup):
 #    x = 0
 #    while x < 1:
 #        x = x + 0.1

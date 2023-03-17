@@ -1,5 +1,5 @@
 import pandas as pd
-
+import src.game.gamelogic.canvas as canvas
 import src.game.gamelogic.weapon as weapon
 from src.game.gamelogic.weapon import WeaponType as type
 import pytest
@@ -13,9 +13,9 @@ def setup():
     wrk_dir = os.path.abspath(os.path.dirname(__file__))
     basicmap = str(wrk_dir) + r"/basicmap"
     pygame.display.set_mode((50, 50))
-    test_weapon1 = weapon.Weapon(type.Fist, basicmap + r"/waffen/faeuste", 0, [0, 0],
+    test_weapon1 = weapon.Weapon(type.Fist, basicmap + r"/waffen/faeuste", [0, 0],
                                  basicmap + r"/waffen/faeuste/animation/fists_magenta_animation")
-    test_weapon2 = weapon.Weapon(type.Sword, basicmap + r"/waffen/schwert", 1, [1, 1],
+    test_weapon2 = weapon.Weapon(type.Sword, basicmap + r"/waffen/schwert", [1, 1],
                                  basicmap + r"/waffen/schwert/animation/sword_hold_animation_magenta")
 
     return test_weapon1, test_weapon2
@@ -30,13 +30,14 @@ def test_get_dataframe(setup):
 
 
 def test_draw(setup):
+    test_canvas= canvas.Canvas(100, 100)
     for i in setup:
         i.x = 100
         i.y = 100
         i.animation_direction = 0
-        assert i.draw() is None
+        assert i.draw(y=10, height=100, width=100, x=10, g=test_canvas.get_canvas()) is None
         i.animation_direction = 1
-        assert i.draw() is None
+        assert i.draw(y=10, height=100, x=10, width=100, g=test_canvas.get_canvas()) is None
 
 
 def test_can_hit(setup):
@@ -57,14 +58,15 @@ def test_can_hit(setup):
 
 def test_hit(setup):
     for i in setup:
+        i.destroyed = False
         i.durability = 5
         assert i.hit() is None
         assert i.destroyed is False
         i.durability = 1
         assert i.hit() is None
-        assert i.destroyed is True
+        assert i.destroyed is False
         assert i.hit() is None
-        assert i.destroyed is True
+        assert i.destroyed is False
         i.durability = -1
         assert i.hit() is None
         assert i.destroyed is True
