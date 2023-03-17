@@ -5,6 +5,16 @@ on:
   - pull_request
 
 jobs:
+  Run-xvfb-on-Ubuntu:
+    name: Run xvfb on Ubuntu
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '14'
+      - run: apt install xvfb && xvfb-run
+
   test:
     runs-on: ${{ matrix.os }}
     strategy:
