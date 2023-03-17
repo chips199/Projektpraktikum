@@ -1,7 +1,7 @@
 name: Tests
 
 env:
-  SDL_VIDEODRIVER = "dummy"
+  SDL_VIDEODRIVER: "dummy"
 
 on:
   - push
