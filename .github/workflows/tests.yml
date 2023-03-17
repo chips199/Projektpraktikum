@@ -2,7 +2,7 @@ name: Tests
 
 env:
   SDL_VIDEODRIVER: "dummy"
-
+  SDL_AUDIODRIVER: "dummy"
 on:
   - push
   - pull_request
