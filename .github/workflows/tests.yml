@@ -1,5 +1,8 @@
 name: Tests
 
+env:
+  SDL_VIDEODRIVER = "dummy"
+
 on:
   - push
   - pull_request
