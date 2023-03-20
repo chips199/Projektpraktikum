@@ -45,7 +45,6 @@ class Game:
         self.music_on = True
 
         # pygame.init()
-        # time.sleep(0.5)
         pygame.display.set_icon(pygame.image.load(wrk_dir + r"\..\stick_wars_logo.png"))
         self.width = w
         self.height = h
@@ -87,9 +86,6 @@ class Game:
         """
         the core method of the game containing the game loop
         """
-        # pygame stuff
-        # clock = pygame.time.Clock()
-
         # Draw countdown
         while datetime.datetime.now() < self.start_time:
             self.canvas.get_canvas().fill((32, 32, 32))
@@ -103,13 +99,9 @@ class Game:
 
         # game loop
         while run:
-            fps_timer = datetime.datetime.now()
-            # timer = datetime.datetime.now()
-
             # pygame stuff for the max fps
-            clock.tick(100)
-            # print()
-            # print("FPS:", self.update_fps())
+            clock.tick(60)
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
@@ -136,9 +128,6 @@ class Game:
                     self.playerList[id].death_time = datetime.datetime.now()
                     self.playerList[id].killed_by[4] += 1
                 # handling pygame events
-
-                # print("Handling Events:", datetime.datetime.now() - timer)
-                # timer = datetime.datetime.now()
 
                 # get the key presses
                 keys = pygame.key.get_pressed()
@@ -209,8 +198,6 @@ class Game:
                 # gravity
                 self.playerList[id].gravity(func=self.next_to_solid)
 
-                # print("Handling Keys:", datetime.datetime.now() - timer)
-                # timer = datetime.datetime.now()
             else:
                 # if player is dead, respawn
                 if datetime.datetime.now() - self.playerList[id].death_time > datetime.timedelta(seconds=3):
@@ -221,11 +208,7 @@ class Game:
 
             # Send Data about this player and get some over the others als reply
             self.send_to_background_process()
-            # print("Handling send:", datetime.datetime.now() - timer)
-            # timer = datetime.datetime.now()
-            self.update_background_process()
-            # print("Handling update:", datetime.datetime.now() - timer)
-            # timer = datetime.datetime.now()
+            self.receive_from_background_process()
 
             # sync data
             self.player_frames, self.weapon_frames, health, killed, pos, con, shots, blocking = self.parse()
@@ -270,11 +253,8 @@ class Game:
 
             # sync items
             self.map.setitems(self.data["metadata"]["spawnpoints"]["items"])
-            # print("Handling pos parsing:", datetime.datetime.now() - timer)
-            # timer = datetime.datetime.now()
 
             # Draw Map Background
-            # self.map.draw(self.canvas.get_canvas())
             self.map.draw_background(self.canvas.get_canvas())
 
             # Draw Players
@@ -376,37 +356,8 @@ class Game:
 
             # Update Canvas
             self.canvas.update()
-            # print("Handling redraw:", datetime.datetime.now() - timer)
-            # timer = datetime.datetime.now()
 
             self.send_to_background_process()
-
-            this_time = int((datetime.datetime.now() - fps_timer).microseconds)
-            delay = 0.0
-
-            if self.counter_reset_timer > 0 and \
-                    round((self.time_total + this_time) / 1000, 3) / (self.counter_reset_timer + 1) < 16:
-                delay = (self.counter_reset_timer + 1) * 16 - round((self.time_total + this_time) / 1000, 3)
-
-            elif self.counter_reset_timer == 0:
-                delay = 16 - this_time / 1000
-
-            wait_time = datetime.datetime.now()
-            while datetime.datetime.now() - wait_time < datetime.timedelta(microseconds=(delay - 0.5) * 1000):
-                continue
-                # print((datetime.datetime.now() - wait_time).microseconds / 1000)
-            # timer = datetime.datetime.now()
-
-            # print("TOTAL TIME:", datetime.datetime.now() - fps_timer)
-
-            this_time = int((datetime.datetime.now() - fps_timer).microseconds)
-            self.counter_reset_timer += 1
-            self.time_total += this_time
-
-            if self.counter_reset_timer == 10:
-                self.counter_reset_timer = 0
-                self.time_total = 0
-                self.new_fps_timer = datetime.datetime.now()
 
         self.process.kill()  # muss noch übergeben werden
         pygame.quit()
@@ -429,22 +380,23 @@ class Game:
         self.canvas.get_canvas().blit(pygame.image.load(wrk_dir + '\\Loadingscreen.png').convert_alpha(), (0, 0))
         self.canvas.update()
 
-    def update_background_process(self):
-        # if datetime.datetime.now() - self.timer >= datetime.timedelta(seconds=1):
-        #     self.timer = datetime.datetime.now()
-        #     print("count in Menu:", self.counter)
-        #     self.counter = 0
-        # else:
-        #     self.counter += 1
+    def receive_from_background_process(self):
+        """
+        Update the data received from the background process
+        """
         new_data = None
-        # while not self.conn.poll():
-        #     continue
+        # Check for any data received from the background process
         while self.conn.poll():
             new_data = self.conn.recv()
+        # If new data is a string, parse it as JSON and update self.data
         if type(new_data) == str:
             self.data = json.loads(new_data)
 
-    def send_to_background_process(self):
+    def send_to_background_process(self) -> None:
+        """
+        Sends current player and weapon data to the background process
+        """
+        # Get relevant data from the current player
         temp_data = {
             "position": [int(self.playerList[int(self.data["id"])].x), int(self.playerList[int(self.data["id"])].y)],
             "player_frame": [self.playerList[int(self.data['id'])].current_frame,
@@ -461,18 +413,16 @@ class Game:
             "is_blocking": self.playerList[int(self.data['id'])].is_blocking,
             "shots": list(map(weapon_shot.WeaponShot.get_sync_data, self.playerList[int(self.data['id'])].weapon_shots))
         }
+        # Send the data to the background process
         self.conn.send(temp_data)
-
-    @staticmethod
-    def update_fps():
-        fps = str(int(clock.get_fps()))
-        return fps
 
     def parse(self):
         """
-        extracts positions from server data
-        :return: list of player frames [current_frame, animation_running, animation_direction],
-                 list of weapon frames[current_frame, animation_running, animation_direction]
+        Parse the received data and return a tuple containing lists with the data.
+
+        Returns:
+        Tuple of lists with the parsed data in the order:
+        erg_player, erg_weapon, erg_health, erg_killed_by, erg_pos, erg_con, erg_shots, erg_blocking
         """
         erg_player = []
         erg_weapon = []
@@ -578,5 +528,9 @@ class Game:
         return erg
 
     def initialize_game_data(self):
+        """
+        Initializes the game data by calling receive_from_background_process() method
+        until the metadata is not found in the data dictionary.
+        """
         while "metadata" not in self.data:
-            self.update_background_process()
+            self.receive_from_background_process()
