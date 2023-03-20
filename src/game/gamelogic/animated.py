@@ -127,10 +127,6 @@ class Animated:
         """
         self.animation_running = False
 
-    def start_animation_in_direction(self, direction):
-        self.animation_direction = direction
-        self.animation_running = True
-
     def start_animation_in_direction(self, direction: int) -> None:
         """
         Start the animation in the given direction
