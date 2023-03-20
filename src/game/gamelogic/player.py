@@ -132,6 +132,7 @@ class Player(Animated):
                              end_pos=(self.x + self.frame_width, self.y - 5),
                              width=3)
             if self.health > 0:
+                print(f"Player heatlh in class player {self.health}")
                 pygame.draw.line(surface=g,
                                  color=pygame.Color(45, 175, 20),
                                  start_pos=(self.x, self.y - 5),
@@ -403,6 +404,9 @@ class Player(Animated):
 
     @staticmethod
     def get_map(p):
+        """
+        Returns the map
+        """
         if p.__contains__("basic"):
             return "basic"
         elif p.__contains__("space"):
@@ -415,17 +419,17 @@ class Player(Animated):
     @staticmethod
     def get_color_rgb(p):
         """
-        Returns the color of the player in hex
+        Returns the color of the player in rgb
         param: p: Player
         """
         if p.directory.__contains__("magenta"):
-            return pygame.Color(227, 0, 113)
+            return pygame.Color(227, 0, 113)  # magenta
         elif p.directory.__contains__("orange"):
-            return pygame.Color(254, 174, 24)
+            return pygame.Color(254, 174, 24)  # orange
         elif p.directory.__contains__("purple"):
-            return pygame.Color(159, 2, 238)
+            return pygame.Color(159, 2, 238)  # purple
         else:
-            return pygame.Color(0, 195, 150)
+            return pygame.Color(0, 195, 150)  # turquoise
 
     def add_shot(self):
         """
@@ -433,12 +437,14 @@ class Player(Animated):
         """
         # Direction of the shot
         shot_direction = self.animation_direction
+        # Left
         if self.animation_direction == 0:
             shot_direction = 1
+        # Right
         elif self.animation_direction == 1:
             shot_direction = -1
         # determine start position from shot
-        pos = self.weapon.get_position_weapon_shot(x=self.x, y=self.y, width=self.frame_width, height=self.frame_height)
+        pos = self.weapon.get_position_for_weapon_shot(x=self.x, y=self.y, width=self.frame_width, height=self.frame_height)
         # Add shot to array
         self.weapon_shots.append(
             WeaponShot(pos, self.weapon.get_shot_speed(), Player.get_color_rgb(self), shot_direction,

@@ -9,6 +9,8 @@ class Music:
     def __init__(self, sound_path, volume):
         """
         Initialize the class Music
+        param: sound_path: path to the music file
+        param: volume:  Volume of the music
         """
         # Initialize mixer
         mixer.init()
@@ -32,6 +34,7 @@ class Music:
     def play(self, loops=0):
         """
         Plays a sound
+        param: loops: Number repetition of music; -1 for infinite repetitions
         :return: None
         """
         pygame.mixer.music.play(loops=loops)
@@ -53,7 +56,7 @@ class Music:
 
     def get_status(self):
         """
-        Returns whether music is currently being played
+        Returns whether music is currently being played or not
         :return: boolean
         """
         return pygame.mixer.music.get_busy()
