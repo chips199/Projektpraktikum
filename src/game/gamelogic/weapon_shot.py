@@ -12,7 +12,11 @@ class WeaponShot:
         """
         pygame.Color(231, 24, 55)
         param: direction: +1, -1 (left, right)
+        param: velocity: velocity of the shot
+        param: color: color of the shot (should have the same color as that of the player)
+        param: direction: direction of the shot: 1: left, -1: right
         """
+        # Initialize variables
         self.x, self.y = pos
         self.velocity = velocity
         self.color = color
@@ -21,7 +25,8 @@ class WeaponShot:
         self.max_width = self.width
         self.direction = direction
         self.damage = damage
-        print(damage)
+
+        # Create dataframe
         solid = []
         for x in range(self.width):
             solid.append((x, 0))
@@ -37,6 +42,7 @@ class WeaponShot:
             self.shot_id = calendar.timegm(date.utctimetuple())
         else:
             self.shot_id = shot_id
+
         # Status of the shot
         self.active = True
 
@@ -45,8 +51,8 @@ class WeaponShot:
         returns the data frame of the shot
         """
         df = copy(self.solid_df)
-        # direction: right
         if self.direction == -1:
+            # direction: right
             df['x'] = df['x'].map(lambda x: x + self.x - self.width)
             df['y'] = df['y'].map(lambda y: y + self.y - self.height)
         else:
