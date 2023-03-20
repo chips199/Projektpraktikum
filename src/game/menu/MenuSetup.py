@@ -120,7 +120,7 @@ class MenuSetup:
     def load_main_frame(self):
         # -------------------------------------------  MainFrame  -------------------------------------------
         """
-               Load the main frame for the game window
+        Load the main frame for the game window
         """
 
         self.main_frame = MyFrame(master=self.root, width=self.window_width, height=self.window_height)
@@ -156,10 +156,13 @@ class MenuSetup:
                                         corner_radius=int(self.h / 3),
                                         command=self.back_to_start)
 
-    def load_interaction_frame(self):
+    def load_interaction_frame(self) -> None:
+        """
+        Load the interaction frame, holding the buttons to start and create a session and an entry field to enter an
+        existing session id
+        """
         self.interaction_frame = MyFrame(master=self.main_frame,
                                          width=self.root.window_width,
-                                         # height=int(710 * self.sizing_height),
                                          height=self.window_height * 0.79,
                                          fg_color="#212121")
         self.interaction_frame.place(anchor='sw', x=0, y=self.window_height)
@@ -211,21 +214,35 @@ class MenuSetup:
                                  rely=0.2,
                                  anchor='n')
 
-    def load_choose_map_frame(self):
+    def load_choose_map_frame(self) -> None:
+        """
+        Load the 'Choose Map' frame.
+
+        This function destroys the current interaction frame and creates a new frame
+        where players can choose a map to play on. The chosen map is passed to
+        create_lobby().
+
+        Returns:
+            None
+        """
+        # Destroy the current interaction frame
         self.interaction_frame.destroy()  # type:ignore[union-attr]
 
-        self.choose_map_frame = MyFrame(master=self.main_frame, width=int(self.window_width),
+        # Create a new frame for the map selection
+        self.choose_map_frame = MyFrame(master=self.main_frame,
+                                        width=int(self.window_width),
                                         height=int(400 * self.sizing_height),
                                         fg_color="#212121")
         self.choose_map_frame.place(anchor='n', x=self.window_width / 2, y=self.window_height * 0.3)
 
+        # Create the 'back' button
         self.back_button.place(relx=0.05,
                                rely=0.1)
 
         width = int(444 * self.sizing_width)
         height = int(250 * self.sizing_height)
 
-        # load basic map
+        # Load and place the basic map
         basic_map_structures = tk.CTkImage(
             dark_image=Image.open(wrk_dir + r"\..\menu\maps\basic_map.png"),
             size=(width, height))
@@ -236,7 +253,7 @@ class MenuSetup:
                    rely=0.5,
                    anchor='center')
 
-        # load space map
+        # Load and place the space map
         space_map_platforms = tk.CTkImage(
             dark_image=Image.open(wrk_dir + r"\..\menu\maps\space_map.png"),
             size=(width, height))
@@ -248,7 +265,7 @@ class MenuSetup:
                    rely=0.5,
                    anchor='center')
 
-        # load snow map
+        # Load and place the snow map
         schnee_map_platforms = tk.CTkImage(
             dark_image=Image.open(wrk_dir + r"\..\menu\maps\snow_map.png"),
             size=(width, height))
@@ -260,9 +277,7 @@ class MenuSetup:
                    rely=0.5,
                    anchor='center')
 
-        self.root.update()
-
-        # add buttons to choose a map
+        # Create buttons to select each map
         button_start = tk.CTkButton(master=self.choose_map_frame,
                                     text="Basicmap",
                                     width=width,
@@ -296,20 +311,31 @@ class MenuSetup:
                             rely=0.9,
                             anchor='center')
 
-    def load_lobby_frame(self):
+    def load_lobby_frame(self) -> None:
+        """
+        Load the lobby frame.
+
+        The lobby frame consists of a MyFrame widget and various child widgets,
+        including a back button, a session ID label, and a start button.
+        """
+        # Create a MyFrame widget as the lobby frame
         self.lobby_frame = MyFrame(master=self.root,
                                    fg_color="#212121")
 
-        self.lobby_frame.configure(width=self.window_width,
+        # Configure the dimensions of the lobby frame
+        self.lobby_frame.configure(width=self.window_width,  # type:ignore[union-attr]
                                    height=150 * self.sizing_height)  # type:ignore[union-attr]
-        self.lobby_frame.place(x=0, y=250 * self.sizing_height)  # type:ignore[union-attr]
+        # Place the lobby frame at the appropriate position
+        self.lobby_frame.place(x=0, y=250 * self.sizing_height)
 
+        # Configure and place the back button widget
         self.back_button.configure(text="Leave Lobby")
-        self.back_button.place(relx=0.02,
-                               rely=0.1)
+        self.back_button.place(relx=0.02, rely=0.1)
 
+        # Update the main window to render any newly-added widgets
         self.root.update()
 
+        # Create a session ID label widget and place it in the lobby frame
         session_id_label = MyLabel(master=self.main_frame,
                                    width=self.w,
                                    height=self.h,
@@ -320,6 +346,7 @@ class MenuSetup:
                                       self.label_game_name.winfo_height() +  # type:ignore[union-attr]
                                       10) * self.sizing_height))
 
+        # Create a start button widget and place it in the lobby frame
         button_start = tk.CTkButton(master=self.lobby_frame,
                                     text="Start",
                                     width=self.w,
@@ -327,9 +354,7 @@ class MenuSetup:
                                     command=self.start_game,
                                     font=("None", self.h * 0.6),
                                     corner_radius=int(self.h / 3))
-        button_start.place(relx=0.5,
-                           y=0,
-                           anchor='n')
+        button_start.place(relx=0.5, y=0, anchor='n')
 
     # __________________Player Functions__________________
 
@@ -427,7 +452,12 @@ class MenuSetup:
                                  after_time=1500,
                                  func=lambda: self.load_choose_map_frame())
 
-    def create_lobby(self, map_name):
+    def create_lobby(self, map_name: str) -> None:
+        """
+        Creates a lobby with the given map_name.
+
+        :param map_name: The name of the map to be used in the lobby.
+        """
         self.lobby_owner = True
         self.start_network(argument=map_name,
                            update_func=lambda: self.update_background_process(),
@@ -439,7 +469,11 @@ class MenuSetup:
                                func2=lambda: self.check_if_game_started(),
                                func3=lambda: self.main_frame.after(1700, lambda: self.update_player())))
 
-    def join_lobby(self):
+    def join_lobby(self) -> None:
+        """
+        Start the network and try to join the lobby with the session ID from the entry field
+        When successful, slide out the interaction frame and load the lobby frame.
+        """
         self.start_network(argument=self.entry_session_id.get(),  # type:ignore[union-attr]
                            update_func=lambda: self.update_background_process(),
                            success_func=lambda: self.clear_frame_sliding(
@@ -450,20 +484,26 @@ class MenuSetup:
                                fun2=lambda: self.check_if_game_started(),
                                func3=lambda: self.main_frame.after(1700, lambda: self.update_player())))
 
-    def start_game(self):
+    def start_game(self) -> None:
+        """
+        Start the game and close the main window
+        """
+        # Send start signal to the game
         self.conn1.send("start")  # type:ignore[attr-defined]
-        print("send start to background")
+        # Stop the main loop
         self.root.run = False
+        # Destroy the main window
         self.root.destroy()
-        # important sleep, don't remove!!! Neccessary for the background task to realize that the game
-        # has started, to send correct data to the game
         # Stop the music
         self.music.fadeout(2000)
-        # sleep(2)
+        # Create and run the game instance
         g = game.Game(w=1600, h=900, conn=self.conn1, process=self.process)
         g.run()
 
-    def back_to_start(self):
+    def back_to_start(self) -> None:
+        """
+        Return to the main frame of the game, destroying any current frames and resetting attributes
+        """
         response = "yes"
         if self.lobby_owner:
             response = messagebox.askquestion(title="",
@@ -471,19 +511,29 @@ class MenuSetup:
 
         if response == "yes":
             self.lobby_owner = False
+            # Destroy current frames
             self.main_frame.destroy()
+            # Load the main frame
             self.load_main_frame()
+            # Load the interaction frame
             self.load_interaction_frame()
+            # Remove the back button
             self.back_button.place_forget()
+            # Reset player dictionary
             self.player_dict = copy.deepcopy(self.copy_player_dict)
             if self.process is not None:
+                # Terminate the process
                 self.process.kill()
+                # Reset attributes
                 self.amount_player = 0
                 self.lobby_frame.destroy()
 
     # __________________other Functions__________________
-
-    def check_if_game_started(self):
+    def check_if_game_started(self) -> None:
+        """
+        Check if the game has started and call the start_game method if it has, otherwise wait 1500 ms and
+        call itself recursively.
+        """
         if self.data["game_started"]:  # type:ignore[union-attr]
             self.start_game()
         else:
@@ -584,15 +634,13 @@ class MenuSetup:
                 time=3000,
                 message="No answer from server")
 
-    def update_background_process(self):
-        if datetime.datetime.now() - self.timer >= datetime.timedelta(seconds=1):
-            self.timer = datetime.datetime.now()
-            print("count in Menu:", self.counter)
-            self.counter = 0
-        else:
-            self.counter += 1
+    def update_background_process(self) -> None:
+        """
+        Updates the background process by checking if there is data available through a connection
+        """
         if self.conn1.poll():  # type:ignore[attr-defined]
             self.data = self.conn1.recv()  # type:ignore[attr-defined]
+        # Set up the next update by calling itself through after method
         self.update_background_after_id = self.main_frame.after(100, self.update_background_process)
 
 
