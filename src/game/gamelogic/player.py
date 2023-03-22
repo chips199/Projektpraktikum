@@ -132,7 +132,6 @@ class Player(Animated):
                              end_pos=(self.x + self.frame_width, self.y - 5),
                              width=3)
             if self.health > 0:
-                print(f"Player heatlh in class player {self.health}")
                 pygame.draw.line(surface=g,
                                  color=pygame.Color(45, 175, 20),
                                  start_pos=(self.x, self.y - 5),
