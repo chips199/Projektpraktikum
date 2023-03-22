@@ -10,9 +10,9 @@ from src.game.gamelogic.sounds import Sounds
 
 
 class WeaponType(Enum):
-    Fist = {"Damage": 10, "damage_to_weapon_per_hit": 0, "Cooldown": 1, "IsShortRange": True, "shot_speed": 0, "sound_level": 1}
-    Sword = {"Damage": 20, "damage_to_weapon_per_hit": 10, "Cooldown": 2, "IsShortRange": True, "shot_speed": 0, "sound_level": 1}
-    Laser = {"Damage": 15, "damage_to_weapon_per_hit": 10, "Cooldown": 2, "IsShortRange": False, "shot_speed": 15, "sound_level": 0.9}
+    Fist = {"Damage": 10, "damage_to_weapon_per_hit": 0, "Cooldown": 1, "IsShortRange": True, "shot_speed": 0, "sound_level": 1, "abs_l": None, "abs_r": None, "rel_l": None, "rel_r": None}
+    Sword = {"Damage": 20, "damage_to_weapon_per_hit": 10, "Cooldown": 2, "IsShortRange": True, "shot_speed": 0, "sound_level": 1, "abs_l": None, "abs_r": None, "rel_l": None, "rel_r": None}
+    Laser = {"Damage": 15, "damage_to_weapon_per_hit": 10, "Cooldown": 2, "IsShortRange": False, "shot_speed": 15, "sound_level": 0.9, "abs_l": None, "abs_r": None, "rel_l": None, "rel_r": None}
 
     @staticmethod
     def getObj(string):
@@ -45,8 +45,18 @@ class Weapon(Animated):
         self.hitted = list()
         self.hitted_me = False
         self.durability = 100
-        self.abs_l, self.abs_r, self.rel_l, self.rel_r = self.load_dfs()
-        # Loads the sound of the weapon
+        if self.weapon_type.value["abs_l"] is None:
+            self.abs_l, self.abs_r, self.rel_l, self.rel_r = self.load_dfs()
+            self.weapon_type.value["abs_l"] = self.abs_l
+            self.weapon_type.value["abs_r"] = self.abs_r
+            self.weapon_type.value["rel_l"] = self.rel_l
+            self.weapon_type.value["rel_r"] = self.rel_r
+        else:
+            self.abs_l = self.weapon_type.value["abs_l"]
+            self.abs_r = self.weapon_type.value["abs_r"]
+            self.rel_l = self.weapon_type.value["rel_l"]
+            self.rel_r = self.weapon_type.value["rel_r"]
+            # Loads the sound of the weapon
         impact_sound_path_volume = self.weapon_type.value['sound_level']
         self.sound_hit = Sounds(impact_sound_path + r"\sound_effects\sound_hit.mp3", impact_sound_path_volume)
         self.sound_destroy = Sounds(impact_sound_path + r"\sound_effects\sound_destroy.mp3", impact_sound_path_volume)
