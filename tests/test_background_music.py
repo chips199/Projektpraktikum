@@ -8,7 +8,7 @@ import pygame
 def setup():
     pygame.init()
     wrk_dir = os.path.abspath(os.path.dirname(__file__))
-    basicmap = os.path.join(wrk_dir, "basicmap", "music")
+    basicmap = os.path.join(wrk_dir, "mock_resources", "basicmap", "music")
     test = music.Music(basicmap, 1)
     music.Music(basicmap, -1)
     music.Music(basicmap, 0)

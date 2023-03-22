@@ -13,7 +13,7 @@ def setup():
     pygame.init()
     pygame.display.set_mode((50, 50))
     wrk_dir = os.path.abspath(os.path.dirname(__file__))
-    basicmap = os.path.join(wrk_dir,  "basicmap")
+    basicmap = os.path.join(wrk_dir, "mock_resources", "basicmap")
     pygame.display.set_mode((50, 50))
     test_weapon1 = weapon.Weapon(type.Fist, os.path.join(basicmap, "waffen", "faeuste"), [0, 0],
                                  os.path.join(basicmap, "waffen", "faeuste", "animation", "fists_magenta_animation"))

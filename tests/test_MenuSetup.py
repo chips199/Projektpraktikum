@@ -51,7 +51,7 @@ def test_load_lobby_frame(setup):
 
 # loop
 def test_load_player(setup):
-    path = os.path.join("basicmap", "player", "basic_player_magenta.png")
+    path = os.path.join("mock_resources", "basicmap", "player", "basic_player_magenta.png")
     assert setup.load_player(5.0, path) is None
     assert setup.load_player(5, path) is None
     assert setup.load_player(0, path) is None

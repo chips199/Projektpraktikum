@@ -11,7 +11,7 @@ def setup():
     pygame.init()
     pygame.display.set_mode((50, 50))
     wrk_dir = os.path.abspath(os.path.dirname(__file__))
-    basicmap = os.path.join(wrk_dir, "basicmap")
+    basicmap = os.path.join(wrk_dir, "mock_resources", "basicmap")
     return animated.Animated([0, 0], os.path.join(basicmap, "player", "blood_animation"))
 
 

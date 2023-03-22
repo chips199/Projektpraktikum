@@ -11,7 +11,7 @@ import pygame
 def setup():
     pygame.init()
     pygame.display.set_mode((50, 50))
-    waffe = os.path.join(os.path.dirname(__file__), "basicmap", "waffen")
+    waffe = os.path.join(os.path.dirname(__file__), "mock_resources", "basicmap", "waffen")
     item1 = item.Item(weapon.WeaponType.Sword, (10, 10), os.path.join(waffe, "schwert", "sword.png"))
     item2 = item.Item(weapon.WeaponType.Fist, (0, 0), os.path.join(waffe, "faeuste", "fists_magenta.png"))
     item3 = item.Item(weapon.WeaponType.Laser, (20, 20), os.path.join(waffe, "laser", "laser.png"))
