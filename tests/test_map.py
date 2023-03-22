@@ -13,9 +13,9 @@ def setup():
     game.width = 50
     game.height = 50
     pygame.display.set_mode((50, 50))
-    basicmap = os.path.join(os.path.abspath(os.path.dirname(__file__)),"basicmap")
-    platformmap = os.path.join(os.path.abspath(os.path.dirname(__file__)), "platformmap")
-    schneemap = os.path.join(os.path.abspath(os.path.dirname(__file__)), "schneemap")
+    basicmap = os.path.join(os.path.abspath(os.path.dirname(__file__)), "mock_resources", "basicmap")
+    platformmap = os.path.join(os.path.abspath(os.path.dirname(__file__)), "mock_resources", "platformmap")
+    schneemap = os.path.join(os.path.abspath(os.path.dirname(__file__)), "mock_resources", "schneemap")
     test_map = map.Map(game, basicmap)
     map.Map(game, platformmap)
     map.Map(game, schneemap)
