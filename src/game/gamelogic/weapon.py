@@ -151,18 +151,7 @@ class Weapon(Animated):
             if p.weapon.animation_running:
                 if not p.weapon.hitted_me and not pd.merge(p.weapon.get_dataframe(), pldf, how='inner',
                                                            on=['x', 'y']).empty:
-                    if pl.is_blocking:
-                        print("blocked")
-                        pl.health -= (p.weapon.weapon_type.value["Damage"] / 2)
-                    else:
-                        pl.health -= p.weapon.weapon_type.value["Damage"]
-                    pl.blood_frame = 0
-                    p.weapon.hitted_me = True
-                    if not pl.is_alive():
-                        pl.killed_by[int(p.id)] += 1
-                        pl.death_time = datetime.now()
-                    else:
-                        pl.sound_hurt.play()
+                    Weapon.player_hit(g, p, pl, p.weapon.weapon_type.value["Damage"])
             else:
                 p.weapon.hitted_me = False
             # check if a weapon shot has hit a player
