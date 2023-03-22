@@ -26,6 +26,7 @@ wrk_dir = os.path.abspath(os.path.dirname(__file__))
 class MenuSetup:
     def __init__(self):
         # -------------------------------------------  Parameters  -------------------------------------------
+        self.test = None
         self.process = None
         self.counter = 0
         self.timer = datetime.datetime.now()
@@ -157,6 +158,7 @@ class MenuSetup:
                                         command=self.back_to_start)
 
     def load_interaction_frame(self):
+        self.test = True
         self.interaction_frame = MyFrame(master=self.main_frame,
                                          width=self.root.window_width,
                                          # height=int(710 * self.sizing_height),
@@ -211,7 +213,10 @@ class MenuSetup:
                                  rely=0.2,
                                  anchor='n')
 
+        self.test = False
+
     def load_choose_map_frame(self):
+        self.test = True
         self.interaction_frame.destroy()  # type:ignore[union-attr]
 
         self.choose_map_frame = MyFrame(master=self.main_frame, width=int(self.window_width),
@@ -295,8 +300,10 @@ class MenuSetup:
         button_start3.place(relx=0.79,
                             rely=0.9,
                             anchor='center')
+        self.test = False
 
     def load_lobby_frame(self):
+        self.test = True
         self.lobby_frame = MyFrame(master=self.root,
                                    fg_color="#212121")
 
@@ -330,6 +337,7 @@ class MenuSetup:
         button_start.place(relx=0.5,
                            y=0,
                            anchor='n')
+        self.test = False
 
     # __________________Player Functions__________________
 
@@ -343,6 +351,7 @@ class MenuSetup:
         :param path: The file path to the player image
         :return: None
         """
+        self.test = True
         # Load the player image from the specified file path
         player_image = tk.CTkImage(dark_image=Image.open(path),
                                    size=(int(49 * self.sizing_width), int(142 * self.sizing_height)))
@@ -373,6 +382,7 @@ class MenuSetup:
                                    ending_function=lambda: label_image.idle_animation_on_y_axis(upper_y=0.58,
                                                                                                 lower_y=0.6,
                                                                                                 stepsize=0.0008))
+        self.test = False
 
     def update_player(self) -> None:
         """

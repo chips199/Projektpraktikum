@@ -3,7 +3,7 @@ import pytest
 import multiprocessing
 import src.game.gamelogic.backgroundProzess as process
 import pygame
-from unittest.mock import MagicMock, Mock
+from unittest.mock import MagicMock
 import pandas as pd
 
 
@@ -15,7 +15,6 @@ def setup():
     pygame.init()
     conn1, conn2 = multiprocessing.Pipe(duplex=True)
     test_process = multiprocessing.Process(target=process.backgroundProzess, args=("abc", conn2))
-    test_process.start()
     return game.Game(50, 50, conn1, test_process)
 
 

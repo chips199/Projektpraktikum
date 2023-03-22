@@ -1,6 +1,6 @@
 import os
 import src.game.menu.MenuSetup as menu
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, patch, Mock
 import pytest
 import multiprocessing
 import pygame
@@ -32,30 +32,35 @@ def test_load_main_frame(setup):
     assert setup.load_main_frame() is None
 
 
-#def test_load_interaction_frame(setup):
-#    assert setup.load_interaction_frame() is None
+def test_load_interaction_frame(setup):
+    while setup.test:
+        assert setup.root.update() is None
+        assert setup.load_interaction_frame() is None
 
 
-#def test_load_choose_map_frame(setup):
-#    assert setup.load_choose_map_frame() is None
-#    setup.interaction_frame.destroy.assert_called()
-#    setup.back_button.place.assert_called()
+def test_load_choose_map_frame(setup):
+    while setup.test:
+        assert setup.load_choose_map_frame() is None
+        setup.interaction_frame.destroy.assert_called()
+        setup.back_button.place.assert_called()
 
 
-#def test_load_lobby_frame(setup):
-#    assert setup.load_lobby_frame() is None
-#    setup.back_button.configure.assert_called_with(text="Leave Lobby")
-#    setup.label_game_name.winfo_y.assert_called()
-#    setup.label_game_name.winfo_height.assert_called()
+def test_load_lobby_frame(setup):
+    while setup.test:
+        assert setup.load_lobby_frame() is None
+        setup.back_button.configure.assert_called_with(text="Leave Lobby")
+        setup.label_game_name.winfo_y.assert_called()
+        setup.label_game_name.winfo_height.assert_called()
 
 
 # loop
-#def test_load_player(setup):
-#    path = os.path.join("mock_resources", "basicmap", "player", "basic_player_magenta.png")
-#    assert setup.load_player(5.0, path) is None
-#    assert setup.load_player(5, path) is None
-#    assert setup.load_player(0, path) is None
-#    assert setup.load_player(-5.0, path) is None
+def test_load_player(setup):
+    while setup.test:
+        path = os.path.join("mock_resources", "basicmap", "player", "basic_player_magenta.png")
+        assert setup.load_player(5.0, path) is None
+        assert setup.load_player(5, path) is None
+        assert setup.load_player(0, path) is None
+        assert setup.load_player(-5.0, path) is None
 
 
 def test_update_player(setup):
