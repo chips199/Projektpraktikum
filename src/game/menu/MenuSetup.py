@@ -56,7 +56,7 @@ class MenuSetup:
         }
 
         # -------------------------------------------  Music  -------------------------------------------
-        self.music = Music(r"music", 1.0)
+        self.music = Music(os.path.join(os.path.abspath(os.path.dirname(__file__)), "music"), 1.0)
         self.music.play(-1)
 
         self.player_dict = {

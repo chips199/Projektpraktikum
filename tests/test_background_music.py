@@ -1,12 +1,14 @@
 import src.game.gamelogic.background_music as music
 import pytest
 import os
+import pygame
 
 
 @pytest.fixture
 def setup():
-    wrk_dir = wrk_dir = os.path.abspath(os.path.dirname(__file__))
-    basicmap = "\\".join(str(wrk_dir).split("\\")) + r"\basicmap\music"
+    pygame.init()
+    wrk_dir = os.path.abspath(os.path.dirname(__file__))
+    basicmap = os.path.join(wrk_dir, "mock_resources", "basicmap", "music")
     test = music.Music(basicmap, 1)
     music.Music(basicmap, -1)
     music.Music(basicmap, 0)

@@ -9,9 +9,10 @@ import pygame
 
 @pytest.fixture
 def p_setup():
+    pygame.init()
     pygame.display.set_mode((50, 50))
-    basicmap = str(os.path.abspath(os.path.dirname(__file__))) + "\\basicmap"
-    test_player = player.Player(1, [0, 0], directory=basicmap + "\\player\\animation\\basic_player_magenta_animation")
+    basicmap = os.path.join((os.path.abspath(os.path.dirname(__file__))), "mock_resources", "basicmap")
+    test_player = player.Player(1, [0, 0], directory=os.path.join(basicmap, "player", "animation", "basic_player_magenta_animation"))
     test_player.solid_df = pd.DataFrame([(1, 2), (3, 4), (4, 5)], columns=['x', 'y'])
     test_player.relative_solid_df = pd.DataFrame([(1, 1)], columns=["x", "y"])
     return test_player
@@ -19,12 +20,13 @@ def p_setup():
 
 @pytest.fixture
 def setup():
+    pygame.init()
     pygame.display.set_mode((50, 50))
-    basicmap = str(os.path.abspath(os.path.dirname(__file__))) + "\\basicmap"
-    t1 = player.Player(1, [0, 0], basicmap + "\\player\\animation\\basic_player_magenta_animation")
-    t2 = player.Player(2, [0, 0], basicmap + "\\player\\animation\\basic_player_magenta_animation")
-    t3 = player.Player(3, [0, 0], basicmap + "\\player\\animation\\basic_player_magenta_animation")
-    t4 = player.Player(4, [0, 0], basicmap + "\\player\\animation\\basic_player_magenta_animation")
+    basicmap = os.path.join((os.path.abspath(os.path.dirname(__file__))), "mock_resources", "basicmap")
+    t1 = player.Player(1, [0, 0], os.path.join(basicmap, "player", "animation", "basic_player_magenta_animation"))
+    t2 = player.Player(2, [0, 0], os.path.join(basicmap, "player", "animation", "basic_player_magenta_animation"))
+    t3 = player.Player(3, [0, 0], os.path.join(basicmap, "player", "animation", "basic_player_magenta_animation"))
+    t4 = player.Player(4, [0, 0], os.path.join(basicmap, "player", "animation", "basic_player_magenta_animation"))
     return t1, t2, t3, t4
 
 
@@ -86,24 +88,26 @@ def test_draw(p_setup):
     assert p_setup.draw(c.get_canvas()) is None
 
 
+# using == instead of "is" to compare boolean values
+# reason for this is the failing comparison in this case using is
 def test_shift_df(p_setup):
     p_setup.shift_df(p_setup.solid_df, 0, 1)
-    assert (p_setup.solid_df["x"] == 3).any() is False
+    assert (p_setup.solid_df["x"] == 3).any() == False
     p_setup.shift_df(p_setup.solid_df, 0, -1)
-    assert (p_setup.solid_df["x"] == 1).any() is True
+    assert (p_setup.solid_df["x"] == 1).any() == True
     p_setup.shift_df(p_setup.solid_df, 0, 1)
     p_setup.shift_df(p_setup.solid_df, 1, 1)
-    assert (p_setup.solid_df["x"] == 1).any() is True
+    assert (p_setup.solid_df["x"] == 1).any() == True
     p_setup.shift_df(p_setup.solid_df, 1, -1)
-    assert (p_setup.solid_df["x"] == 3).any() is False
+    assert (p_setup.solid_df["x"] == 3).any() == False
     p_setup.shift_df(p_setup.solid_df, 2, 1)
-    assert (p_setup.solid_df["y"] == 4).any() is True
+    assert (p_setup.solid_df["y"] == 4).any() == True
     p_setup.shift_df(p_setup.solid_df, 2, -1)
-    assert (p_setup.solid_df["y"] == 2).any() is True
+    assert (p_setup.solid_df["y"] == 2).any() == True
     p_setup.shift_df(p_setup.solid_df, 3, -1)
-    assert (p_setup.solid_df["y"] == 6).any() is False
+    assert (p_setup.solid_df["y"] == 6).any() == False
     p_setup.shift_df(p_setup.solid_df, 3, 1)
-    assert (p_setup.solid_df["y"] == 4).any() is True
+    assert (p_setup.solid_df["y"] == 4).any() == True
 
 
 def test_move(p_setup):

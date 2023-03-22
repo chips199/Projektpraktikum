@@ -3,10 +3,12 @@ import pytest
 import multiprocessing
 from src.game.gamelogic import backgroundProzess
 from unittest.mock import MagicMock, Mock
+import pygame
 
 
 @pytest.fixture
 def setup():
+    pygame.init()
     return window.MyWindow()
 
 
