@@ -8,10 +8,11 @@ import pygame
 
 @pytest.fixture
 def setup():
+    pygame.init()
     pygame.display.set_mode((50, 50))
     wrk_dir = os.path.abspath(os.path.dirname(__file__))
-    basicmap = str(wrk_dir) + r"/basicmap"
-    return animated.Animated([0, 0], basicmap + "/player/blood_animation")
+    basicmap = os.path.join(wrk_dir, "basicmap")
+    return animated.Animated([0, 0], os.path.join(basicmap, "player", "blood_animation"))
 
 
 @pytest.fixture
@@ -89,3 +90,10 @@ def test_load_dfs(setup):
         assert isinstance(i, list)
         for item in i:
             assert isinstance(item, pd.DataFrame)
+
+
+def test_animate(setup, setup_canvas):
+    setup.animation_direction = 0
+    assert setup.animate(setup_canvas.get_canvas(), setup.load_images()[0]) is None
+    setup.animation_direction = 1
+    assert setup.animate(setup_canvas.get_canvas(), setup.load_images()[0]) is None

@@ -1,12 +1,14 @@
+import os
 import src.game.menu.MenuSetup as menu
 from unittest.mock import MagicMock, patch
 import pytest
 import multiprocessing
-import src.game.gamelogic.game as game
+import pygame
 
 
 @pytest.fixture
 def setup():
+    pygame.init()
     test_menu = menu.MenuSetup()
     test_menu.label_error = MagicMock()
     test_menu.label_error.label_hide_show = MagicMock()
@@ -47,11 +49,13 @@ def test_load_lobby_frame(setup):
     setup.label_game_name.winfo_height.assert_called()
 
 
+# loop
 def test_load_player(setup):
-    assert setup.load_player(5.0, "basicmap/player/basic_player_magenta.png") is None
-    assert setup.load_player(5, "basicmap/player/basic_player_magenta.png") is None
-    assert setup.load_player(0, "basicmap/player/basic_player_magenta.png") is None
-    assert setup.load_player(-5.0, "basicmap/player/basic_player_magenta.png") is None
+    path = os.path.join("basicmap", "player", "basic_player_magenta.png")
+    assert setup.load_player(5.0, path) is None
+    assert setup.load_player(5, path) is None
+    assert setup.load_player(0, path) is None
+    assert setup.load_player(-5.0, path) is None
 
 
 def test_update_player(setup):

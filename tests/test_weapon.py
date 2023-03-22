@@ -10,13 +10,15 @@ import pygame
 
 @pytest.fixture()
 def setup():
-    wrk_dir = os.path.abspath(os.path.dirname(__file__))
-    basicmap = str(wrk_dir) + r"/basicmap"
+    pygame.init()
     pygame.display.set_mode((50, 50))
-    test_weapon1 = weapon.Weapon(type.Fist, basicmap + r"/waffen/faeuste", [0, 0],
-                                 basicmap + r"/waffen/faeuste/animation/fists_magenta_animation")
-    test_weapon2 = weapon.Weapon(type.Sword, basicmap + r"/waffen/schwert", [1, 1],
-                                 basicmap + r"/waffen/schwert/animation/sword_hold_animation_magenta")
+    wrk_dir = os.path.abspath(os.path.dirname(__file__))
+    basicmap = os.path.join(wrk_dir,  "basicmap")
+    pygame.display.set_mode((50, 50))
+    test_weapon1 = weapon.Weapon(type.Fist, os.path.join(basicmap, "waffen", "faeuste"), [0, 0],
+                                 os.path.join(basicmap, "waffen", "faeuste", "animation", "fists_magenta_animation"))
+    test_weapon2 = weapon.Weapon(type.Sword, os.path.join(basicmap, "waffen", "schwert"), [1, 1],
+                                 os.path.join(basicmap, "waffen", "schwert", "animation", "sword_hold_animation_magenta"))
 
     return test_weapon1, test_weapon2
 
@@ -30,7 +32,7 @@ def test_get_dataframe(setup):
 
 
 def test_draw(setup):
-    test_canvas= canvas.Canvas(100, 100)
+    test_canvas = canvas.Canvas(100, 100)
     for i in setup:
         i.x = 100
         i.y = 100

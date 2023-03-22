@@ -1,3 +1,5 @@
+import os.path
+
 import src.game.menu.MyLabel as label
 import src.game.menu.MyFrame as frame
 import src.game.menu.MyWindow as window
@@ -9,7 +11,7 @@ from PIL import Image
 @pytest.fixture()
 def setup():
     test_frame = frame.MyFrame(window.MyWindow(), 50, 50)
-    test_image = tk.CTkImage(dark_image=Image.open("\\basicmap\\player\\basic_player_orange.png"), size=(3, 4))
+    test_image = tk.CTkImage(dark_image=Image.open(os.path.join("basicmap", "player", "basic_player_orange.png")), size=(3, 4))
     test_label = label.MyLabel(master=test_frame, text=None, image=test_image, fg_color="#212121")
     return test_label
 

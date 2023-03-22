@@ -2,10 +2,12 @@ import src.game.gamelogic.game as game
 import pytest
 import multiprocessing
 import src.game.gamelogic.backgroundProzess as process
+import pygame
 
 
 @pytest.fixture
 def setup():
+    pygame.init()
     conn1, conn2 = multiprocessing.Pipe(duplex=True)
     test_process = multiprocessing.Process(target=process.backgroundProzess, args=("abc", conn2))
     test_process.start()

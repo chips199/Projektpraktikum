@@ -8,6 +8,7 @@ import src.game.gamelogic.canvas as canvas
 
 @pytest.fixture
 def setup():
+    pygame.init()
     game = MagicMock()
     game.width = 50
     game.height = 50
@@ -39,6 +40,5 @@ def test_draw_items(setup):
     assert setup.draw_items(test_canvas.get_canvas()) is None
 
 
-# test only to be run locally
-# def test_load_music(setup):
-#    assert setup.load_music is None
+def test_load_music(setup):
+    assert setup.music_load() is None

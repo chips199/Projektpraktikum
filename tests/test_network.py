@@ -1,9 +1,11 @@
 import pytest
 import src.game.gamelogic.network as network
+import pygame
 
 
 @pytest.fixture
 def setup():
+    pygame.init()
     con1 = network.Network("schneemap")
     con2 = network.Network("basicmap")
     con3 = network.Network("platformmap")
