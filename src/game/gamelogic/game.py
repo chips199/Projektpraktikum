@@ -578,7 +578,7 @@ class Game:
         return erg
 
     def initialize_game_data(self):
-        timeout = time.time() + 60 * 0
+        timeout = time.time() + 60 * 5
         while "metadata" not in self.data:
             self.update_background_process()
             if time.time() > timeout:
