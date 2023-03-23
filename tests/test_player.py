@@ -213,3 +213,19 @@ def test_get_color(setup):
     test = [setup[0].get_color(setup[0].directory), setup[0].get_color(setup[1].directory), setup[2].get_color(setup[2].directory), setup[3].get_color(setup[3].directory)]
     assert "magenta" in test
     assert len(test) == 4
+
+
+def test_add_shot(p_setup):
+    p_setup.animation_direction = 0
+
+    assert len(p_setup.weapon_shots) == 0
+    p_setup.add_shot()
+    assert len(p_setup.weapon_shots) == 1
+
+    assert player.Player.get_color_rgb(p_setup) == p_setup.weapon_shots[0].color
+
+    assert p_setup.weapon_shots[0].direction == 1
+    p_setup.animation_direction = 1
+    p_setup.add_shot()
+    assert p_setup.weapon_shots[1].direction == -1
+

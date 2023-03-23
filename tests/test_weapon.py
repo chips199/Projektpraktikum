@@ -123,3 +123,6 @@ def test_check_hit(setup):
     player1.is_alive = False
     weapon.Weapon.check_hit(player1, player_list, MagicMock(), canvas)
     assert player1.killed_by[4] == 2
+
+    # Test for shot
+    player1.add
