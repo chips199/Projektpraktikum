@@ -2,7 +2,7 @@ import json
 import os
 from copy import copy
 import datetime
-
+import time
 import pandas as pd
 import pygame
 import math
@@ -30,8 +30,8 @@ pygame.font.init()
 
 class Game:
 
-    def __init__(self, w, h, conn, process):
-        self.data = {}  # type:ignore[var-annotated]
+    def __init__(self, w, h, conn, process, data={}):
+        self.data = data  # type:ignore[var-annotated]
         self.kills_to_win = 5
         self.counter = 0
         self.conn = conn
@@ -81,6 +81,7 @@ class Game:
         # Sound effects
         self.lost_sound_effect = Sounds(self.map.directory + r"\sounds\lost_sound.mp3", 1.0)
         self.win_sound_effect = Sounds(self.map.directory + r"\sounds\win_sound.mp3", 1.0)
+
 
     def run(self):
         """
@@ -577,5 +578,8 @@ class Game:
         return erg
 
     def initialize_game_data(self):
+        timeout = time.time() + 60 * 0
         while "metadata" not in self.data:
             self.update_background_process()
+            if time.time() > timeout:
+                raise Exception('timeout while receiving data from background process')

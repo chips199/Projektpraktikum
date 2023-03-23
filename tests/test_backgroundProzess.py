@@ -3,7 +3,7 @@ import src.game.gamelogic.backgroundProzess as process
 import time
 
 
-def test_Background_Connection():
+def test_background_connection():
     conn1, conn2 = multiprocessing.Pipe(duplex=True)
     connection = multiprocessing.Process(target=process.backgroundProzess, args=("abc", conn2))
     connection.start()
