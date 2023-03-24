@@ -2,7 +2,7 @@ import pytest
 import src.game.gamelogic.network as network
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def setup():
     con1 = network.Network("schneemap")
     con2 = network.Network("basicmap")

@@ -7,7 +7,7 @@ import os
 import pygame
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def p_setup():
     pygame.init()
     pygame.display.set_mode((50, 50))
@@ -18,7 +18,7 @@ def p_setup():
     return test_player
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def setup():
     pygame.init()
     pygame.display.set_mode((50, 50))

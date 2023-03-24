@@ -4,7 +4,7 @@ import os
 import pygame
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def setup():
     pygame.init()
     wrk_dir = os.path.abspath(os.path.dirname(__file__))

@@ -7,7 +7,7 @@ import customtkinter as tk
 from PIL import Image
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def setup():
     wrk_dir = os.path.abspath(os.path.dirname(__file__))
     test_frame = frame.MyFrame(window.MyWindow(), 50, 50)

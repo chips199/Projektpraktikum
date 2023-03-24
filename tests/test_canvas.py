@@ -4,7 +4,7 @@ import pygame
 import os
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def setup():
     return canvas.Canvas(50, 50)
 

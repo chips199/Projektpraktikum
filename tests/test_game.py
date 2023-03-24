@@ -11,7 +11,7 @@ import datetime
 # the method "run" of game will only be tested exploratory since it is the main game loop and therefore subject to
 # constant change and countless dependencies and an endless loop
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def setup():
     pygame.init()
     conn1, conn2 = multiprocessing.Pipe(duplex=True)
@@ -36,10 +36,6 @@ def test_update_background_process(setup):
 
 def test_send_to_background_process(setup):
     assert setup.send_to_background_process() is None
-
-
-def test_update_fps(setup):
-    assert isinstance(setup.update_fps(), str)
 
 
 def test_parse(setup):

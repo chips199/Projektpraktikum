@@ -7,7 +7,7 @@ import pandas as pd
 import pygame
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def setup():
     pygame.init()
     pygame.display.set_mode((50, 50))

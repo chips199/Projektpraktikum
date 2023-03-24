@@ -6,7 +6,7 @@ import src.game.gamelogic.canvas as canvas
 import pygame
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def setup():
     pygame.init()
     pygame.display.set_mode((50, 50))
@@ -15,7 +15,7 @@ def setup():
     return animated.Animated([0, 0], os.path.join(basicmap, "player", "blood_animation"))
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def setup_canvas():
     return canvas.Canvas(50, 50)
 

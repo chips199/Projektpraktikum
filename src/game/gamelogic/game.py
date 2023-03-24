@@ -81,7 +81,6 @@ class Game:
         self.lost_sound_effect = Sounds(self.map.directory + r"\sounds\lost_sound.mp3", 1.0)
         self.win_sound_effect = Sounds(self.map.directory + r"\sounds\win_sound.mp3", 1.0)
 
-
     def run(self):
         """
         the core method of the game containing the game loop
@@ -208,7 +207,7 @@ class Game:
 
             # Send Data about this player and get some over the others als reply
             self.send_to_background_process()
-            self.receive_from_background_process()
+            self.update_background_process()
 
             # sync data
             self.player_frames, self.weapon_frames, health, killed, pos, con, shots, blocking = self.parse()
@@ -537,6 +536,6 @@ class Game:
         """
         timeout = time.time() + 60 * 5
         while "metadata" not in self.data:
-            self.receive_from_background_process()
+            self.update_background_process()
             if time.time() > timeout:
                 raise Exception('timeout while receiving data from background process')

@@ -165,6 +165,7 @@ class MenuSetup:
         self.test = True
         self.interaction_frame = MyFrame(master=self.main_frame,
                                          width=self.root.window_width,
+                                         # height=int(710 * self.sizing_height),
                                          height=self.window_height * 0.79,
                                          fg_color="#212121")
         self.interaction_frame.place(anchor='sw', x=0, y=self.window_height)
@@ -376,7 +377,6 @@ class MenuSetup:
         :param path: The file path to the player image
         :return: None
         """
-        self.test = True
         # Load the player image from the specified file path
         player_image = tk.CTkImage(dark_image=Image.open(path),
                                    size=(int(49 * self.sizing_width), int(142 * self.sizing_height)))
@@ -514,6 +514,7 @@ class MenuSetup:
         """
         Return to the main frame of the game, destroying any current frames and resetting attributes
         """
+        self.test = True
         response = "yes"
         if self.lobby_owner:
             response = messagebox.askquestion(title="",
@@ -532,18 +533,14 @@ class MenuSetup:
             # Reset player dictionary
             self.player_dict = copy.deepcopy(self.copy_player_dict)
             if self.process is not None:
-                # Terminate the process
                 self.process.kill()
-                # Reset attributes
                 self.amount_player = 0
                 self.lobby_frame.destroy()
+            self.test = False
 
     # __________________other Functions__________________
-    def check_if_game_started(self) -> None:
-        """
-        Check if the game has started and call the start_game method if it has, otherwise wait 1500 ms and
-        call itself recursively.
-        """
+
+    def check_if_game_started(self):
         if self.data["game_started"]:  # type:ignore[union-attr]
             self.start_game()
         else:
@@ -644,13 +641,15 @@ class MenuSetup:
                 time=3000,
                 message="No answer from server")
 
-    def update_background_process(self) -> None:
-        """
-        Updates the background process by checking if there is data available through a connection
-        """
+    def update_background_process(self):
+        if datetime.datetime.now() - self.timer >= datetime.timedelta(seconds=1):
+            self.timer = datetime.datetime.now()
+            print("count in Menu:", self.counter)
+            self.counter = 0
+        else:
+            self.counter += 1
         if self.conn1.poll():  # type:ignore[attr-defined]
             self.data = self.conn1.recv()  # type:ignore[attr-defined]
-        # Set up the next update by calling itself through after method
         self.update_background_after_id = self.main_frame.after(100, self.update_background_process)
 
 

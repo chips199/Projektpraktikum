@@ -6,13 +6,13 @@ import src.game.gamelogic.canvas as canvas
 import pygame
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def setup_right():
     pygame.init()
     return shot.WeaponShot((12, 45), 2, (231, 24, 55), 1, 10, 12)
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def setup_left():
     pygame.init()
     return shot.WeaponShot((12, 45), 2, (231, 24, 55), -1, 10, 12)

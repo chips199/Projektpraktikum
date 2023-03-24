@@ -6,7 +6,7 @@ import os
 import src.game.gamelogic.canvas as canvas
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def setup():
     pygame.init()
     game = MagicMock()

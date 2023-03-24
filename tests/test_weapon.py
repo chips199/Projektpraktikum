@@ -13,7 +13,7 @@ import pygame
 from freezegun import freeze_time
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def setup():
     pygame.init()
     pygame.display.set_mode((50, 50))
@@ -71,12 +71,12 @@ def test_get_position_weapon_shot(setup):
             weapon_test.frame_height = 10
 
             # Test for direction left
-            result = weapon_test.get_position_weapon_shot(width=10, height=10, x=10, y=0)
+            result = weapon_test.get_position_for_weapon_shot(width=10, height=10, x=10, y=0)
             assert result == (5, 46)
 
             # Test for direction right
             weapon_test.animation_direction = -1
-            result = weapon_test.get_position_weapon_shot(width=10, height=10, x=10, y=0)
+            result = weapon_test.get_position_for_weapon_shot(width=10, height=10, x=10, y=0)
             assert result == (15, 46)
 
 
