@@ -228,4 +228,3 @@ def test_add_shot(p_setup):
     p_setup.animation_direction = 1
     p_setup.add_shot()
     assert p_setup.weapon_shots[1].direction == -1
-

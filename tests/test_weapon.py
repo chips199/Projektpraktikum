@@ -3,7 +3,7 @@ import src.game.gamelogic.canvas as canvas
 import src.game.gamelogic.weapon as weapon
 from src.game.gamelogic.weapon import WeaponType as type
 import pytest
-from unittest.mock import MagicMock, Mock
+from unittest.mock import MagicMock, Mock, patch
 import os
 import pygame
 
@@ -24,6 +24,12 @@ def setup():
                                  os.path.join(basicmap, "waffen", "laser", "animation", "laser_hold_magenta"))
 
     return test_weapon1, test_weapon2, test_weapon3
+
+
+def test_getObj():
+    assert type.getObj("Fist") == type.Fist
+    assert type.getObj("Sword") == type.Sword
+    assert type.getObj("Laser") == type.Laser
 
 
 def test_get_dataframe(setup):
@@ -88,11 +94,18 @@ def test_check_hit(setup):
     # Set Player1 up
 
     player1.solid_df = pd.DataFrame([(2, 2)], columns=["x", "y"])
-    player1.health = 50
+    player1.health = 15
     player1.is_blocking = True
 
-    # Set Player list up
+    player_list = [player4, player3, player2, player1]
+    player1.killed_by = [0, 0, 0, 1, 0]
+    canvas = MagicMock()
+    player1.weapon.animation_running = False
+    for i in player_list:
+        i.weapon = MagicMock()
+        i.weapon.get_dataframe = Mock(return_value=pd.DataFrame([(2, 2)], columns=["x", "y"]))
 
+    # Set Player list up
     player4.weapon.animation_running = True
     player3.weapon.animation_running = False
     player2.weapon.animation_running = True
@@ -105,24 +118,33 @@ def test_check_hit(setup):
     player2.weapon.weapon_type = weapon.WeaponType.Fist
     player3.weapon.weapon_type = weapon.WeaponType.Fist
     player4.weapon.weapon_type = weapon.WeaponType.Fist
-    player_list = [player4, player3, player2, player1]
-    player1.killed_by = [0, 0, 0, 1, 0]
-    canvas = MagicMock()
-    player1.weapon.animation_running = False
-    for i in player_list:
-        i.weapon = MagicMock()
-        i.weapon.get_dataframe = Mock(return_value=pd.DataFrame([(2, 2)], columns=["x", "y"]))
 
     # Test for Damage, static method
-
     weapon.Weapon.check_hit(player1, player_list, MagicMock(), canvas)
-    assert player1.health == 25
+    assert player1.health == 10
     player1.is_blocking = False
+    player4.weapon.hitted_me = False
+
+    player1.is_alive.return_value = False
     weapon.Weapon.check_hit(player1, player_list, MagicMock(), canvas)
     assert player1.health == 0
-    player1.is_alive = False
-    weapon.Weapon.check_hit(player1, player_list, MagicMock(), canvas)
-    assert player1.killed_by[4] == 2
+    assert player1.killed_by[1] == 1
 
-    # Test for shot
-    player1.add
+    # Test weapon shots
+    player4.weapon_shots = []
+    player4.weapon_shots.append(MagicMock())
+    player4.weapon_shots[0].damage = 10
+    player4.weapon_shots[0].get_dataframe = Mock(return_value=pd.DataFrame([(2, 2)], columns=["x", "y"]))
+    player4.weapon_shots[0].active = True
+    for i in player_list:
+        i.weapon.animation_running = False
+    player1.health = 20
+
+    # Check if player gets Damage when shot is active
+    weapon.Weapon.check_hit(player1, player_list, MagicMock(), canvas)
+    assert player1.health == 10
+
+    # Check if player gets Damage when shot is inactive
+    player4.weapon_shots[0].active = False
+    weapon.Weapon.check_hit(player1, player_list, MagicMock(), canvas)
+    assert player1.health == 10
