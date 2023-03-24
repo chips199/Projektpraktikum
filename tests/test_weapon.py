@@ -51,6 +51,27 @@ def test_draw(setup):
         assert i.draw(y=10, height=100, x=10, width=100, g=test_canvas.get_canvas()) is None
 
 
+def test_get_position_weapon_shot(setup):
+    """
+    Tests the method get_position_weapon_shot
+    """
+    for weapon_test in setup:
+        if not weapon_test.is_short_range_weapon():
+            # define variables
+            weapon_test.animation_direction = 1
+            weapon_test.frame_width = 10
+            weapon_test.frame_height = 10
+
+            # Test for direction left
+            result = weapon_test.get_position_weapon_shot(width=10, height=10, x=10, y=0)
+            assert result == (5, 46)
+
+            # Test for direction right
+            weapon_test.animation_direction = -1
+            result = weapon_test.get_position_weapon_shot(width=10, height=10, x=10, y=0)
+            assert result == (15, 46)
+
+
 def test_can_hit(setup):
     for i in setup:
         i.durability = 10
@@ -72,12 +93,15 @@ def test_hit(setup):
         i.destroyed = False
         i.durability = 5
         assert i.hit() is None
-        assert i.destroyed is False
+
+        if i.weapon_type.value["damage_to_weapon_per_hit"] > 0:
+            assert i.destroyed is False
         i.durability = 1
         assert i.hit() is None
         assert i.destroyed is False
         assert i.hit() is None
-        assert i.destroyed is True
+        if i.weapon_type.value["damage_to_weapon_per_hit"] > 0:
+            assert i.destroyed is True
         i.durability = -1
         assert i.hit() is None
         assert i.destroyed is True
@@ -131,6 +155,7 @@ def test_check_hit(setup):
     assert player1.killed_by[1] == 1
 
     # Test weapon shots
+    # Preparation for tests
     player4.weapon_shots = []
     player4.weapon_shots.append(MagicMock())
     player4.weapon_shots[0].damage = 10
