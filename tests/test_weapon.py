@@ -1,3 +1,6 @@
+import datetime
+from unittest import mock
+
 import pandas as pd
 import src.game.gamelogic.canvas as canvas
 import src.game.gamelogic.weapon as weapon
@@ -6,6 +9,8 @@ import pytest
 from unittest.mock import MagicMock, Mock, patch
 import os
 import pygame
+
+from freezegun import freeze_time
 
 
 @pytest.fixture()
@@ -88,23 +93,37 @@ def test_can_hit(setup):
         assert i.can_hit() is False
 
 
+@freeze_time("2023-01-01")
 def test_hit(setup):
+    """
+    Tests the method hit
+    Checks that the weapon get the status destroyed when he hits someone
+    """
     for i in setup:
+        # Check Weapon not destroyed after
         i.destroyed = False
-        i.durability = 5
-        assert i.hit() is None
-
-        if i.weapon_type.value["damage_to_weapon_per_hit"] > 0:
-            assert i.destroyed is False
-        i.durability = 1
+        i.durability = i.weapon_type.value["damage_to_weapon_per_hit"] + 1
         assert i.hit() is None
         assert i.destroyed is False
         assert i.hit() is None
         if i.weapon_type.value["damage_to_weapon_per_hit"] > 0:
             assert i.destroyed is True
+        else:
+            assert i.destroyed is False
+
+        # Check weapon destroyed
+        assert i.hit() is None
+        if i.weapon_type.value["damage_to_weapon_per_hit"] > 0:
+            assert i.destroyed is True
+
+        # Check if status of weapon is destroyed, when durability is under 0
         i.durability = -1
         assert i.hit() is None
         assert i.destroyed is True
+
+        # Check that the timestamp for last_hit
+        assert i.hit() is None
+        assert i.last_hit == 1672531200
 
 
 def test_check_hit(setup):
