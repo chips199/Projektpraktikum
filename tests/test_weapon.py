@@ -32,6 +32,9 @@ def setup():
 
 
 def test_getObj():
+    """
+    checks if the method getObj returns the correct enums for the names
+    """
     assert type.getObj("Fist") == type.Fist
     assert type.getObj("Sword") == type.Sword
     assert type.getObj("Laser") == type.Laser
@@ -126,7 +129,44 @@ def test_hit(setup):
         assert i.last_hit == 1672531200
 
 
+def test_is_short_range_weapon(setup):
+    """
+    Tests the Getter Method is_short_range_weapon
+    """
+    for weapon_test in setup:
+        weapon_test.weapon_type.value["IsShortRange"] = True
+        assert weapon_test.is_short_range_weapon() is True
+
+        weapon_test.weapon_type.value["IsShortRange"] = False
+        assert weapon_test.is_short_range_weapon() is False
+
+
+def test_get_shot_speed(setup):
+    """
+    Tests the Getter Method get_shot_speed
+    """
+    for weapon_test in setup:
+        if not weapon_test.is_short_range_weapon():
+            weapon_test.weapon_type.value["shot_speed"] = 10
+            assert weapon_test.get_shot_speed() == 10
+
+
+def test_get_shot_speed(setup):
+    """
+    Tests the Getter Method get_shot_speed
+    """
+    for weapon_test in setup:
+        weapon_test.weapon_type.value["Damage"] = 10
+        assert weapon_test.get_weapon_damage() == 10
+
+
 def test_check_hit(setup):
+    """
+    Tests the method check hit
+    Checks if a player can be hit by another player
+    Checks if a player can be hit by a shot from another player
+    checks if a player dies when he has no life points left
+    """
     # Mock Players
 
     player1 = MagicMock()
