@@ -4,6 +4,7 @@ from unittest.mock import MagicMock, patch, Mock
 import pytest
 import multiprocessing
 import pygame
+import src.game.menu.MyFrame as frame
 
 
 @pytest.fixture()
@@ -64,8 +65,15 @@ def test_load_player(setup):
 
 
 def test_update_player(setup):
+    setup.data["map"] = "schneemap"
     assert setup.update_player() is None
-    setup.main_frame.after.assert_called_with(1000, lambda: setup.update_player())
+    setup.main_frame.after.assert_called()
+    setup.data["map"] = "platformmap"
+    assert setup.update_player() is None
+    setup.main_frame.after.assert_called()
+    setup.data["map"] = "basicmap"
+    assert setup.update_player() is None
+    setup.main_frame.after.assert_called()
 
 
 # test_start_new_session only calls another already tested method
@@ -104,3 +112,18 @@ def test_if_game_started(setup):
         setup.data["game_started"] = False
         assert setup.check_if_game_started() is None
         game_mock.assert_called()
+
+
+def test_update_background_process(setup):
+    assert setup.update_background_process() is None
+
+
+def test_clear_frame_sliding(setup):
+    test_frame = MagicMock()
+    assert setup.clear_frame_sliding(test_frame, "n", 10, 0) is None
+    assert setup.clear_frame_sliding(test_frame, "ne", 0, 20) is None
+    assert setup.clear_frame_sliding(test_frame, "w", -10) is None
+    assert setup.clear_frame_sliding(test_frame, "sw") is None
+    assert setup.clear_frame_sliding(test_frame, "nw") is None
+    assert setup.clear_frame_sliding(test_frame, "se") is None
+
