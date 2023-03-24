@@ -156,7 +156,7 @@ class Weapon(Animated):
                 p.weapon.hitted_me = False
             # check if a weapon shot has hit a player
             for shot in p.weapon_shots:
-                if not pd.merge(shot.get_dataframe(), pldf, how='inner', on=['x', 'y']).empty:
+                if not pd.merge(shot.get_dataframe(), pldf, how='inner', on=['x', 'y']).empty and shot.active:
                     Weapon.player_hit(g, p, pl, shot.damage)
                     shot.active = False
 

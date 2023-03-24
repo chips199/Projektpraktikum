@@ -7,3 +7,4 @@ customtkinter~=5.0.3
 Pillow~=9.4.0
 pytest~=7.2.0
 pytest-cov
+freezegun~=1.2.2
