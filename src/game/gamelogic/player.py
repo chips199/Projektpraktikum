@@ -80,7 +80,17 @@ class Player(Animated):
         self.sound_die_played = False
         self.sound_die = Sounds(map_dir + r"\sounds\die_sound.mp3", 0.5)
 
-    def set_velocity(self, data=(1, 1, 0, 0)):
+    def set_velocity(self, data=(1, 1, 0, 0)) -> None:
+        """
+        Set the velocity of the player.
+
+        Args:
+            data: A tuple containing the following data in this order:
+                - Ground moving velocity
+                - Airborne moving velocity
+                - Jumping velocity
+                - Velocity counter
+        """
         self.moving_velocity_on_ground = data[0]
         self.moving_velocity_in_air = data[1]
         self.velocity_jumping = self.max_jumping_speed = data[2]
@@ -119,13 +129,17 @@ class Player(Animated):
         """
         self.sliding_frame_counter = 1
 
-    def draw(self, g):
+    def draw(self, g: pygame.Surface) -> None:
+        """
+        Draws the player onto the given surface.
+        """
         if self.health > 0:
+            # Call the superclass draw method to draw the player's sprite
             super(Player, self).draw(g=g)
 
             self.death_animation.current_frame = 0
 
-            # health bar
+            # Draw the health bar
             pygame.draw.line(surface=g,
                              color=pygame.Color(231, 24, 55),
                              start_pos=(self.x, self.y - 5),
@@ -138,7 +152,7 @@ class Player(Animated):
                                  end_pos=(self.x + (self.frame_width * (self.health / 100)), self.y - 5),
                                  width=3)
 
-            # durability bar
+            # Draw the weapon durability bar
             pygame.draw.line(surface=g,
                              color=pygame.Color(20, 20, 20),
                              start_pos=(self.x, self.y - 10),
@@ -151,6 +165,7 @@ class Player(Animated):
                                  end_pos=(self.x + (self.frame_width * (self.weapon.durability / 100)), self.y - 10),
                                  width=3)
 
+            # Draw the shield if the player
             if self.is_blocking:
                 player_rec = pygame.Rect(self.x - 1, self.y - 3, self.frame_width, self.frame_height)
                 g.blit(self.shield_right, player_rec)
@@ -182,7 +197,6 @@ class Player(Animated):
 
         # death animation
         else:
-            # print(self.death_animation.current_frame, "at:", datetime.now())
             self.death_animation.set_pos(self.x, self.y)
             self.death_animation.draw_animation_once(g=g)
             # Play sound effect die
@@ -297,9 +311,19 @@ class Player(Animated):
         return self.health > 0
 
     def refresh_solids(self):
+        """
+        Refresh the position of solids in the `solid_df` DataFrame by adding the current position
+        of the element container to their position values.
+        """
+        # Create a new DataFrame with the same values as `relativ_solids_df`
+        # (the position of each solid relative to the element container)
         new_pos = copy(self.relativ_solids_df)
+
+        # Add the current position of the element container to the x and y values of each solid
         new_pos['x'] = new_pos['x'].map(lambda x: x + self.x)
         new_pos['y'] = new_pos['y'].map(lambda y: y + self.y)
+
+        # Update the `solid_df` DataFrame with the new positions
         self.solid_df = new_pos
 
     def falling(self, func):
@@ -402,7 +426,14 @@ class Player(Animated):
             return "turquoise"
 
     @staticmethod
-    def get_map(p):
+    def get_map(p: str) -> str:
+        """
+        Return the name of the map based on the given string parameter.
+
+        :param p: String parameter that contains the name of the map
+        :return: Name of the map, either "basic", "space", "snow", or "unknown map" if the name is not recognized
+
+        """
         if p.__contains__("basic"):
             return "basic"
         elif p.__contains__("space"):
@@ -415,17 +446,17 @@ class Player(Animated):
     @staticmethod
     def get_color_rgb(p):
         """
-        Returns the color of the player in hex
+        Returns the color of the player in rgb
         param: p: Player
         """
         if p.directory.__contains__("magenta"):
-            return pygame.Color(227, 0, 113)
+            return pygame.Color(227, 0, 113)  # magenta
         elif p.directory.__contains__("orange"):
-            return pygame.Color(254, 174, 24)
+            return pygame.Color(254, 174, 24)  # orange
         elif p.directory.__contains__("purple"):
-            return pygame.Color(159, 2, 238)
+            return pygame.Color(159, 2, 238)  # purple
         else:
-            return pygame.Color(0, 195, 150)
+            return pygame.Color(0, 195, 150)  # turquoise
 
     def add_shot(self):
         """
@@ -433,12 +464,14 @@ class Player(Animated):
         """
         # Direction of the shot
         shot_direction = self.animation_direction
+        # Left
         if self.animation_direction == 0:
             shot_direction = 1
+        # Right
         elif self.animation_direction == 1:
             shot_direction = -1
         # determine start position from shot
-        pos = self.weapon.get_position_weapon_shot(x=self.x, y=self.y, width=self.frame_width, height=self.frame_height)
+        pos = self.weapon.get_position_for_weapon_shot(x=self.x, y=self.y, width=self.frame_width, height=self.frame_height)
         # Add shot to array
         self.weapon_shots.append(
             WeaponShot(pos, self.weapon.get_shot_speed(), Player.get_color_rgb(self), shot_direction,
