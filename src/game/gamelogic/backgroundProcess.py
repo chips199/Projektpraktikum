@@ -31,8 +31,6 @@ class backgroundProzess:
         self.map = "unknown"
         self.shots: List[weapon_shot.WeaponShot] = []
 
-        # self.net.send("ready")
-
         while True:
             if not self.game_started:
                 self.check_game_started()
@@ -44,7 +42,11 @@ class backgroundProzess:
                 self.update_game_pos()
                 self.send_game()
 
-    def check_game_started(self):
+    def check_game_started(self) -> None:
+        """
+        Check if the game has started by polling the connection for incoming messages.
+        If the message received is "start", start the game via the 'net' object.
+        """
         if self.conn.poll():
             msg = self.conn.recv()
             if msg == "start":
@@ -54,7 +56,10 @@ class backgroundProzess:
                 return
         self.game_started = False
 
-    def send_menu(self):
+    def send_menu(self) -> None:
+        """
+        Sends the lobby menu data to the client via pipe (connectiont)
+        """
         data = {
             "id": self.net.id,
             "s_id": self.net.session_id,
@@ -62,13 +67,17 @@ class backgroundProzess:
             "game_started": self.net.game_started(),
             "map": self.net.get_map()
         }
-        print("send", data['map'])
+        # Send data to client
         self.conn.send(data)
 
-    def send_game(self):
+    def send_game(self) -> None:
+        """
+        Send game data to the server
+        """
         with open(config_file) as file:
             sample = json.load(file)
 
+        # put all clients data into an dictionary to send it to the server
         data = sample[str(self.net.id)]
         data['id'] = int(self.net.id)
         data['position'] = self.position
@@ -79,16 +88,22 @@ class backgroundProzess:
         data['killed_by'] = self.killed_by
         data['is_blocking'] = self.is_blocking
         data['shots'] = self.shots
+
+        # Send game data to the server and receive it's reply
         self.reply = self.net.send(json.dumps(data))
         try:
             self.reply = json.loads(self.reply)
             self.reply["id"] = self.net.id  # type:ignore[index]
             self.reply = json.dumps(self.reply)
+            # send reply from server into the pipe (connectiont) to the client
             self.conn.send(self.reply)
         except:
             print(self.reply)
 
-    def update_game_pos(self):
+    def update_game_pos(self) -> None:
+        """
+        Receiving the latest clients data via a multiprocessing connection
+        """
         while self.conn.poll():
             data = self.conn.recv()
             self.position = data['position']

@@ -530,7 +530,7 @@ class Game:
     def initialize_game_data(self):
         """
         Initializes the game data by calling receive_from_background_process() method
-        until the metadata is not found in the data dictionary.
+        until the metadata is found in the data dictionary.
         """
         while "metadata" not in self.data:
             self.receive_from_background_process()
