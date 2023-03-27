@@ -1,5 +1,5 @@
 import multiprocessing
-import src.game.gamelogic.backgroundProzess as process
+import src.game.gamelogic.backgroundProcess as process
 import time
 
 

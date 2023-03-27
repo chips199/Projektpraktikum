@@ -1,7 +1,7 @@
 import src.game.menu.MyWindow as window
 import pytest
 import multiprocessing
-from src.game.gamelogic import backgroundProzess
+from src.game.gamelogic import backgroundProcess
 from unittest.mock import MagicMock, Mock
 import pygame
 

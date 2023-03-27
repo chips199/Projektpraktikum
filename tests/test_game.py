@@ -1,7 +1,7 @@
 import src.game.gamelogic.game as game
 import pytest
 import multiprocessing
-import src.game.gamelogic.backgroundProzess as process
+import src.game.gamelogic.backgroundProcess as process
 import pygame
 from unittest.mock import MagicMock
 import pandas as pd
