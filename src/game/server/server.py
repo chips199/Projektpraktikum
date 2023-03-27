@@ -66,38 +66,57 @@ spawn_file = os.path.abspath(os.path.join(os.path.dirname(__file__), r'spawnpoin
 with open(spawn_file) as sfile:
     spawn_points = json.load(sfile)
 # generate list of games and put them with the ids in a dictionary
-game_datas = list()
-for _ in range(number_of_games_at_a_time):
-    game_datas.append(copy(game_data))
-game_data_dict = dict(zip(get_random_ids(number_of_games_at_a_time, 4), game_datas))
+# game_datas = list()
+# for _ in range(number_of_games_at_a_time):
+#     game_datas.append(copy(game_data))
+# game_data_dict = dict(zip(get_random_ids(number_of_games_at_a_time, 4), game_datas))
+game_data_dict = dict()
+for gid in get_random_ids(number_of_games_at_a_time, 4):
+    # game_data_dict[gid] = copy(game_data)
+    game_data_dict[gid] = game_data
+
 # generate a 2d list with the games and info if each slot is used, with different stati
 # 0 = not connected, 1 = connected in lobby, 2 = connection lost, 3 = after game started
 players_connected: list[Any] = list()
-for _ in range(number_of_games_at_a_time):
-    players_connected.append([0] * number_of_players_per_game)
+for i in range(number_of_games_at_a_time):
+    players_connected.append(list())
+    for _ in range(number_of_players_per_game):
+        players_connected[i].append(0)
+    # players_connected.append([0] * number_of_players_per_game)
 # get a dict to save the map of each lobby
-maps_dict = dict(zip(game_data_dict.keys(), repeat("none")))
+maps_dict = dict()
+for k in game_data_dict.keys():
+    maps_dict[k] = 'none'
+# maps_dict = dict(zip(game_data_dict.keys(), repeat("none")))
 
 
 def game_server(game_id, this_gid):
     global game_data_dict
-    while not players_connected[this_gid].__contains__(3) and players_connected[this_gid].count(
-            0) != number_of_players_per_game:
+    # wait until game starts or exit if lobby was closed
+    while not players_connected[this_gid].__contains__(3):
+        if players_connected[this_gid].count(0) == number_of_players_per_game:
+            exit(0)
         pass
+    # reset items of the game, to be sure
     game_data_dict[game_id]["metadata"]["spawnpoints"]["items"] = {"Sword": [],
                                                                    "Laser": []
                                                                    }
+    # set sstart and end time
     game_data_dict[game_id]["metadata"]["start"] = (datetime.datetime.now() + datetime.timedelta(seconds=12)).strftime(
         "%d/%m/%Y, %H:%M:%S")
     game_data_dict[game_id]["metadata"]["end"] = (datetime.datetime.now() + datetime.timedelta(seconds=312)).strftime(
         "%d/%m/%Y, %H:%M:%S")
+    # deal with items while the game runs
     last_w_of_p = [None] * number_of_players_per_game
     last_spawn_check = datetime.datetime.now()
-    while players_connected[this_gid] != [0] * number_of_players_per_game:
-        tmp = copy(list(game_data_dict[game_id].items()))
+    while players_connected[this_gid].count(3) > 0:
+        # get the weapon of each player
+        # tmp = copy(list(game_data_dict[game_id].items()))
+        tmp = list(game_data_dict[game_id].items())
         w_of_p = list(map(lambda x: x[1]["weapon_data"][3],  # type: ignore[no-any-return]
                           filter(lambda y: ["0", "1", "2", "3"].__contains__(y[0]),
                                  tmp)))
+        # if the weapon of a player has changed, delete the collected weapon in items
         for ip, wp in enumerate(w_of_p):
             p_pos = game_data_dict[game_id][str(ip)]["position"]
             if last_w_of_p[ip] != wp:
@@ -107,15 +126,20 @@ def game_server(game_id, this_gid):
                     potential_items_distances = list(map(lambda x: math.dist(p_pos, x), potential_items))
                     i = potential_items_distances.index(min(potential_items_distances))
                     game_data_dict[game_id]["metadata"]["spawnpoints"]["items"][wp].pop(i)
+        # every 10sec spawn new items
         if datetime.datetime.now() - last_spawn_check > datetime.timedelta(seconds=10):
             last_spawn_check = datetime.datetime.now()
+            # go through every spawn-point as tuple
             for point in spawn_points[maps_dict[game_id]]["item_spawnpoints"]:
                 free = True
+                # check if the point is free
                 for ki, vi in game_data_dict[game_id]["metadata"]["spawnpoints"]["items"].items():
                     if vi.__contains__(point):
                         free = False
+                # go through every item odds
                 for k, v in spawn_points[maps_dict[game_id]]["item-odds"].items():
                     r = random.random()
+                    # if the current point is free and the random is beneath the odd append the item.
                     if r < v and free:
                         game_data_dict[game_id]["metadata"]["spawnpoints"]["items"][k].append(point)
                         break
@@ -127,12 +151,13 @@ def reset_games():
     """
     for i, g in enumerate(players_connected):
         # going through all games
-        if g.count(2) + g.count(0) == number_of_players_per_game and g.count(2) > 0:
+        if g.count(0) == number_of_players_per_game:
             # set all players to not connected
             players_connected[i] = [0] * number_of_players_per_game
             # get session_id and set game_data to default and reset map
             game_id = list(game_data_dict.keys())[i]
-            game_data_dict[game_id] = copy(game_data)
+            game_data_dict[game_id] = game_data
+            # game_data_dict[game_id] = copy(game_data)
             game_data_dict[game_id]["metadata"]["scoreboard"] = {"0": [0, 0],
                                                                  "1": [0, 0],
                                                                  "2": [0, 0],
@@ -168,30 +193,44 @@ def threaded_client(conn):
             conn.close()
             exit(1)
         elif players_connected[local_gid].count(3) > 1:
+            # rejoin if possible test phase ----------------------------------------
+            if 0 < players_connected[local_gid].count(0) < 4:
+                this_gid = local_gid
+                this_pid = players_connected[this_gid].index(0)
+                players_connected[this_gid][this_pid] = 1
+            # rejoin if possible test phase ----------------------------------------
             # send error Message if session is running
-            conn.send(str.encode("5, Session is already running"))
-            conn.close()
-            exit(1)
+            # conn.send(str.encode("5, Session is already running"))
+            # conn.close()
+            # exit(1)
         elif 0 < players_connected[local_gid].count(0) < 4:
             # connects player if there is space
             this_gid = local_gid
             this_pid = players_connected[this_gid].index(0)
             players_connected[this_gid][this_pid] = 1
-        else:
+        elif players_connected[local_gid].count(0) == 4:
             # send error Message if session is full
             conn.send(str.encode("5, Session is full"))
             conn.close()
             exit(1)
+        else:
+            # send error Message if session is full
+            conn.send(str.encode("5, An unexpected Error occurred"))
+            conn.close()
+            exit(1)
         # setting a few necessary variables
         game_id = start_msg
-        this_spawn_points = copy(spawn_points[maps_dict[game_id]])
+        # this_spawn_points = copy(spawn_points[maps_dict[game_id]])
+        this_spawn_points = spawn_points[maps_dict[game_id]]
         conn.send(str.encode(f"{this_pid},{game_id}"))
+        print(f"Joined Lobby: {game_id}")
         # finished connecting player
     else:
         # Create new game
         try:
             map_name = start_msg
-            this_spawn_points = copy(spawn_points[map_name])
+            # this_spawn_points = copy(spawn_points[map_name])
+            this_spawn_points = spawn_points[map_name]
         except KeyError:
             # send error Message if map is not known, means the user entered sth other than 4 digits
             conn.send(str.encode("5, Invalid Session_ID"))
@@ -212,7 +251,7 @@ def threaded_client(conn):
         # send error Message if no empty game exists
         if not game_found:
             # send msg if no empty game can be found
-            conn.send(str.encode("5, Server is full"))
+            conn.send(str.encode("5, No Lobby available try later again"))
             conn.close()
             exit(1)
         # get real game_id
@@ -222,10 +261,10 @@ def threaded_client(conn):
         game_data_dict[game_id]["metadata"]["spawnpoints"] = this_spawn_points
         maps_dict[game_id] = start_msg
         conn.send(str.encode(f"{this_pid},{game_id}"))
+        print(f"Lobby starts: {game_id}")
         # finished creating game and booking player
 
     # reuniting join and create game
-    print(f"Lobby starts: {game_id}")
     start_waiting = datetime.datetime.now()
     last_msg = datetime.datetime.now()
     while True:
@@ -234,7 +273,7 @@ def threaded_client(conn):
         except ConnectionResetError:
             # handles if the connection is lost
             print("connection lost")
-            players_connected[this_gid][this_pid] = 2
+            players_connected[this_gid][this_pid] = 0
             reset_games()
             conn.close()
             exit(0)
@@ -246,29 +285,38 @@ def threaded_client(conn):
             conn.close()
             exit(0)
         if msg == "lobby_check":
+            # sends back how many players are connected to the lobby
             conn.send(str.encode(f"{players_connected[this_gid].count(1)}"))
             last_msg = datetime.datetime.now()
         elif msg == "game started":
+            # sends True if a game was started by another Player
             conn.sendall(str.encode(str(players_connected[this_gid][this_pid] == 3)))
         elif msg == "get_spawnpoints":
+            # sends spownpoints and data for velocity
             conn.sendall(str.encode(json.dumps(this_spawn_points)))
             last_msg = datetime.datetime.now()
         elif msg == "get Mapname":
+            # sends the name of the selected map
             conn.send(str.encode(maps_dict[game_id]))
         elif msg == "ready":
+            # starts the game and sends name of the map
             conn.send(str.encode(maps_dict[game_id]))
-            players_connected[this_gid] = list(map(lambda x: 3 if x == 1 else 2, players_connected[this_gid]))
+            players_connected[this_gid] = list(map(lambda x: 3 if x == 1 or x == 3 else 0, players_connected[this_gid]))
+            print(players_connected)
             break
         elif msg == "get max players":
+            # sends the maximum amount of players
             conn.send(str.encode(f"{number_of_players_per_game}"))
             last_msg = datetime.datetime.now()
         elif (datetime.datetime.now() - start_waiting).seconds > 600:
+            # ends the lobby after 10min
             print("Lobby expired")
             players_connected[this_gid] = [2] * number_of_players_per_game
             reset_games()
             conn.close()
             exit(0)
         elif (datetime.datetime.now() - last_msg).seconds > 2:
+            # open up a connection if somebody leaves or has a disconnect
             print("connection timeout")
             players_connected[this_gid][this_pid] = 0
             reset_games()
@@ -278,6 +326,7 @@ def threaded_client(conn):
         sleep(0.2)
 
     print("Game starts: " + game_id)
+    print(maps_dict)
     # set player status in game_data to online
     game_data_dict[game_id][str(this_pid)]["connected"] = True
     # enter game loop
@@ -311,13 +360,12 @@ def threaded_client(conn):
         if (datetime.datetime.now() - last_msg).seconds > 5:
             # if the last message is more than 5 seconds old theconnection timedout
             print("Connection timeout")
-
             break
 
     print("Connection Closed")
     # set lost player to connected false and disconected and close the connection
     game_data_dict[game_id][str(this_pid)]["connected"] = False
-    players_connected[this_gid][this_pid] = 2
+    players_connected[this_gid][this_pid] = 0
     conn.close()
     # check if there is a game where every player connected once but disconnected again, if true reset the game
     reset_games()
