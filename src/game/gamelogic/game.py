@@ -534,7 +534,7 @@ class Game:
         Initializes the game data by calling receive_from_background_process() method
         until the metadata is found in the data dictionary.
         """
-        timeout = time.time() + 60 * 0
+        timeout = time.time() + 10
         while "metadata" not in self.data:
             self.update_background_process()
             if time.time() > timeout:
