@@ -10,7 +10,7 @@ import customtkinter as tk
 from PIL import Image
 
 from src.game.gamelogic import game
-from src.game.gamelogic.backgroundProzess import backgroundProzess
+from src.game.gamelogic.backgroundProcess import backgroundProzess
 from src.game.gamelogic.background_music import Music
 
 from src.game.menu.MyFrame import MyFrame
