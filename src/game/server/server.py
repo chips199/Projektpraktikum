@@ -7,7 +7,7 @@ import socket
 from _thread import start_new_thread
 import random
 import string
-from copy import copy
+import copy
 from itertools import repeat
 from time import sleep
 from typing import List, Any
@@ -73,7 +73,7 @@ with open(spawn_file) as sfile:
 game_data_dict = dict()
 for gid in get_random_ids(number_of_games_at_a_time, 4):
     # game_data_dict[gid] = copy(game_data)
-    game_data_dict[gid] = game_data
+    game_data_dict[gid] = copy.deepcopy(game_data)
 
 # generate a 2d list with the games and info if each slot is used, with different stati
 # 0 = not connected, 1 = connected in lobby, 2 = connection lost, 3 = after game started
@@ -262,6 +262,7 @@ def threaded_client(conn):
             exit(1)
         # get real game_id
         game_id = list(game_data_dict.keys())[this_gid]
+        print(game_id)
         # start_new_thread(game_server, (game_id, this_gid,))
         game_data_dict[game_id]["metadata"]["map"] = start_msg
         game_data_dict[game_id]["metadata"]["spawnpoints"] = this_spawn_points
