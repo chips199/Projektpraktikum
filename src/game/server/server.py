@@ -263,7 +263,7 @@ def threaded_client(conn):
         # get real game_id
         game_id = list(game_data_dict.keys())[this_gid]
         print(game_id)
-        # start_new_thread(game_server, (game_id, this_gid,))
+        start_new_thread(game_server, (game_id, this_gid,))
         game_data_dict[game_id]["metadata"]["map"] = map_name
         game_data_dict[game_id]["metadata"]["spawnpoints"] = this_spawn_points
         # maps_dict[game_id] = start_msg
