@@ -85,15 +85,15 @@ for i in range(number_of_games_at_a_time):
 #[[0,0,0,0][0,0,0,0][0,0,0,0]]
     # players_connected.append([0] * number_of_players_per_game)
 # get a dict to save the map of each lobby
-maps_dict = dict()
-for k in game_data_dict.keys():
-    maps_dict[k] = 'none'
+# maps_dict = dict()
+# for k in game_data_dict.keys():
+#     maps_dict[k] = 'none'
 # maps_dict = dict(zip(game_data_dict.keys(), repeat("none")))
 
 print(game_data_dict)
 print(spawn_points)
 print(players_connected)
-print(maps_dict)
+# print(maps_dict)
 
 
 def game_server(game_id, this_gid):
@@ -136,14 +136,14 @@ def game_server(game_id, this_gid):
         if datetime.datetime.now() - last_spawn_check > datetime.timedelta(seconds=10):
             last_spawn_check = datetime.datetime.now()
             # go through every spawn-point as tuple
-            for point in spawn_points[maps_dict[game_id]]["item_spawnpoints"]:
+            for point in spawn_points[game_data_dict[game_id]["metadata"]["map"]]["item_spawnpoints"]:
                 free = True
                 # check if the point is free
                 for ki, vi in game_data_dict[game_id]["metadata"]["spawnpoints"]["items"].items():
                     if vi.__contains__(point):
                         free = False
                 # go through every item odds
-                for k, v in spawn_points[maps_dict[game_id]]["item-odds"].items():
+                for k, v in spawn_points[game_data_dict[game_id]["metadata"]["map"]]["item-odds"].items():
                     r = random.random()
                     # if the current point is free and the random is beneath the odd append the item.
                     if r < v and free:
@@ -168,7 +168,7 @@ def reset_games():
                                                                  "1": [0, 0],
                                                                  "2": [0, 0],
                                                                  "3": [0, 0]}
-            maps_dict[game_id] = "none"
+            game_data_dict[game_id]["metadata"]["map"] = "none"
             # game_data_dict does not reset online, so manually reset it
             for n in range(number_of_players_per_game):
                 game_data_dict[game_id][str(n)]["connected"] = False
@@ -227,7 +227,7 @@ def threaded_client(conn):
         # setting a few necessary variables
         game_id = start_msg
         # this_spawn_points = copy(spawn_points[maps_dict[game_id]])
-        this_spawn_points = spawn_points[maps_dict[game_id]]
+        this_spawn_points = spawn_points[game_data_dict[game_id]["metadata"]["map"]]
         conn.send(str.encode(f"{this_pid},{game_id}"))
         print(f"Joined Lobby: {game_id}")
         # finished connecting player
@@ -265,7 +265,7 @@ def threaded_client(conn):
         # start_new_thread(game_server, (game_id, this_gid,))
         game_data_dict[game_id]["metadata"]["map"] = start_msg
         game_data_dict[game_id]["metadata"]["spawnpoints"] = this_spawn_points
-        maps_dict[game_id] = start_msg
+        # maps_dict[game_id] = start_msg
         conn.send(str.encode(f"{this_pid},{game_id}"))
         print(f"Lobby starts: {game_id}")
         # finished creating game and booking player
@@ -304,11 +304,11 @@ def threaded_client(conn):
             last_msg = datetime.datetime.now()
         elif msg == "get Mapname":
             # sends the name of the selected map
-            conn.send(str.encode(maps_dict[game_id]))
+            conn.send(str.encode(game_data_dict[game_id]["metadata"]["map"]))
         elif msg == "ready":
             # starts the game and sends name of the map
-            conn.send(str.encode(maps_dict[game_id]))
-            print(maps_dict[game_id])
+            conn.send(str.encode(game_data_dict[game_id]["metadata"]["map"]))
+            print(game_data_dict[game_id]["metadata"]["map"])
             players_connected[this_gid] = list(map(lambda x: 3 if x == 1 or x == 3 else 0, players_connected[this_gid]))
             print(this_gid, this_pid, players_connected)
             break
