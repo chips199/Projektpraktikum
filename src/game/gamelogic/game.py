@@ -75,8 +75,8 @@ class Game:
         self.show_scoreboard = False
 
         # Sets the start and end time of the game
-        self.start_time = datetime.datetime.now() # datetime.datetime.strptime(self.data["metadata"]["start"], "%d/%m/%Y, %H:%M:%S")
-        self.end_time = datetime.datetime.now() + datetime.timedelta(seconds=312)# datetime.datetime.strptime(self.data["metadata"]["end"], "%d/%m/%Y, %H:%M:%S")
+        self.start_time = datetime.datetime.strptime(self.data["metadata"]["start"], "%d/%m/%Y, %H:%M:%S")
+        self.end_time = datetime.datetime.strptime(self.data["metadata"]["end"], "%d/%m/%Y, %H:%M:%S")
 
         # Sound effects
         self.lost_sound_effect = Sounds(self.map.directory + r"\sounds\lost_sound.mp3", 1.0)
