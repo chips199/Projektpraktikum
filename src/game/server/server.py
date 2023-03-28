@@ -82,12 +82,18 @@ for i in range(number_of_games_at_a_time):
     players_connected.append(list())
     for _ in range(number_of_players_per_game):
         players_connected[i].append(0)
+#[[0,0,0,0][0,0,0,0][0,0,0,0]]
     # players_connected.append([0] * number_of_players_per_game)
 # get a dict to save the map of each lobby
 maps_dict = dict()
 for k in game_data_dict.keys():
     maps_dict[k] = 'none'
 # maps_dict = dict(zip(game_data_dict.keys(), repeat("none")))
+
+print(game_data_dict)
+print(spawn_points)
+print(players_connected)
+print(maps_dict)
 
 
 def game_server(game_id, this_gid):
@@ -192,7 +198,7 @@ def threaded_client(conn):
             conn.send(str.encode("5, Session isn't opened"))
             conn.close()
             exit(1)
-        elif players_connected[local_gid].count(3) > 1:
+        elif players_connected[local_gid].count(3) > 0:
             # rejoin if possible test phase ----------------------------------------
             if 0 < players_connected[local_gid].count(0) < 4:
                 this_gid = local_gid
@@ -251,7 +257,7 @@ def threaded_client(conn):
         # send error Message if no empty game exists
         if not game_found:
             # send msg if no empty game can be found
-            conn.send(str.encode("5, No Lobby available try later again"))
+            conn.send(str.encode("5, No Lobby available try again later"))
             conn.close()
             exit(1)
         # get real game_id
@@ -291,6 +297,7 @@ def threaded_client(conn):
         elif msg == "game started":
             # sends True if a game was started by another Player
             conn.sendall(str.encode(str(players_connected[this_gid][this_pid] == 3)))
+            print(this_gid, this_pid, str.encode(str(players_connected[this_gid][this_pid] == 3)))
         elif msg == "get_spawnpoints":
             # sends spownpoints and data for velocity
             conn.sendall(str.encode(json.dumps(this_spawn_points)))
@@ -301,8 +308,9 @@ def threaded_client(conn):
         elif msg == "ready":
             # starts the game and sends name of the map
             conn.send(str.encode(maps_dict[game_id]))
+            print(maps_dict[game_id])
             players_connected[this_gid] = list(map(lambda x: 3 if x == 1 or x == 3 else 0, players_connected[this_gid]))
-            print(players_connected)
+            print(this_gid, this_pid, players_connected)
             break
         elif msg == "get max players":
             # sends the maximum amount of players
