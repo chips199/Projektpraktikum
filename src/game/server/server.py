@@ -177,7 +177,7 @@ def reset_games():
 
 
 def threaded_client(conn):
-    global game_data_dict, players_connected, maps_dict
+    global game_data_dict, players_connected#, maps_dict
     # receiving the first message
     start_msg = conn.recv(2048).decode()
     print(start_msg)
@@ -334,7 +334,7 @@ def threaded_client(conn):
         sleep(0.2)
 
     print("Game starts: " + game_id)
-    print(maps_dict)
+    # print(maps_dict)
     # set player status in game_data to online
     game_data_dict[game_id][str(this_pid)]["connected"] = True
     # enter game loop
