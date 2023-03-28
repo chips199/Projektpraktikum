@@ -227,7 +227,7 @@ def threaded_client(conn):
         # setting a few necessary variables
         game_id = start_msg
         # this_spawn_points = copy(spawn_points[maps_dict[game_id]])
-        this_spawn_points = spawn_points[game_data_dict[game_id]["metadata"]["map"]]
+        this_spawn_points = copy.deepcopy(spawn_points[game_data_dict[game_id]["metadata"]["map"]])
         conn.send(str.encode(f"{this_pid},{game_id}"))
         print(f"Joined Lobby: {game_id}")
         # finished connecting player
@@ -236,7 +236,7 @@ def threaded_client(conn):
         try:
             map_name = start_msg
             # this_spawn_points = copy(spawn_points[map_name])
-            this_spawn_points = spawn_points[map_name]
+            this_spawn_points = copy.deepcopy(spawn_points[map_name])
         except KeyError:
             # send error Message if map is not known, means the user entered sth other than 4 digits
             conn.send(str.encode("5, Invalid Session_ID"))
