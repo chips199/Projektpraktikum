@@ -264,7 +264,7 @@ def threaded_client(conn):
         game_id = list(game_data_dict.keys())[this_gid]
         print(game_id)
         # start_new_thread(game_server, (game_id, this_gid,))
-        game_data_dict[game_id]["metadata"]["map"] = start_msg
+        game_data_dict[game_id]["metadata"]["map"] = map_name
         game_data_dict[game_id]["metadata"]["spawnpoints"] = this_spawn_points
         # maps_dict[game_id] = start_msg
         conn.send(str.encode(f"{this_pid},{game_id}"))
@@ -343,12 +343,11 @@ def threaded_client(conn):
         try:
             # receive data from client
             data = conn.recv(2048).decode('utf-8')
-            reply = data
             # if no data has been sent the connection has been closed
             if data:
                 # print(reply)
                 # parse the client data into the game_data Dictionary, and send the result back to the client
-                game_data_dict[game_id][str(this_pid)] = json.loads(reply)
+                game_data_dict[game_id][str(this_pid)] = json.loads(data)
                 # print(game_data_dict[game_id][this_pid])
                 deaths = game_data_dict[game_id][str(this_pid)]["killed_by"]
                 kills = list(map(lambda x: x[1]["killed_by"][:4],  # type: ignore[no-any-return]
