@@ -164,7 +164,7 @@ class Weapon(Animated):
         print(f"durability: {self.durability}")
         # Play sound of the weapon
         if self.durability <= 0:
-            # weapon destroy --> weapon will disappear
+            # weapon destroy --> weapon disappears
             self.destroyed = True
             self.sound_destroy.play()
         else:
