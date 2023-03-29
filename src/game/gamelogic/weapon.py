@@ -67,7 +67,7 @@ class Weapon(Animated):
         # Durability of the weapon
         self.durability = 100
 
-        # TODO
+        # preloads the dataframes for the weapon, so that they do not have to be reloaded or generated again
         if self.weapon_type.value["abs_l"] is None:
             self.abs_l, self.abs_r, self.rel_l, self.rel_r = self.load_dfs()
             self.weapon_type.value["abs_l"] = self.abs_l
