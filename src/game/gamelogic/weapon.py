@@ -90,7 +90,8 @@ class Weapon(Animated):
         returns the data frame of the weapon
         """
         try:
-            if self.animation_direction == 0:  # Player direction right
+            if self.animation_direction == 0:
+                # Player direction right
                 erg = copy(self.rel_r[frame])
                 erg['x'] = erg['x'].map(lambda x: x + self.x)
                 erg['y'] = erg['y'].map(lambda y: y + self.y)
@@ -102,7 +103,8 @@ class Weapon(Animated):
                 erg['y'] = erg['y'].map(lambda y: y + self.y)
                 return erg
         except IndexError:
-            if self.animation_direction == 0:  # Player direction right
+            if self.animation_direction == 0:
+                # Player direction right
                 erg = copy(self.rel_r[self.current_frame])
                 erg['x'] = erg['x'].map(lambda x: x + self.x)
                 erg['y'] = erg['y'].map(lambda y: y + self.y)
@@ -123,7 +125,8 @@ class Weapon(Animated):
         self.y = kwargs["y"] + kwargs["height"] - self.frame_height
         if self.animation_direction == 1:  # Player direction left
             self.x = kwargs["x"] + kwargs["width"] - self.frame_width
-        else:  # Player direction right
+        else:
+            # Player direction right
             self.x = kwargs["x"]
         super(Weapon, self).draw(g=kwargs["g"])
 
@@ -205,7 +208,7 @@ class Weapon(Animated):
             else:
                 # Reset that the player has hit me
                 player_other.weapon.hitted_me = False
-            # check if a weapon shot has hit a player
+            # Check if a weapon shot has hit a player
             for shot in player_other.weapon_shots:
                 # Check if the shot has a collision with me and the shot is active
                 if not pd.merge(shot.get_dataframe(), player_df, how='inner', on=['x', 'y']).empty and shot.active:
