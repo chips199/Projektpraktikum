@@ -81,7 +81,7 @@ players_connected = dict()
 empty_game = [0] * number_of_players_per_game
 for k in game_data_dict.keys():
     players_connected[k] = copy.deepcopy(empty_game)
-#[[0,0,0,0][0,0,0,0][0,0,0,0]]
+# [[0,0,0,0][0,0,0,0][0,0,0,0]]
 
 print(game_data_dict)
 print(spawn_points)
@@ -171,7 +171,7 @@ def reset_games():
 
 
 def threaded_client(conn):
-    global game_data_dict, players_connected#, maps_dict
+    global game_data_dict, players_connected  # , maps_dict
     # receiving the first message
     start_msg = conn.recv(2048).decode()
     print(start_msg)
