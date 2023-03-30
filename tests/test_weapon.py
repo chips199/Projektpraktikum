@@ -15,6 +15,8 @@ from freezegun import freeze_time
 
 @pytest.fixture(scope="session")
 def setup():
+    # setup test subject and initialize game
+
     pygame.init()
     pygame.display.set_mode((50, 50))
     wrk_dir = os.path.abspath(os.path.dirname(__file__))
@@ -41,6 +43,8 @@ def test_getObj():
 
 
 def test_get_dataframe(setup):
+    # iterates through weapons in setup to test for the return datatype of get dataframe
+
     for i in setup:
         i.animation_direction = 0
         assert isinstance(i.get_dataframe(), pd.DataFrame)
@@ -49,6 +53,8 @@ def test_get_dataframe(setup):
 
 
 def test_draw(setup):
+    # iterates through weapons in setup to test for an error free draw method execution
+
     test_canvas = canvas.Canvas(100, 100)
     for i in setup:
         i.x = 100
@@ -81,6 +87,8 @@ def test_get_position_weapon_shot(setup):
 
 
 def test_can_hit(setup):
+    # iterates through weapons in setup to test for the correct return value of can_hit
+
     for i in setup:
         i.durability = 10
         i.last_hit = 100000

@@ -9,6 +9,7 @@ import pygame
 
 @pytest.fixture(scope="session")
 def p_setup():
+    # set up one player to test
     pygame.init()
     pygame.display.set_mode((50, 50))
     basicmap = os.path.join((os.path.abspath(os.path.dirname(__file__))), "mock_resources", "basicmap")
@@ -20,6 +21,7 @@ def p_setup():
 
 @pytest.fixture(scope="session")
 def setup():
+    # set up four players to test
     pygame.init()
     pygame.display.set_mode((50, 50))
     basicmap = os.path.join((os.path.abspath(os.path.dirname(__file__))), "mock_resources", "basicmap")
