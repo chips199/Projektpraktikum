@@ -341,10 +341,7 @@ class MenuSetup:
                                    height=self.h,
                                    text="Session ID: {}".format(self.data["s_id"]),
                                    font=("None", self.h * 0.6))
-        session_id_label.place(x=50 * self.sizing_width,
-                               y=int((self.label_game_name.winfo_y() +  # type:ignore[union-attr]
-                                      self.label_game_name.winfo_height() +  # type:ignore[union-attr]
-                                      10) * self.sizing_height))
+        session_id_label.place(relx=0.01, rely=0.2)
 
         # Create a start button widget and place it in the lobby frame
         button_start = tk.CTkButton(master=self.lobby_frame,
