@@ -7,6 +7,7 @@ from matplotlib import pyplot as plt
 from pandas import DataFrame
 
 from src.game.gamelogic import weapon
+from src.game.gamelogic.game import Game
 from src.game.gamelogic.item import Item
 from src.game.gamelogic.weapon import WeaponType
 
@@ -18,7 +19,13 @@ class Map:
     staticimages = list()  # type: List[pygame.surface.Surface]
     player_uris = list()  # type: List[str]
 
-    def __init__(self, game, uri):
+    def __init__(self, game: Game, uri: str) -> None:
+        """
+        Initialize a new instance of the Inventory class.
+
+        :param game: The instance of the game
+        :param uri: A string containing the path to the directory.
+        """
         self.game = game
         self.directory = uri
         self.items = list()
@@ -92,30 +99,58 @@ class Map:
                 self.static_objects_img.blit(image, (0, 0))
             self.static_objects_img = self.static_objects_img.convert_alpha()
 
-    def setitems(self, item_dict):
+    def setitems(self, item_dict) -> None:
+        """
+        Set the items on the game board based on the item dictionary.
+        :param item_dict: Dictionary containing weapon names as keys and a list of positions as values.
+        """
+        # Iterate through each item in the dictionary
         for k, v in item_dict.items():
+            # Iterate through each position for the current item
             for pos in v:
+                # Check if the item is already in the game
                 if not list(map(lambda i: [i.x, i.y], self.items)).__contains__(pos):
+                    # Create a new Item object for the current position and add it to the game's items list
                     self.items.append(Item(WeaponType.getObj(k), pos, self.weapon_path[k]))
+
+        # Iterate through each item in the game's items list
         for i in self.items:
+            # Check if the item's position is in the dictionary
             if not item_dict[i.type.name].__contains__([i.x, i.y]):
+                # If the item is not in the dictionary, remove it from the game's items list
                 self.items.remove(i)
 
-    def draw_items(self, screen):
+    def draw_items(self, screen: pygame.Surface) -> None:
+        """
+        Draw all items in the game on the given screen.
+
+        :param screen: The surface on which to draw the items.
+        """
         for i in self.items:
             i.draw(screen)
 
-    def draw_background(self, screen):
+    def draw_background(self, screen: pygame.Surface) -> None:
+        """
+        Draws the game background on the screen using Pygame blit function
+
+        :param screen: Pygame screen object to blit the background on
+        :return: None
+        """
         canvas_rec = pygame.Rect(0, 0, self.game.width, self.game.height)
         if isinstance(self.background, pygame.Surface):
             screen.blit(self.background, canvas_rec)
 
-    def draw_solids(self, screen):
+    def draw_solids(self, screen: pygame.Surface) -> None:
+        """
+        Draw the static objects (solids) on the screen
+
+        :param screen: Pygame screen object to blit the solids on
+        """
         canvas_rec = pygame.Rect(0, 0, self.game.width, self.game.height)
         if len(self.staticimages) != 0:
             screen.blit(self.static_objects_img, canvas_rec)
 
-    def music_load(self):
+    def music_load(self) -> None:
         """
         Loads the music from the folder and starts playing it
         :return:
