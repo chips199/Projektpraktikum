@@ -161,7 +161,7 @@ class Weapon(Animated):
         """
         self.durability -= self.weapon_type.value["damage_to_weapon_per_hit"]
         self.last_hit = int(round(datetime.now().timestamp()))
-        print(f"durability: {self.durability}")
+        # print(f"durability: {self.durability}")
         # Play sound of the weapon
         if self.durability <= 0:
             # weapon destroy --> weapon disappears
