@@ -59,6 +59,9 @@ class Network:
         # print(self.spawnpoints)
         return self.send("ready")
 
+    # def getSpawnpoint(self, id):
+    #     return self.spawnpoints[str(id)]
+
     def get_max_number_of_players(self):
         return self.send("get max players")
 
