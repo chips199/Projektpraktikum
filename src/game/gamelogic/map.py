@@ -157,4 +157,4 @@ class Map:
         # Load Music
         self.music = Music(self.directory + r"\music", 1.0)
         # Start Music
-        self.music.play()
+        self.music.play()  # type: ignore[attr-defined]
