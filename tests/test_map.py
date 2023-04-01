@@ -8,6 +8,9 @@ import src.game.gamelogic.canvas as canvas
 
 @pytest.fixture(scope="session")
 def setup():
+
+    # set up test subject
+
     pygame.init()
     game = MagicMock()
     game.width = 50
@@ -23,19 +26,31 @@ def setup():
 
 
 def test_draw_solids(setup):
+
+    # check for error free execution
+
     test_canvas = canvas.Canvas(50, 50)
     assert setup.draw_solids(test_canvas.get_canvas()) is None
 
 
 def test_draw_background(setup):
+
+    # check for error free execution
+
     test_canvas = canvas.Canvas(50, 50)
     assert setup.draw_background(test_canvas.get_canvas()) is None
 
 
 def test_draw_items(setup):
+
+    # check for error free execution
+
     test_canvas = canvas.Canvas(50, 50)
     assert setup.draw_items(test_canvas.get_canvas()) is None
 
 
 def test_load_music(setup):
+
+    # check for error free execution
+
     assert setup.music_load() is None

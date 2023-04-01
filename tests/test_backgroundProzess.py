@@ -4,6 +4,9 @@ import time
 
 
 def test_background_connection():
+
+    # check for successfull creation of background process
+
     conn1, conn2 = multiprocessing.Pipe(duplex=True)
     connection = multiprocessing.Process(target=process.backgroundProzess, args=("abc", conn2))
     connection.start()

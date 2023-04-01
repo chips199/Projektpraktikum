@@ -21,6 +21,9 @@ def setup_canvas():
 
 
 def test_set_pos(setup):
+
+    # check for correct results
+
     setup.set_pos(1, 2)
     assert setup.x == 1
     assert setup.y == 2
@@ -36,10 +39,16 @@ def test_set_pos(setup):
 
 
 def test_draw(setup, setup_canvas):
+
+    # test error free execution
+
     assert setup.draw(g=setup_canvas.get_canvas()) is None
 
 
 def test_cut_frames(setup):
+
+    # check for correct result of function
+
     length = len(setup.images_right) - 1
     setup.cut_frames(2)
     if length % 2 == 0:
@@ -50,6 +59,9 @@ def test_cut_frames(setup):
 
 
 def test_double_frames(setup):
+
+    # check for correct result of function
+
     length = len(setup.images_right)
     setup.double_frames(1)
     assert len(setup.images_right) - 1 == length * 2 - 1
@@ -59,16 +71,25 @@ def test_double_frames(setup):
 
 
 def test_draw_animation_once(setup, setup_canvas):
+
+    # test error free execution
+
     assert setup.draw_animation_once(setup_canvas.get_canvas()) is None
 
 
 def test_stop_animation(setup):
+
+    # check for correct result of function
+
     setup.animation_running = True
     setup.stop_animation()
     assert setup.animation_running is False
 
 
 def test_start_animation(setup):
+
+    # check for correct result for every direction
+
     dir = 0
     while dir < 4:
         setup.animation_running = False
@@ -79,12 +100,18 @@ def test_start_animation(setup):
 
 
 def test_load_images(setup):
+
+    # check for correct datatype of return value
+
     res = setup.load_images()
     for i in res:
         assert isinstance(i, list)
 
 
 def test_load_dfs(setup):
+
+    # check for correct datatype of return value
+
     res = setup.load_dfs()
     for i in res:
         assert isinstance(i, list)
@@ -93,6 +120,9 @@ def test_load_dfs(setup):
 
 
 def test_animate(setup, setup_canvas):
+
+    # check for error free execution in both directions
+
     setup.animation_direction = 0
     assert setup.animate(setup_canvas.get_canvas(), setup.load_images()[0]) is None
     setup.animation_direction = 1

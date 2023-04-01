@@ -13,6 +13,9 @@ import datetime
 
 @pytest.fixture(scope="session")
 def setup():
+
+    # set up test game
+
     pygame.init()
     conn1, conn2 = multiprocessing.Pipe(duplex=True)
     test_process = multiprocessing.Process(target=process.backgroundProzess, args=("abc", conn2))
@@ -24,6 +27,9 @@ def setup():
 
 
 def test_print_loading(setup):
+
+    # test error free execution for every percentage on 0.1 steps
+
     i = 0
     while i < 1.1:
         assert setup.print_loading(i) is None
@@ -31,14 +37,23 @@ def test_print_loading(setup):
 
 
 def test_update_background_process(setup):
+
+    # test error free execution
+
     assert setup.update_background_process() is None
 
 
 def test_send_to_background_process(setup):
+
+    # test error free execution
+
     assert setup.send_to_background_process() is None
 
 
 def test_parse(setup):
+
+    # check for correct datatype of the return value
+
     res = setup.parse()
     assert isinstance(res, tuple)
     for key in res:
@@ -48,6 +63,9 @@ def test_parse(setup):
 
 def test_next_to_solid(setup):
     # this method also tests next_to_solid_df by call
+    # check for correct return values of function
+    # return value should be the distance
+
     player = MagicMock()
     player.solid_df = pd.DataFrame([(2, 2)], columns=["x", "y"])
     setup.map.solid_df = pd.DataFrame([(5, 3)], columns=["x", "y"])
@@ -66,6 +84,9 @@ def test_next_to_solid(setup):
 
 
 def set_data():
+
+    # sample data to test the functions and set up the test game
+
     data = {
         "id": 1,
         "0": {

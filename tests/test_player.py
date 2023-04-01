@@ -33,6 +33,10 @@ def setup():
 
 
 def test_velocity(p_setup):
+
+    # execute method and check for correct values
+    # default values, positive values, negative values, zero values
+
     p_setup.set_velocity()
     assert p_setup.moving_velocity_on_ground == 1
     assert p_setup.moving_velocity_in_air == 1
@@ -56,6 +60,9 @@ def test_velocity(p_setup):
 
 
 def test_keep_sliding(p_setup):
+
+    # set parameters
+
     p_setup.landed = True
     p_setup.moving_on_edge = True
     p_setup.is_falling = False
@@ -65,22 +72,37 @@ def test_keep_sliding(p_setup):
     p_setup.max_sliding_frames = 1
     p_setup.keep_sliding(test_fun)
     p_setup.animation_direction = 0
+
+    # execute function and check for correct result
+
     p_setup.keep_sliding(test_fun)
     assert p_setup.sliding_frame_counter == 1
 
 
 def test_reset_sliding_counter(p_setup):
+
+    # check for error free execution and correct result
+
     assert p_setup.reset_sliding_counter() is None
     assert p_setup.sliding_frame_counter == p_setup.max_sliding_frames
 
 
 def test_stop_sliding(p_setup):
+
+    # set parameters and execute function
+
     p_setup.sliding_frame_counter = 12
     p_setup.stop_sliding()
+
+    # check for correct result
+
     assert p_setup.sliding_frame_counter == 1
 
 
 def test_draw(p_setup):
+
+    # set parameters and check for error free execution
+
     c = canvas.Canvas(50, 50)
     p_setup.health = 0
     assert p_setup.draw(c.get_canvas()) is None
@@ -93,32 +115,44 @@ def test_draw(p_setup):
 # using == instead of "is" to compare boolean values
 # reason for this is the failing comparison in this case using is
 def test_shift_df(p_setup):
+
+    # alternating set parameters and check for result
+
     p_setup.shift_df(p_setup.solid_df, 0, 1)
-    assert (p_setup.solid_df["x"] == 3).any() == False
+    assert (p_setup.solid_df["x"] == 2).any() == True
     p_setup.shift_df(p_setup.solid_df, 0, -1)
     assert (p_setup.solid_df["x"] == 1).any() == True
     p_setup.shift_df(p_setup.solid_df, 0, 1)
     p_setup.shift_df(p_setup.solid_df, 1, 1)
     assert (p_setup.solid_df["x"] == 1).any() == True
     p_setup.shift_df(p_setup.solid_df, 1, -1)
-    assert (p_setup.solid_df["x"] == 3).any() == False
+    assert (p_setup.solid_df["x"] == 2).any() == True
     p_setup.shift_df(p_setup.solid_df, 2, 1)
     assert (p_setup.solid_df["y"] == 4).any() == True
     p_setup.shift_df(p_setup.solid_df, 2, -1)
     assert (p_setup.solid_df["y"] == 2).any() == True
     p_setup.shift_df(p_setup.solid_df, 3, -1)
-    assert (p_setup.solid_df["y"] == 6).any() == False
+    assert (p_setup.solid_df["y"] == 4).any() == True
     p_setup.shift_df(p_setup.solid_df, 3, 1)
     assert (p_setup.solid_df["y"] == 4).any() == True
 
 
 def test_move(p_setup):
+
+    # check for error free execution in every direction
+
     assert p_setup.move(0) is None
     assert p_setup.move(1) is None
     assert p_setup.move(2) is None
     assert p_setup.move(3) is None
+
+    # set up parameter
+
     p_setup.x = 0
     p_setup.y = 0
+
+    # check for correct results
+
     p_setup.move(0, 1)
     assert p_setup.x == 1
     p_setup.move(1, 1)
@@ -130,6 +164,9 @@ def test_move(p_setup):
 
 
 def test_jump(p_setup):
+
+    # set parameters and test for error free execution
+
     next_to_solid = Mock(return_value=2)
     p_setup.is_falling = False
     assert p_setup.jump(next_to_solid) is None
@@ -148,6 +185,10 @@ def test_jump(p_setup):
 
 
 def test_start_blocking(p_setup):
+
+    # set parameters and check for correct results
+    # other parameter value not tested because the called function is tested separately
+
     p_setup.is_blocking = False
     p_setup.block_x_axis = False
     p_setup.start_blocking()
@@ -156,14 +197,26 @@ def test_start_blocking(p_setup):
 
 
 def test_stop_blocking(p_setup):
+
+    # set parameters and check for correct results
+
     p_setup.is_blocking = True
     p_setup.block_x_axis = True
     p_setup.stop_blocking()
     assert p_setup.is_blocking is False
     assert p_setup.block_x_axis is False
 
+    p_setup.is_blocking = False
+    p_setup.block_x_axis = False
+    p_setup.stop_blocking()
+    assert p_setup.is_blocking is False
+    assert p_setup.block_x_axis is False
+
 
 def test_is_alive(p_setup):
+
+    # set parameters and test for result
+
     p_setup.health = 50
     assert p_setup.is_alive() is True
     p_setup.health = 0
@@ -173,6 +226,10 @@ def test_is_alive(p_setup):
 
 
 def test_refresh_solids(p_setup):
+
+    # set parameters and check for correct results
+    # the setup.x and y should be added onto the test paramter
+
     p_setup.relativ_solids_df = pd.DataFrame([(1, 1)], columns=["x", "y"])
     p_setup.x = 1
     p_setup.y = 1
@@ -194,6 +251,9 @@ def test_refresh_solids(p_setup):
 
 
 def test_falling(p_setup):
+
+    # set parameters and check for correct results
+
     next_to_solid = Mock(return_value=10)
     p_setup.is_jumping = False
     assert p_setup.falling(next_to_solid) is None
@@ -212,12 +272,19 @@ def test_falling(p_setup):
 
 
 def test_get_color(setup):
+
+    # set parameters and check for correct results
+
     test = [setup[0].get_color(setup[0].directory), setup[0].get_color(setup[1].directory), setup[2].get_color(setup[2].directory), setup[3].get_color(setup[3].directory)]
     assert "magenta" in test
     assert len(test) == 4
 
 
 def test_add_shot(p_setup):
+
+    # set parameters and check for correct results
+    # direction, amount and color are tested
+
     p_setup.animation_direction = 0
 
     assert len(p_setup.weapon_shots) == 0

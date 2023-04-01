@@ -11,6 +11,10 @@ def setup():
 
 
 def test_clear_frame(setup):
+
+    # call function and check for correct calls and error free execution
+    # every widget should be destroyed
+
     for widget in setup.winfo_children():
         widget.place_forget = MagicMock()
         widget.destroy = MagicMock()

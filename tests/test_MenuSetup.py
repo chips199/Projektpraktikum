@@ -9,6 +9,9 @@ import src.game.menu.MyFrame as frame
 
 @pytest.fixture()
 def setup():
+
+    # set up test menu
+
     pygame.init()
     test_menu = menu.MenuSetup()
     test_menu.label_error = Mock()
@@ -30,16 +33,25 @@ def setup():
 
 
 def test_load_main_frame(setup):
+
+    # check for error free execution
+
     assert setup.load_main_frame() is None
 
 
 def test_load_interaction_frame(setup):
+
+    # check for error free execution
+
     while setup.test:
         assert setup.root.update() is None
         assert setup.load_interaction_frame() is None
 
 
 def test_load_choose_map_frame(setup):
+
+    # check for error free execution and correct calls
+
     while setup.test:
         assert setup.load_choose_map_frame() is None
         setup.interaction_frame.destroy.assert_called()
@@ -47,6 +59,9 @@ def test_load_choose_map_frame(setup):
 
 
 def test_load_lobby_frame(setup):
+
+    # check for error free execution and correct calls
+
     while setup.test:
         assert setup.load_lobby_frame() is None
         setup.back_button.configure.assert_called_with(text="Leave Lobby")
@@ -56,6 +71,9 @@ def test_load_lobby_frame(setup):
 
 # loop
 def test_load_player(setup):
+
+    # check for error free execution
+
     while setup.test:
         path = os.path.join("mock_resources", "basicmap", "player", "basic_player_magenta.png")
         assert setup.load_player(5.0, path) is None
@@ -65,6 +83,9 @@ def test_load_player(setup):
 
 
 def test_update_player(setup):
+
+    # check for error free execution and correct calls
+
     setup.data["map"] = "schneemap"
     assert setup.update_player() is None
     setup.main_frame.after.assert_called()
@@ -80,10 +101,16 @@ def test_update_player(setup):
 
 
 def test_create_lobby(setup):
+
+    # check for error free execution
+
     assert setup.create_lobby("Schneemap") is None
 
 
 def test_start_network(setup):
+
+    # check for error free execution and correct calls
+
     success_func = MagicMock()
     update_func = MagicMock()
     assert setup.start_network("test", success_func, update_func) is None
@@ -92,6 +119,9 @@ def test_start_network(setup):
 
 
 def test_start_game(setup):
+
+    # check for error free execution and correct calls
+
     with patch('src.game.gamelogic.game.Game') as game_mock:
         assert setup.start_game() is None
         game_mock.assert_called()
@@ -101,11 +131,17 @@ def test_start_game(setup):
 
 
 def test_back_to_start(setup):
+
+    # check for error free execution
+
     while setup.test:
         assert setup.back_to_start() is None
 
 
 def test_if_game_started(setup):
+
+    # check for error free execution and correct calls
+
     with patch('src.game.gamelogic.game.Game') as game_mock:
         setup.data["game_started"] = True
         assert setup.check_if_game_started() is None
@@ -115,10 +151,16 @@ def test_if_game_started(setup):
 
 
 def test_update_background_process(setup):
+
+    # check for error free execution
+
     assert setup.update_background_process() is None
 
 
 def test_clear_frame_sliding(setup):
+
+    # check for error free execution
+
     test_frame = MagicMock()
     assert setup.clear_frame_sliding(test_frame, "n", 10, 0) is None
     assert setup.clear_frame_sliding(test_frame, "ne", 0, 20) is None

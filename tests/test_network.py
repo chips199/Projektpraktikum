@@ -29,6 +29,9 @@ def setup():
 
 
 def test_lobby_check():
+
+    # set parameters and check for correct results
+
     con1 = network.Network("schneemap")
     network.Network(con1.session_id)
     network.Network(con1.session_id)
@@ -36,26 +39,41 @@ def test_lobby_check():
 
 
 def test_send():
+
+    # set parameters and check for correct results
+
     con1 = network.Network("schneemap")
     assert con1.send("ready") is not None
 
 
 def test_start_game():
+
+    # set parameters and check for correct results
+
     con1 = network.Network("schneemap")
     assert con1.start_game() == 'schneemap'
 
 
 def test_get_max_players():
+
+    # set parameters and check for correct results
+
     con1 = network.Network("schneemap")
     assert con1.get_max_number_of_players() == con1.send("get max players")
 
 
 def test_get_map():
+
+    # set parameters and check for correct results
+
     con1 = network.Network("schneemap")
     assert con1.get_map() == con1.send("get Mapname")
 
 
 def test_game_started():
+
+    # set parameters and check for correct results
+
     con1 = network.Network("schneemap")
     assert con1.game_started() is False
     # game start cannot be mocked without huge unnecessary effort. Tested exploratively
