@@ -89,6 +89,9 @@ print(players_connected)
 
 
 def game_server(game_id, this_gid):
+    """
+        provides metadata with the start and end of a game as well as spawning and despawning items
+    """
     global game_data_dict
     # wait until game starts or exit if lobby was closed
     # while not players_connected[this_gid].__contains__(3):
@@ -171,6 +174,9 @@ def reset_games():
 
 
 def threaded_client(conn):
+    """
+        handles a connection to a client from creating/joining a lobby up to the game loop and disconnections
+    """
     global game_data_dict, players_connected  # , maps_dict
     # receiving the first message
     start_msg = conn.recv(2048).decode()
