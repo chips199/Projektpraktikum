@@ -1,3 +1,5 @@
+from typing import Union
+
 import pandas as pd
 import pygame.image
 from src.game.gamelogic import weapon
