@@ -19,13 +19,12 @@ class WeaponType(Enum):
     Laser = {"Damage": 15, "damage_to_weapon_per_hit": 10, "Cooldown": 2, "IsShortRange": False, "shot_speed": 15, "sound_level": 0.9, "abs_l": None, "abs_r": None, "rel_l": None, "rel_r": None}
 
     @staticmethod
-    def getObj(weapon_type_string):
+    def getObj(string):
         """
-        Returns the WeaponType for a String
-        @param: weapon_type_string: Name of a WeaponType
+        searches for a weapon by string returns fists if string is not found
         """
         for e in WeaponType:
-            if e.name == weapon_type_string:
+            if e.name == string:
                 return e
         return WeaponType.Fist
 
@@ -51,15 +50,7 @@ class Weapon(Animated):
         # Cuts the picture of the Fists
         if self.weapon_type == WeaponType.Fist:
             self.cut_frames(2)
-        # Load Image of the Weapon
-        self.drop_img = None
-        try:
-            self.drop_img = pygame.image.load(
-                "\\".join(self.directory.split("\\")[:-2]) + "\\" + self.weapon_type.name + ".png").convert_alpha()
-        except FileNotFoundError:
-            pass
 
-        # Cooldown
         self.last_hit = int(round(datetime.now().timestamp()))
         # Saves if the weapon has hit me
         self.hitted = list()
@@ -150,7 +141,8 @@ class Weapon(Animated):
          - Shelf life not yet used up
          - Cooldown must have expired
         """
-        return self.durability > 0 and self.last_hit + self.weapon_type.value["Cooldown"] <= int(round(datetime.now().timestamp()))
+        return self.durability > 0 and self.last_hit + self.weapon_type.value["Cooldown"] <= int(
+            round(datetime.now().timestamp()))
 
     def hit(self):
         """

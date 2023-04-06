@@ -52,24 +52,27 @@ class Network:
             return str(e)
 
     def check_lobby(self):
+        """
+        returns the number of players in the lobby provided by the server
+        """
         return self.send("lobby_check")
 
     def start_game(self):
+        """
+        sets the spawnpoints provided by the server and starts a game
+        """
         self.spawnpoints = json.loads(self.send("get_spawnpoints"))
-        # print(self.spawnpoints)
         return self.send("ready")
 
-    # def getSpawnpoint(self, id):
-    #     return self.spawnpoints[str(id)]
-
-    def get_max_number_of_players(self):
-        return self.send("get max players")
-
     def get_map(self):
+        """
+        returns the name of the map selected in the lobby
+        """
         return self.send("get Mapname")
 
     def game_started(self):
+        """
+        checks if the game has started
+        """
         rpl = self.send("game started")
-        # print("rpl: " + rpl)
-        # print("bool: " + str(rpl == "True"))
         return rpl == "True"
