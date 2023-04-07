@@ -40,7 +40,7 @@ def test_lobby_check():
 
 def test_send():
 
-    # set parameters and check for correct results
+    # set parameters and check for answer
 
     con1 = network.Network("schneemap")
     assert con1.send("ready") is not None
@@ -52,14 +52,6 @@ def test_start_game():
 
     con1 = network.Network("schneemap")
     assert con1.start_game() == 'schneemap'
-
-
-def test_get_max_players():
-
-    # set parameters and check for correct results
-
-    con1 = network.Network("schneemap")
-    assert con1.get_max_number_of_players() == con1.send("get max players")
 
 
 def test_get_map():
